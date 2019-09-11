@@ -11,6 +11,8 @@
 #
 ################################################################################
 
+myproject(${TARGET_NAME})
+
 cmake_policy(SET CMP0003 NEW)
 cmake_policy(SET CMP0020 NEW)
 

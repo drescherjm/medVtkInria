@@ -29,9 +29,16 @@ PURPOSE.  See the above copyright notices for more information.
 #include <time.h>
 #include <cstdlib>
 #include <vector>
+#include "smvtkInteractorStyleImageView2D.h"
+#include <QApplication>
+#include "smvtkInteractorStyle2D.h"
 
-int vtkImageViewTest7_SynchronizedViews(int argc, char* argv[])
+
+int main(int argc, char* argv[])
 {
+
+  // QT Stuff
+  QApplication app( argc, argv );
 
   vtkImageView2D* view1 = vtkImageView2D::New();
   vtkImageView2D* view2 = vtkImageView2D::New();
@@ -43,6 +50,18 @@ int vtkImageViewTest7_SynchronizedViews(int argc, char* argv[])
   vtkRenderWindowInteractor* iren3 = vtkRenderWindowInteractor::New();
   vtkRenderWindowInteractor* iren4 = vtkRenderWindowInteractor::New();
 
+  smvtkInteractorStyleImageView2D* irenStyle1 = smvtkInteractorStyle2D::New();
+  smvtkInteractorStyleImageView2D* irenStyle2 = smvtkInteractorStyle2D::New();
+  smvtkInteractorStyleImageView2D* irenStyle3 = smvtkInteractorStyle2D::New();
+
+  view1->SetInteractorStyle(irenStyle1);
+  view2->SetInteractorStyle(irenStyle2);
+  view3->SetInteractorStyle(irenStyle3);
+
+  iren1->SetInteractorStyle(irenStyle1);
+  iren2->SetInteractorStyle(irenStyle2);
+  iren3->SetInteractorStyle(irenStyle3);
+  
   vtkRenderWindow* rwin1 = vtkRenderWindow::New();
   vtkRenderWindow* rwin2 = vtkRenderWindow::New();
   vtkRenderWindow* rwin3 = vtkRenderWindow::New();
@@ -73,6 +92,9 @@ int vtkImageViewTest7_SynchronizedViews(int argc, char* argv[])
   view3->SetRenderer ( renderer3 );
   view4->SetRenderer ( renderer4 );
 
+  view1->SetCursorFollowMouse(0);
+  view2->SetCursorFollowMouse(0);
+  view3->SetCursorFollowMouse(0);
   
   view1->SetSliceOrientation (vtkImageView2D::SLICE_ORIENTATION_XY);
   view2->SetSliceOrientation (vtkImageView2D::SLICE_ORIENTATION_XZ);
@@ -106,7 +128,7 @@ int vtkImageViewTest7_SynchronizedViews(int argc, char* argv[])
   imageSource->SetRadius (64,32,32);
   imageSource->Update();
 
-  auto image = imageSource->GetOutputPort();
+  vtkImageData* image = imageSource->GetOutput();
   
   pool->SyncSetInput (image, 0);
   

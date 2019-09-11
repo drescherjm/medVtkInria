@@ -23,6 +23,12 @@ endif()
 PROJECT(vtkINRIA3D)
 cmake_minimum_required(VERSION 3.12)
 
+set (${PROJECT_NAME}_VERSION_MAJOR 2)
+set (${PROJECT_NAME}_VERSION_MINOR 0)
+set (${PROJECT_NAME}_VERSION_PATCH 0)
+
+set (${PROJECT_NAME}_VERSION_PATCH_CLEAN ${${PROJECT_NAME}_VERSION_PATCH})
+
 if(COMMAND cmake_policy)
   cmake_policy(SET CMP0003 NEW)
   cmake_policy(SET CMP0020 NEW)
@@ -88,8 +94,10 @@ endif()
 ## #############################################################################
 
 set(${PROJECT_NAME}_CMAKE_DIR
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake
-  ${CMAKE_CURRENT_SOURCE_DIR}/cmake/module
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/module
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/External/Modules
+  ${CMAKE_CURRENT_SOURCE_DIR}/CMake/External/Scripts
   )
 
 set(CMAKE_MODULE_PATH
@@ -104,6 +112,15 @@ include(set_lib_install_rules)
 include(set_lib_properties_variables)
 include(set_plugin_install_rules)
 include(set_plugin_install_rules_legacy)
+include(HelperMacros)
+include(GetCompilerVersion)
+include(NamingConvention)
+include(SubversionVersionInfo)
+include(UnoptimizedRelWithDebInfo)
+include(SetupProject)
+include(SupportQt)
+
+setup_project(${PROJECT_NAME})
 
 include(add_plugins)
 
