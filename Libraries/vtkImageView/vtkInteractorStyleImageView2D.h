@@ -103,12 +103,12 @@ protected:
   void operator=(const vtkInteractorStyleImageView2D&);  // Not implemented.
 
 
+protected:
   int LeftButtonInteraction;
   int RightButtonInteraction;
   int MiddleButtonInteraction;
   int WheelButtonInteraction;
   int KeyboardInteraction;
-  
 };
 
 

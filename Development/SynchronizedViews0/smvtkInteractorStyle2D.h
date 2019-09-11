@@ -1,13 +1,17 @@
-#ifndef __SMVTKINTERACTORSTYLE2D_H__
-#define __SMVTKINTERACTORSTYLE2D_H__
+#pragma once
+
+#ifndef SMVTKINTERACTORSTYLE2D_H
+#define SMVTKINTERACTORSTYLE2D_H
 
 #include "smvtkInteractorStyleImageView2D.h"
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 class smvtkInteractorStyle2D : public smvtkInteractorStyleImageView2D
 {
 public:
 	static smvtkInteractorStyle2D *New();
-	vtkTypeRevisionMacro (smvtkInteractorStyle2D, smvtkInteractorStyleImageView2D);
+	vtkTypeMacro (smvtkInteractorStyle2D, smvtkInteractorStyleImageView2D);
 
 protected:
 	smvtkInteractorStyle2D();
@@ -23,4 +27,6 @@ private:
 
 };
 
-#endif //__SMVTKINTERACTORSTYLE2D_H__
+/////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // SMVTKINTERACTORSTYLE2D_H

@@ -99,9 +99,7 @@ void smvtkInteractorStyleImageView2D::smPrivate::OnMouseMove( smvtkInteractorSty
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-vtkCxxRevisionMacro (smvtkInteractorStyleImageView2D, "$Revision: 1 $");
 vtkStandardNewMacro (smvtkInteractorStyleImageView2D);
-
 
 smvtkInteractorStyleImageView2D::smvtkInteractorStyleImageView2D()
 : vtkInteractorStyleImageView2D()

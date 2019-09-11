@@ -152,4 +152,4 @@ set_lib_install_rules(${TARGET_NAME}
   ${${TARGET_NAME}_HEADERS}
   )
 
-
+set_target_properties(${TARGET_NAME} PROPERTIES FOLDER Libraries)

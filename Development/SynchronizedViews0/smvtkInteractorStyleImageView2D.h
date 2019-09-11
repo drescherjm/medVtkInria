@@ -15,23 +15,25 @@ the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR
 PURPOSE.  See the above copyright notices for more information.
 
 =========================================================================*/
-#ifndef _smvtk_InteractorStyleImageView2D_h_
-#define _smvtk_InteractorStyleImageView2D_h_
+#pragma once
 
+#ifndef SMVTKINTERACTORSTYLEIMAGEVIEW2D_H
+#define SMVTKINTERACTORSTYLEIMAGEVIEW2D_H
 
 #include <vtkInteractorStyleImageView2D.h>
 #include <QSharedPointer>
 
 class smvtkInteractorEvent;
 
+/////////////////////////////////////////////////////////////////////////////////////////
+
 class smvtkInteractorStyleImageView2D : public vtkInteractorStyleImageView2D
 {
 	typedef vtkInteractorStyleImageView2D Superclass;
  public:
   static smvtkInteractorStyleImageView2D *New();
-  vtkTypeRevisionMacro (smvtkInteractorStyleImageView2D, vtkInteractorStyleImageView2D);
-
- 
+  vtkTypeMacro (smvtkInteractorStyleImageView2D, vtkInteractorStyleImageView2D);
+   
   //BTX
   enum InteractionTypeIdsEx
   {
@@ -104,4 +106,6 @@ private:
   
 };
 
-#endif //def _smvtk_InteractorStyleImageView2D_h_
+/////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // SMVTKINTERACTORSTYLEIMAGEVIEW2D_H

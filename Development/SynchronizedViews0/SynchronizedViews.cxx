@@ -72,6 +72,11 @@ int main(int argc, char* argv[])
   vtkRenderer* renderer3 = vtkRenderer::New();
   vtkRenderer* renderer4 = vtkRenderer::New();
 
+  rwin1->SetSize(512, 512);
+  rwin2->SetSize(512, 512);
+  rwin3->SetSize(512, 512);
+  rwin4->SetSize(512, 512);
+
   iren1->SetRenderWindow (rwin1);
   iren2->SetRenderWindow (rwin2);
   iren3->SetRenderWindow (rwin3);
@@ -128,7 +133,7 @@ int main(int argc, char* argv[])
   imageSource->SetRadius (64,32,32);
   imageSource->Update();
 
-  vtkImageData* image = imageSource->GetOutput();
+  auto image = imageSource->GetOutputPort();
   
   pool->SyncSetInput (image, 0);
   

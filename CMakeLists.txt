@@ -36,6 +36,9 @@ endif(COMMAND cmake_policy)
 
 set(TARGET_NAME medVtkInria)
 
+#Use solution folders.
+set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+
 SET(EXECUTABLE_OUTPUT_PATH 
  ${CMAKE_BINARY_DIR}/bin 
  CACHE PATH "Single output directory for building all executables."
