@@ -40,11 +40,9 @@ SET(LIBRARY_OUTPUT_PATH
  CACHE PATH "Single output directory for building all libraries."
 )
 
+option(${PROJECT_NAME}_BUILD_TESTS   		"Build tests"   OFF )
+option(${PROJECT_NAME}_BUILD_DEVELOPMENT   	"Build development examples"   OFF )
 
-option(${PROJECT_NAME}_BUILD_TESTS
-  "Build tests"
-  OFF
-  )
 if(${PROJECT_NAME}_BUILD_TESTS)
     enable_testing()
 endif()
@@ -86,7 +84,6 @@ ELSE()
   set(VTK_OSPRAY_RENDERING_LIBRARY "")
 endif()
 
-
 ## Additionals modules
 ## #############################################################################
 
@@ -118,4 +115,9 @@ add_subdirectory(Libraries)
 
 if(${PROJECT_NAME}_BUILD_TESTS)
   add_subdirectory(tests)
+endif()
+
+
+if(${PROJECT_NAME}_BUILD_DEVELOPMENT)
+  add_subdirectory(Development)
 endif()

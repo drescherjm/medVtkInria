@@ -118,7 +118,7 @@ int vtkImageViewTest7_SynchronizedViews(int argc, char* argv[])
   view2->ShowRulerWidgetOff();
   view3->ShowRulerWidgetOff();
 
-  iren1->Start();
+  iren2->Start();
 
 
 //   view4->ShowActorXOff();
