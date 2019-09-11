@@ -372,8 +372,7 @@ void vtkImageViewCollectionCommand::Execute(vtkObject *caller,
   this->GetCollection()->InitTraversal();
   vtkImageView* v = this->GetCollection()->GetNextItem();
   vtkImageView2D* viewer = NULL;
-
-  
+    
   while(v)
   {
     if (isi == v->GetInteractorStyle())
@@ -381,7 +380,7 @@ void vtkImageViewCollectionCommand::Execute(vtkObject *caller,
     v = this->GetCollection()->GetNextItem();
   }
 
-  if (!viewer || !viewer->GetInput())
+  if (!viewer || !viewer->GetMedVtkImageInfo())
     return;
 
   vtkRenderWindowInteractor *rwi = viewer->GetInteractor();
