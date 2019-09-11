@@ -106,3 +106,11 @@ include(set_plugin_install_rules_legacy)
 include(add_plugins)
 
 add_subdirectory(Libraries)
+
+## #############################################################################
+## Build tests
+## #############################################################################
+
+if(${PROJECT_NAME}_BUILD_TESTS)
+  add_subdirectory(tests)
+endif()
