@@ -430,7 +430,8 @@ void vtkImageView2D::UpdateOrientation()
   // Change axes colors according to orientation
   this->SetSlicePlaneFromOrientation();
   // fix some internal camera settings, do not comment
-  this->ResetCamera();
+  //this->ResetCamera();
+
   // finally update the extent as it might have changed
   this->UpdateDisplayExtent();
   // Restore zoom and pan :
@@ -533,49 +534,109 @@ void vtkImageView2D::UpdateDisplayExtent()
 //----------------------------------------------------------------------------
 void vtkImageView2D::SetViewConvention(int convention)
 {
-  if ( (convention < vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL))
-    return;
+	//   if ( (convention < vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL))
+	//     return;
+	// 
+	//   this->ViewConvention = convention;
+	//   // first vector is the view up for the yz plane (sagittal), directed towards the +z direction
+	//   this->ConventionMatrix->SetElement (2,0, 1);
+	//   // first vector is the view up for the xz plane (coronal),  directed towards the +z direction
+	//   this->ConventionMatrix->SetElement (2,1, 1);
+	//   // first vector is the view up for the xy plane (axial),    directed towards the -y direction
+	//   this->ConventionMatrix->SetElement (1,2, -1);
+	// 
+	//   int x_watcher, y_watcher, z_watcher;
+	// 
+	//   switch(convention)
+	//   {
+	//     case vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL:
+	//     default:
+	//       // for sagittal view, you look from +x point
+	//       x_watcher =  1;
+	//       // for coronal view,  you look from -y point
+	//       y_watcher = -1;
+	//       // for axial view,    you look from -z point
+	//       z_watcher = -1;
+	//       break;
+	//     case vtkImageView2D::VIEW_CONVENTION_NEUROLOGICAL:
+	//       // for sagittal view, you look from +x point
+	//       x_watcher =  1;
+	//       // for coronal view,  you look from +y point
+	//       y_watcher =  1;
+	//       // for axial view,    you look from +z point
+	//       z_watcher =  1;
+	//       break;
+	//       /// \todo We can define oblique convention points of view
+	//       /// that would match cardiologic conventions.
+	//       /// i.e. - A cardiologist looks a heart from short axis (R.V in the righ of plane)
+	//       /// i.e. - A cardiologist looks a heart from 4 chamber  (R.V in the left of plane)
+	//       /// ...
+	//   }
+	//   this->ConventionMatrix->SetElement (0,3, x_watcher);
+	//   this->ConventionMatrix->SetElement (1,3, y_watcher);
+	//   this->ConventionMatrix->SetElement (2,3, z_watcher);
 
-  this->ViewConvention = convention;
-  // first vector is the view up for the yz plane (sagittal), directed towards the +z direction
-  this->ConventionMatrix->SetElement (2,0, 1);
-  // first vector is the view up for the xz plane (coronal),  directed towards the +z direction
-  this->ConventionMatrix->SetElement (2,1, 1);
-  // first vector is the view up for the xy plane (axial),    directed towards the -y direction
-  this->ConventionMatrix->SetElement (1,2, -1);
+	this->ConventionMatrix->Zero();
+	this->ConventionMatrix->SetElement(2, 0, 1);
+	this->ConventionMatrix->SetElement(2, 1, 1);
+	this->ConventionMatrix->SetElement(1, 2, -1);
 
-  int x_watcher, y_watcher, z_watcher;
+	this->ConventionMatrix->SetElement(3, 0, 1);
+	this->ConventionMatrix->SetElement(3, 1, 1);
+	this->ConventionMatrix->SetElement(3, 2, 1);
 
-  switch(convention)
-  {
-    case vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL:
-    default:
-      // for sagittal view, you look from +x point
-      x_watcher =  1;
-      // for coronal view,  you look from -y point
-      y_watcher = -1;
-      // for axial view,    you look from -z point
-      z_watcher = -1;
-      break;
-    case vtkImageView2D::VIEW_CONVENTION_NEUROLOGICAL:
-      // for sagittal view, you look from +x point
-      x_watcher =  1;
-      // for coronal view,  you look from +y point
-      y_watcher =  1;
-      // for axial view,    you look from +z point
-      z_watcher =  1;
-      break;
-      /// \todo We can define oblique convention points of view
-      /// that would match cardiologic conventions.
-      /// i.e. - A cardiologist looks a heart from short axis (R.V in the righ of plane)
-      /// i.e. - A cardiologist looks a heart from 4 chamber  (R.V in the left of plane)
-      /// ...
-  }
-  this->ConventionMatrix->SetElement (0,3, x_watcher);
-  this->ConventionMatrix->SetElement (1,3, y_watcher);
-  this->ConventionMatrix->SetElement (2,3, z_watcher);
+	int x_watcher, y_watcher, z_watcher;
 
-  this->UpdateOrientation();
+	switch (convention)
+	{
+	case vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL_LUNG:
+	default:
+		x_watcher = 1;
+		y_watcher = -1;
+		z_watcher = -1;
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_RADIOLOGICAL_BREAST:
+		x_watcher = -1;
+		y_watcher = -1;
+		z_watcher = 1;
+		this->ConventionMatrix->SetElement(1, 2, 1);
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_NEUROLOGICAL:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = 1;
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL:
+		x_watcher = 1;
+		y_watcher = -1;
+		z_watcher = -1;
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_CORONAL:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = 1;
+		this->ConventionMatrix->SetElement(2, 1, -1);
+		this->ConventionMatrix->SetElement(3, 2, -1);
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_SAGITTAL:
+		x_watcher = -1;
+		y_watcher = 1;
+		z_watcher = 1;
+		this->ConventionMatrix->SetElement(2, 0, -1);
+		this->ConventionMatrix->SetElement(3, 2, -1);
+		break;
+
+		///\todo why not adding cardiologic conventions with oblique points of view ?
+		/// actually we can't: oblique point of view implies resampling data: loss of data... and we don't want that, do we ?
+	}
+
+	this->ConventionMatrix->SetElement(0, 3, x_watcher);
+	this->ConventionMatrix->SetElement(1, 3, y_watcher);
+	this->ConventionMatrix->SetElement(2, 3, z_watcher);
+
+	this->ConventionMatrix->Print(std::cout);
+
+	this->UpdateOrientation();
 }
 
 //----------------------------------------------------------------------------
@@ -922,12 +983,15 @@ int vtkImageView2D::SetCameraFromOrientation()
   conventionposition[id] = this->ConventionMatrix->GetElement (id, 3);
   inverseposition = (vtkMath::Dot (focaltoposition, conventionposition) < 0 );
 
+  
+  
   // invert the cam position if necessary (symmetry along the focal point)
-  if (inverseposition)
+   if (inverseposition)
     for (unsigned int i=0; i<3; i++)
-      position[i] -= 2*focaltoposition[i];
-
-  // finally set the camera with all iinformation.
+      position[i] -= 2* focaltoposition[i];
+  
+	
+  // finally set the camera with all information.
   cam->SetPosition(position[0], position[1], position[2]);
   cam->SetFocalPoint(focalpoint[0], focalpoint[1], focalpoint[2]);
   cam->SetViewUp(viewup[0], viewup[1], viewup[2]);
@@ -938,6 +1002,122 @@ int vtkImageView2D::SetCameraFromOrientation()
   // this should then be set as this->ViewOrientation.
   return id;
 }
+
+// int vtkImageView2D::SetCameraFromOrientation(void)
+// {
+// 	// The camera has already been set as if the image has no orientation.
+// 	// So we just have to adjust its position and view up according
+// 	// to the image orientation and conventions.
+// 
+// 	vtkCamera* cam = this->Renderer ? this->Renderer->GetActiveCamera() : NULL;
+// 	if (!cam)
+// 		return -1;
+// 
+// 	double position[4], focalpoint[4], viewup[4];
+// 	double conventionposition[4];
+// 	double conventionview[4];
+// 	double focaltoposition[3];
+// 	std::vector<double*> viewupchoices;
+// 	double first[3], second[3], third[3], fourth[3];
+// 
+// 
+// 	// First recover information from the camera.
+// 	// Recover also information from the convention matrix
+// 	for (unsigned int i = 0; i < 3; i++)
+// 	{
+// 		position[i] = cam->GetPosition()[i];
+// 		focalpoint[i] = cam->GetFocalPoint()[i];
+// 		conventionposition[i] = this->ConventionMatrix->GetElement(i, 3);
+// 		conventionview[i] = this->ConventionMatrix->GetElement(i, this->SliceOrientation);
+// 	}
+// 
+// 	position[3] = 1;
+// 	focalpoint[3] = 1;
+// 	conventionview[3] = 0;
+// 	viewup[3] = 0;
+// 
+// 	// Apply the orientation matrix to all this information
+// 	if (this->GetOrientationMatrix())
+// 	{
+// 		this->GetOrientationMatrix()->MultiplyPoint(position, position);
+// 		this->GetOrientationMatrix()->MultiplyPoint(focalpoint, focalpoint);
+// 		this->GetOrientationMatrix()->MultiplyPoint(conventionview, conventionview);
+// 		this->GetOrientationMatrix()->MultiplyPoint(conventionposition, conventionposition);
+// 	}
+// 
+// 	// Compute the vector perpendicular to the view
+// 	for (unsigned int i = 0; i < 3; i++)
+// 		focaltoposition[i] = position[i] - focalpoint[i];
+// 
+// 	/*
+// 	// Deal with the position :
+// 	// invert it if necessary (symmetry among the focal point)
+// 	bool inverseposition;
+// 	inverseposition = (vtkMath::Dot (focaltoposition, conventionposition) < 0);
+// 	if (inverseposition)
+// 		for (unsigned int i=0; i<3; i++)
+// 			position[i] -= 2*focaltoposition[i];
+// 	*/
+// 
+// 	// Now we now we have 4 choices for the View-Up information
+// 	for (unsigned int i = 0; i < 3; i++)
+// 	{
+// 		first[i] = conventionview[i];
+// 		second[i] = -conventionview[i];
+// 	}
+// 
+// 	vtkMath::Cross(first, focaltoposition, third);
+// 	vtkMath::Cross(second, focaltoposition, fourth);
+// 	vtkMath::Normalize(third);
+// 	vtkMath::Normalize(fourth);
+// 
+// 	viewupchoices.push_back(first);
+// 	viewupchoices.push_back(second);
+// 	viewupchoices.push_back(third);
+// 	viewupchoices.push_back(fourth);
+// 
+// 	// To choose between these choices, first we find the axis
+// 	// the closest to the focaltoposition vector
+// 	unsigned int id = 0;
+// 	double dot = 0;
+// 	for (unsigned int i = 0; i < 3; i++)
+// 	{
+// 		if (dot < std::abs(focaltoposition[i]))
+// 		{
+// 			dot = std::abs(focaltoposition[i]);
+// 			id = i;
+// 		}
+// 	}
+// 
+// 	// Then we choose the convention matrix vector correspondant to the
+// 	// one we just found
+// 	for (unsigned int i = 0; i < 3; i++)
+// 		conventionview[i] = this->ConventionMatrix->GetElement(i, id);
+// 
+// 	// Then we pick from the 4 solutions the closest to the
+// 	// vector just found
+// 	unsigned int id2 = 0;
+// 	double dot2 = 0;
+// 	for (unsigned int i = 0; i < viewupchoices.size(); i++)
+// 		if (dot2 < vtkMath::Dot(viewupchoices[i], conventionview))
+// 		{
+// 			dot2 = vtkMath::Dot(viewupchoices[i], conventionview);
+// 			id2 = i;
+// 		}
+// 
+// 	// We found the solution
+// 	for (unsigned int i = 0; i < 3; i++)
+// 		viewup[i] = viewupchoices[id2][i];
+// 
+// 	cam->SetPosition(position[0], position[1], position[2]);
+// 	cam->SetFocalPoint(focalpoint[0], focalpoint[1], focalpoint[2]);
+// 	cam->SetViewUp(viewup[0], viewup[1], viewup[2]);
+// 
+// 	this->InvokeEvent(vtkImageView::CameraChangedEvent);
+// 
+// 	return id;
+// }
+
 
 //----------------------------------------------------------------------------
 /**

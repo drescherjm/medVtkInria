@@ -101,8 +101,7 @@ vtkImageView2DCommand::Execute(vtkObject*    caller,
         double dy = 4.0 *
                 (isi->GetWindowLevelStartPosition()[1] -
                 isi->GetWindowLevelCurrentPosition()[1]) / size[1];
-
-
+		
         dx = dx * windowImage * mouseToLevelSpeed;
         dy = dy * levelImage * mouseToLevelSpeed;
 
@@ -120,6 +119,9 @@ vtkImageView2DCommand::Execute(vtkObject*    caller,
         }
 
         this->Viewer->SetColorWindowLevel(newWindow, newLevel);
+		
+		// Must render to see the change in window / level.
+		this->Viewer->Render();
         return;
     }
 
