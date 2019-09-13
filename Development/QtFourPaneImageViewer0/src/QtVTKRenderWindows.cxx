@@ -42,7 +42,8 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	this->ui = new Ui_QtVTKRenderWindows;
 	this->ui->setupUi(this);
 
-	vtkSmartPointer< vtkDICOMImageReader > reader = vtkSmartPointer< vtkDICOMImageReader >::New();
+	vtkSmartPointer< vtkDICOMImageReader > reader =
+		vtkSmartPointer< vtkDICOMImageReader >::New();
 	reader->SetDirectoryName(argv[1]);
 	reader->Update();
 	int imageDims[3];
@@ -50,17 +51,9 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	for (int i = 0; i < 3; i++)
 	{
-		riw[i] = vtkSmartPointer< vtkImageView2DExtended >::New();
-		vtkRenderWindow* renderWindow = vtkGenericOpenGLRenderWindow::New();
-
-		vtkRenderer* pren = vtkRenderer::New();
-		renderWindow->AddRenderer(pren);
+		riw[i] = vtkSmartPointer< vtkImageView2D >::New();
+		vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
 		riw[i]->SetRenderWindow(renderWindow);
-		riw[i]->SetRenderer(pren);
-
-		riw[i]->ShowRulerWidgetOff();
-		riw[i]->ShowScalarBarOff();
-		riw[i]->SetAnnotationStyle(1);
 	}
 
 	this->ui->view1->SetRenderWindow(riw[0]->GetRenderWindow());
@@ -75,33 +68,18 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	for (int i = 0; i < 3; i++)
 	{
 		// make them all share the same reslice cursor object.
-		//     vtkResliceCursorLineRepresentation *rep =
-		//       vtkResliceCursorLineRepresentation::SafeDownCast(
-		//           riw[i]->GetResliceCursorWidget()->GetRepresentation());
-		//     riw[i]->SetResliceCursor(riw[0]->GetResliceCursor());
-		// 
-		//     rep->GetResliceCursorActor()-> GetCursorAlgorithm()->SetReslicePlaneNormal(i);
-riw[i]->SetInput(reader->GetOutputPort());
-		riw[i]->SetSliceOrientation(i); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 
+	//     vtkResliceCursorLineRepresentation *rep =
+	//       vtkResliceCursorLineRepresentation::SafeDownCast(
+	//           riw[i]->GetResliceCursorWidget()->GetRepresentation());
+	//     riw[i]->SetResliceCursor(riw[0]->GetResliceCursor());
+	// 
+	//     rep->GetResliceCursorActor()-> GetCursorAlgorithm()->SetReslicePlaneNormal(i);
 
-		
-		//riw[i]->Reset();
-
-		switch (i) {
-		case vtkImageView2D::SLICE_ORIENTATION_XY:
-			riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
-			break;
-		case vtkImageView2D::SLICE_ORIENTATION_XZ:
-			riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_CORONAL);
-			break;
-		case vtkImageView2D::SLICE_ORIENTATION_YZ:
-			riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_SAGITTAL);
-			break;
-		}
-
-		riw[i]->SetColorLevel(-600.0);
-		riw[i]->SetColorWindow(1500.0);
-
+		riw[i]->SetInput(reader->GetOutputPort());
+		riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
+		riw[i]->SetSliceOrientation(i); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
+		//riw[i]->ResetCamera();
+		//riw[i]->SetResliceModeToAxisAligned();
 	}
 
 	vtkSmartPointer<vtkCellPicker> picker = vtkSmartPointer<vtkCellPicker>::New();
@@ -111,8 +89,7 @@ riw[i]->SetInput(reader->GetOutputPort());
 
 	vtkSmartPointer< vtkRenderer > ren = vtkSmartPointer< vtkRenderer >::New();
 
-	vtkRenderWindow* renderWindow = vtkGenericOpenGLRenderWindow::New();
-
+	vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
 	this->ui->view4->SetRenderWindow(renderWindow);
 	this->ui->view4->GetRenderWindow()->AddRenderer(ren);
 	vtkRenderWindowInteractor* iren = this->ui->view4->GetInteractor();
@@ -133,12 +110,11 @@ riw[i]->SetInput(reader->GetOutputPort());
 		// This sets the background color on the 3 slice views to match the color
 		// set on the 4th 3D Image plane widget.
 		riw[i]->GetRenderer()->SetBackground(color);
-		//riw[i]->Reset();
 
 		planeWidget[i]->SetTexturePlaneProperty(ipwProp);
 		planeWidget[i]->TextureInterpolateOff();
 		planeWidget[i]->SetResliceInterpolateToLinear();
-		planeWidget[i]->SetInputData(reader->GetOutput());
+		planeWidget[i]->SetInputConnection(reader->GetOutputPort());
 		planeWidget[i]->SetPlaneOrientation(i);
 		planeWidget[i]->SetSliceIndex(imageDims[i] / 2);
 		planeWidget[i]->DisplayTextOn();

@@ -430,7 +430,7 @@ void vtkImageView2D::UpdateOrientation()
   // Change axes colors according to orientation
   this->SetSlicePlaneFromOrientation();
   // fix some internal camera settings, do not comment
-  //this->ResetCamera();
+  this->ResetCamera();
 
   // finally update the extent as it might have changed
   this->UpdateDisplayExtent();
