@@ -35,6 +35,8 @@
 #include <vtkImageView2D.h>
 #include <vtkImageView2DExtended.h>
 
+#define USE_BROKEN_VIEW_CONVENTION
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
@@ -53,6 +55,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	{
 		riw[i] = vtkSmartPointer< vtkImageView2D >::New();
 		vtkNew<vtkGenericOpenGLRenderWindow> renderWindow;
+
 		riw[i]->SetRenderWindow(renderWindow);
 	}
 
@@ -76,8 +79,29 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	//     rep->GetResliceCursorActor()-> GetCursorAlgorithm()->SetReslicePlaneNormal(i);
 
 		riw[i]->SetInput(reader->GetOutputPort());
+
+#ifdef USE_BROKEN_VIEW_CONVENTION
+
 		riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
+
+#else // def USE_BROKEN_VIEW_CONVENTION
+
+			switch (i) {
+			case vtkImageView2D::SLICE_ORIENTATION_XY:
+				riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
+				break;
+			case vtkImageView2D::SLICE_ORIENTATION_XZ:
+				riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_CORONAL);
+				break;
+			case vtkImageView2D::SLICE_ORIENTATION_YZ:
+				riw[i]->SetViewConvention(vtkImageView2D::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_SAGITTAL);
+				break;
+			}
+#endif // USE_BROKEN_VIEW_CONVENTION
+
 		riw[i]->SetSliceOrientation(i); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
+
+
 		//riw[i]->ResetCamera();
 		//riw[i]->SetResliceModeToAxisAligned();
 	}
