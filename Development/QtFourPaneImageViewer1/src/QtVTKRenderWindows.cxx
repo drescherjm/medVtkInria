@@ -74,18 +74,8 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	for (int i = 0; i < 3; i++)
 	{
-		// make them all share the same reslice cursor object.
-		//     vtkResliceCursorLineRepresentation *rep =
-		//       vtkResliceCursorLineRepresentation::SafeDownCast(
-		//           riw[i]->GetResliceCursorWidget()->GetRepresentation());
-		//     riw[i]->SetResliceCursor(riw[0]->GetResliceCursor());
-		// 
-		//     rep->GetResliceCursorActor()-> GetCursorAlgorithm()->SetReslicePlaneNormal(i);
-riw[i]->SetInput(reader->GetOutputPort());
+		riw[i]->SetInput(reader->GetOutputPort());
 		riw[i]->SetSliceOrientation(i); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 
-
-		
-		//riw[i]->Reset();
 
 		switch (i) {
 		case vtkImageView2D::SLICE_ORIENTATION_XY:
@@ -133,7 +123,6 @@ riw[i]->SetInput(reader->GetOutputPort());
 		// This sets the background color on the 3 slice views to match the color
 		// set on the 4th 3D Image plane widget.
 		riw[i]->GetRenderer()->SetBackground(color);
-		//riw[i]->Reset();
 
 		planeWidget[i]->SetTexturePlaneProperty(ipwProp);
 		planeWidget[i]->TextureInterpolateOff();

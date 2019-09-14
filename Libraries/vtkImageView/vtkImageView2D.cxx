@@ -634,7 +634,7 @@ void vtkImageView2D::SetViewConvention(int convention)
 	this->ConventionMatrix->SetElement(1, 3, y_watcher);
 	this->ConventionMatrix->SetElement(2, 3, z_watcher);
 
-	this->ConventionMatrix->Print(std::cout);
+	//this->ConventionMatrix->Print(std::cout);
 
 	this->UpdateOrientation();
 }
@@ -655,7 +655,7 @@ void vtkImageView2D::SetViewOrientation(int orientation)
   double dot = 0;
   double projection, p1, p2;
 
-  /// Proiority to the xy plane :
+  /// Priority to the xy plane :
   int viewtoslice[3] = {-1,-1,-1};
 
   for (unsigned int i=0; i<3; i++)
