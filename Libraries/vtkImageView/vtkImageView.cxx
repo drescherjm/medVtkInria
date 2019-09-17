@@ -48,12 +48,15 @@
 #include <vtkRendererCollection.h>
 #include <vtkImageReader2.h>
 #include <vtkAlgorithmOutput.h>
+#include "vtkImageViewCollection.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////
 
 #ifdef WIN32
 #define snprintf _snprintf_s
 #endif
 
+/////////////////////////////////////////////////////////////////////////////////////////
 
 //vtkStandardNewMacro(vtkImageView); // pure virtual class
 
@@ -1770,3 +1773,95 @@ bool vtkImageView::GetUseLookupTable() const
     int layer = this->GetCurrentLayer();
     return this->GetUseLookupTable(layer);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void vtkImageView::AddSiblingView(vtkImageView* pSibling)
+{
+	if (pSibling != NULL) {
+		vtkImageViewCollection* pColThis = GetViewCollection();
+		vtkImageViewCollection* pColSib = pSibling->GetViewCollection();
+		if (pColThis == NULL) {
+			if (pColSib == NULL) {
+				// Both collections are empty. Just create a new one and add both views.
+				pColThis = vtkImageViewCollection::New();
+				pColThis->AddItem(this);
+				pColThis->AddItem(pSibling);
+				this->SetViewCollection(pColThis);
+				pSibling->SetViewCollection(pColThis);
+			}
+			else
+			{
+				// The sibling has a collection use that and add this view to the collection.
+				pColThis = ViewCollection = pColSib;
+				pColThis->AddItem(this);
+			}
+		}
+		else
+		{
+			if (pColSib == NULL) {
+				pColThis->AddItem(pSibling);
+				pSibling->SetViewCollection(pColThis);
+			}
+			else
+			{
+				// We need to combine lists. 
+
+				std::set<vtkImageView*> setViews;
+
+				// Get the set of sibling Views from each view.
+				this->GetImageViewSet(setViews);
+				pSibling->GetImageViewSet(setViews);
+
+				// Make sure that this and pSibbling are in the set..
+				setViews.insert(this);
+				setViews.insert(pSibling);
+
+				pColThis->RemoveAllItems();
+				ImageViewSet::iterator it = setViews.begin();
+
+				for (; it != setViews.end(); ++it) {
+					pColThis->AddItem(*it);
+				}
+
+				SetViewCollection(pColThis);
+				pSibling->SetViewCollection(pColThis);
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+vtkImageViewCollection* vtkImageView::GetViewCollection()
+{
+	return this->ViewCollection;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void vtkImageView::SetViewCollection(vtkImageViewCollection* pCollection)
+{
+	this->ViewCollection = pCollection;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool vtkImageView::GetImageViewSet(vtkImageView::ImageViewSet& setImageViews)
+{
+	vtkImageViewCollection* pColThis = GetViewCollection();
+	bool retVal = (pColThis != NULL);
+	if (retVal) {
+		pColThis->InitTraversal();
+		vtkImageView* item = pColThis->GetNextItem();
+		while (item)
+		{
+			setImageViews.insert(item);
+			item = pColThis->GetNextItem();
+		}
+
+	}
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////

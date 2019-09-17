@@ -194,10 +194,6 @@ void vtkImageView2DExtended::SetOpacity(double opacity)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-#ifdef PREV_VTKRENDERINGADDON_COMPATIBILITY
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
 int vtkImageView2DExtended::GetZSlice()
 {
 	return Superclass::GetSlice();
@@ -264,7 +260,14 @@ bool vtkImageView2DExtended::GetFlipZaxis()
 
 vtkImageData* vtkImageView2DExtended::GetImage()
 {
-	return GetInput();
+	vtkImageData* retVal{};
+
+	auto pImageActor = GetImageActor(IMAGE_ACTOR);
+	if (pImageActor) {
+		retVal = pImageActor->GetInput();
+	}
+
+	return retVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -315,29 +318,32 @@ void vtkImageView2DExtended::SetSlice (unsigned int p_plan, int p_zslice)
 
 void vtkImageView2DExtended::GetPositionForSlice (int p_zslice, int orientation, double pos[3])
 {
+	auto pVtk2DDisplay = GetImage2DDisplayForLayer(IMAGE_ACTOR);
 
-	if( !this->GetImage() )
-	{
-		return;
+	if (pVtk2DDisplay) {
+
+		medVtkImageInfo* pImageInfo = pVtk2DDisplay->GetMedVtkImageInfo();
+		
+		if (pImageInfo) {
+			unsigned int axis = this->GetOrthogonalAxis(orientation);
+
+			double* spacing = pImageInfo->spacing;
+			int* extent = pImageInfo->extent;
+			double* origin = pImageInfo->origin;
+			int     slice = p_zslice;
+
+			int dims[3];
+			dims[0] = extent[1];
+			dims[1] = extent[3];
+			dims[2] = extent[5];
+
+			if (slice >= dims[axis])  slice = dims[axis];
+			if (slice < 0)           slice = 0;
+
+			this->GetCurrentPoint(pos);
+			pos[axis] = origin[axis] + slice * spacing[axis];
+		}
 	}
-
-	unsigned int axis = this->GetOrthogonalAxis(orientation);
-
-	double* spacing = this->GetImage()->GetSpacing();
-	int*    extent  = this->GetImage()->GetWholeExtent();
-	double* origin  = this->GetImage()->GetOrigin();
-	int     slice   = p_zslice;
-
-	int dims[3];
-	dims[0] = extent[1];
-	dims[1] = extent[3];
-	dims[2] = extent[5];  
-
-	if(slice >= dims[axis])  slice = dims[axis];
-	if(slice <  0)           slice = 0;
-
-	this->GetCurrentPoint(pos);
-	pos[axis] = origin[axis] + slice * spacing[axis];
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -387,10 +393,17 @@ int vtkImageView2DExtended::GetSlice()
 
 vtkImageData* vtkImageView2DExtended::GetFGImage()
 {
-	return FGImage;
+	vtkImageData* retVal{};
+
+	auto pImageActor = GetImageActor(FG_IMAGE_ACTOR);
+
+	if (pImageActor) {
+		retVal = pImageActor->GetInput();
+	}
+
+	return retVal;
+	//return FGImage;
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -546,8 +559,6 @@ void vtkImageView2DExtended::SetAnnotationsFromOrientation( void )
 
 	Superclass::SetAnnotationsFromOrientation();
 }
-
-#endif // def PREV_VTKRENDERINGADDON_COMPATIBILITY
 
 /////////////////////////////////////////////////////////////////////////////////////////
 

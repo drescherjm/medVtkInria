@@ -59,6 +59,14 @@ class MEDVTKINRIA_EXPORT vtkImageView2DCommand : public vtkCommand
   };
   //ETX
 
+  //BTX
+  enum CompatibilityEventIds
+  {
+	  ZSliceMoveEvent = SliceMoveEvent,
+	  ZoomEvent = CameraZoomEvent,
+  };
+  //ETX
+
   // Description:
   // Satisfy the superclass API for callbacks. Recall that the caller is
   // the instance invoking the event; eid is the event id (see

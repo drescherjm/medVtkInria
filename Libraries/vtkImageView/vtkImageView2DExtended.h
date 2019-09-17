@@ -31,8 +31,6 @@ public:
 	};
 	//ETX
 
-#ifdef PREV_VTKRENDERINGADDON_COMPATIBILITY
-
 	//BTX
 	/** Indices use in Vtk referentials corresponding to the standard x, y and z unitary vectors. */
 	enum DirectionIds
@@ -100,9 +98,6 @@ protected:
 	//BTX
 	std::string     SizeData_str;
 	//ETX
-
-#endif //def PREV_VTKRENDERINGADDON_COMPATIBILITY
-
 
 public:
 	/**

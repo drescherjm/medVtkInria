@@ -278,7 +278,7 @@ vtkMTimeType vtkImageView2D::GetMTime()
 //----------------------------------------------------------------------------
 void vtkImageView2D::GetSliceRange(int &min, int &max) const
 {
-  if (this->GetMedVtkImageInfo()->initialized)
+  if (this->GetMedVtkImageInfo() && this->GetMedVtkImageInfo()->initialized)
   {
       this->Get2DDisplayMapperInputAlgorithm()->UpdateInformation();
       int* w_ext = this->Get2DDisplayMapperInputAlgorithm()->GetOutputInformation(0)->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());

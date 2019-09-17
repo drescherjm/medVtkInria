@@ -135,12 +135,22 @@ class vtkImageAlgorithm;
    No actual need to keep the input instance, but preferably directly put it into the ImageToColor instance
    as it will (or should) normally not be used otherwise.
 */
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+class vtkImageViewCollection;
+
+#include <set>
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 class MEDVTKINRIA_EXPORT vtkImageView : public vtkObject
 {
 public:
     vtkTypeMacro(vtkImageView, vtkObject);
     void PrintSelf (ostream& os, vtkIndent indent);
 
+	typedef std::set<vtkImageView*> ImageViewSet;
 
     vtkMTimeType GetMTime();
 
@@ -477,6 +487,11 @@ public:
     virtual vtkAlgorithm* Get2DDisplayMapperInputAlgorithm(int layer) const;
     virtual vtkImageAlgorithm* GetInputAlgorithm(int layer) const;
 
+	virtual void	AddSiblingView(vtkImageView* pSibling);
+	virtual void    SetViewCollection(vtkImageViewCollection* pCollection);
+	vtkImageViewCollection*		GetViewCollection();
+	virtual bool				GetImageViewSet(ImageViewSet& setImageViews);
+
 protected:
     vtkImageView();
     ~vtkImageView();
@@ -596,9 +611,12 @@ protected:
     vtkImageData*                   m_poInternalImageFromInput;
     vtkAlgorithmOutput*             m_poInputVtkAlgoOutput;
 
-    std::string PatientName;
-    std::string StudyName;
-    std::string SeriesName;
+    std::string						PatientName;
+    std::string						StudyName;
+    std::string						SeriesName;
+
+	// View Collection
+	vtkSmartPointer<vtkImageViewCollection>	ViewCollection;
 
     vtkSmartPointer<vtkImageFromBoundsSource> m_vtkImageFromBoundsSourceGenerator;
 
