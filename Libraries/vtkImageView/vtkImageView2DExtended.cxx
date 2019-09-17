@@ -23,13 +23,13 @@ vtkStandardNewMacro(vtkImageView2DExtended);
 
 vtkImageView2DExtended::vtkImageView2DExtended()
 {
-	this->CornerAnnotation = vtkImageViewCornerAnnotationEx::New();
-	this->CornerAnnotation->SetNonlinearFontScaleFactor (0.3);
-	this->CornerAnnotation->SetTextProperty ( this->TextProperty );
-	this->CornerAnnotation->SetMaximumFontSize (46);
-	this->CornerAnnotation->SetImageView (this);
-	this->CornerAnnotation->PickableOff();
-	this->CornerAnnotation->SetText (3, "<patient>\n<study>\n<series>");
+// 	this->CornerAnnotation = vtkImageViewCornerAnnotationEx::New();
+// 	this->CornerAnnotation->SetNonlinearFontScaleFactor (0.3);
+// 	this->CornerAnnotation->SetTextProperty ( this->TextProperty );
+// 	this->CornerAnnotation->SetMaximumFontSize (46);
+// 	this->CornerAnnotation->SetImageView (this);
+// 	this->CornerAnnotation->PickableOff();
+// 	this->CornerAnnotation->SetText (3, "<patient>\n<study>\n<series>");
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

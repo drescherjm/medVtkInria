@@ -35,13 +35,13 @@ const int MASK_ROWS = ROWS - MASK_ROW_OFFS - MASK_ROW_OFFS;
 const int MASK_COLS = COLS - MASK_COL_OFFS - MASK_COL_OFFS;
 const int MASK_SLICES = SLICES - MASK_SLICE_OFFS - MASK_SLICE_OFFS;
 
-//#define LIB_SETS_OFFSET
+#define LIB_SETS_OFFSET
 
 vtkImageData*  InitializeInputImage()
 {
 	vtkImageData* pImage = vtkImageData::New();
 	pImage->SetDimensions(COLS,ROWS,SLICES);
-	pImage->AllocateScalars(VTK_UNSIGNED_SHORT, 3);
+	pImage->AllocateScalars(VTK_UNSIGNED_SHORT, 1);
 	pImage->SetSpacing(0.5,0.5,0.5);
 
 	short* pDest = static_cast<short*>(pImage->GetScalarPointer());
@@ -72,7 +72,7 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 	vtkImageData* retVal = vtkImageData::New();
 	if (retVal != NULL) {
 		retVal->SetDimensions(MASK_COLS,MASK_ROWS,MASK_SLICES);
-		retVal->AllocateScalars(VTK_UNSIGNED_CHAR, 3);
+		retVal->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
 
 		char* pDest = static_cast<char*>(retVal->GetScalarPointer());
 
@@ -182,9 +182,28 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
+{
+	vtkImageAlgorithm* pSM = vtkSimpleImageFilterExample::New();
+	pSM->SetInformation(pImage->GetInformation());
+	pSM->SetInputData(pImage);
+
+// 	int extent[6];
+// 
+// 	pImage->GetExtent(extent);
+// 	pSM->SetWholeExtent(extent);
+// 	pSM->SetDataExtent(extent);
+// 	pSM->SetDataScalarType(pImage->GetScalarType());
+ 	pSM->Update();
+
+	return pSM->GetOutputPort();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 // vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
 // {
-// 	vtkImageAlgorithm* pSM = vtkSimpleImageFilterExample::New();
+// 	vtkImageAlgorithm* pSM = vtkImageAlgorithmFilter::New();
 // 	pSM->SetInformation(pImage->GetInformation());
 // 	pSM->SetInputData(pImage);
 // 
@@ -195,28 +214,9 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 // // 	pSM->SetDataExtent(extent);
 // // 	pSM->SetDataScalarType(pImage->GetScalarType());
 // // 	pSM->Update();
-// 
+// 	pSM->Update();
 // 	return pSM->GetOutputPort();
 // }
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
-vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
-{
-	vtkImageAlgorithm* pSM = vtkImageAlgorithmFilter::New();
-	pSM->SetInformation(pImage->GetInformation());
-	pSM->SetInputData(pImage);
-
-// 	int extent[6];
-// 
-// 	pImage->GetExtent(extent);
-// 	pSM->SetWholeExtent(extent);
-// 	pSM->SetDataExtent(extent);
-// 	pSM->SetDataScalarType(pImage->GetScalarType());
-// 	pSM->Update();
-	pSM->Update();
-	return pSM->GetOutputPort();
-}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -239,10 +239,10 @@ int main(int argc, char *argv[])
 
 	lavtkViewImage2D* pViews[3];
 
-	pViews[0] = InitializeView(pImageAlgorithm,laSliceOrientation::Axial);
+	pViews[0] = InitializeView(pImageAlgorithm,laSliceOrientation::Sagittal);
 	pViews[1] = InitializeView(pImageAlgorithm,laSliceOrientation::Coronal);
 	pViews[1]->AddSiblingView(pViews[0]);
-	pViews[2] = InitializeView(pImageAlgorithm,laSliceOrientation::Sagittal);
+	pViews[2] = InitializeView(pImageAlgorithm,laSliceOrientation::Axial);
 	pViews[2]->AddSiblingView(pViews[1]);
 	pViews[0]->AddSiblingView(pViews[2]);
 

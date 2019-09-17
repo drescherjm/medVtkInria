@@ -8,7 +8,7 @@ vtkStandardNewMacro(lavtkImageViewCornerAnnotation);
 
 lavtkImageViewCornerAnnotation::lavtkImageViewCornerAnnotation()
 {
-
+	std::cout << __FUNCTION__;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

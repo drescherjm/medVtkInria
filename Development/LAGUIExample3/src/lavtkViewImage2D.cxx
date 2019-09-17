@@ -155,14 +155,14 @@ void lavtkViewImage2D::SetImage(vtkImageData* image)
 
 lavtkViewImage2D::lavtkViewImage2D()
 {
-	this->CornerAnnotation = lavtkImageViewCornerAnnotation::New();
-
-	this->CornerAnnotation->SetNonlinearFontScaleFactor(0.3);
-	this->CornerAnnotation->SetTextProperty(this->TextProperty);
-	this->CornerAnnotation->SetMaximumFontSize(46);
-	this->CornerAnnotation->SetImageView(this);
-	this->CornerAnnotation->PickableOff();
-	this->CornerAnnotation->SetText(3, "<patient>\n<study>\n<series>");
+// 	this->CornerAnnotation = lavtkImageViewCornerAnnotation::New();
+// 
+// 	this->CornerAnnotation->SetNonlinearFontScaleFactor(0.3);
+// 	this->CornerAnnotation->SetTextProperty(this->TextProperty);
+// 	this->CornerAnnotation->SetMaximumFontSize(46);
+// 	this->CornerAnnotation->SetImageView(this);
+// 	this->CornerAnnotation->PickableOff();
+// 	this->CornerAnnotation->SetText(3, "<patient>\n<study>\n<series>");
 
 	this->initializeVTKObjects();
 
