@@ -14,6 +14,7 @@
 #include "sliceOrientation.h"
 #include <vtkImageSliceMapper.h>
 #include <vtkDICOMImageReader.h>
+#include <vtkImageImport.h>
 
 const int ROWS{ 512 };
 const int COLS{ 512 };
@@ -155,6 +156,25 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
+{
+	auto pSM = vtkImageImport::New();
+	pSM->SetInformation(pImage->GetInformation());
+	pSM->SetImportVoidPointer(pImage->GetScalarPointer());
+
+	int extent[6];
+
+	pImage->GetExtent(extent);
+	pSM->SetWholeExtent(extent);
+	pSM->SetDataExtent(extent);
+	pSM->SetDataScalarType(pImage->GetScalarType());
+	pSM->Update();
+	
+	return pSM->GetOutputPort();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 int main(int argc, char *argv[])
 {
 
@@ -165,19 +185,14 @@ int main(int argc, char *argv[])
 
 	vtkImageData* pImage = InitializeInputImage();
 
+	vtkAlgorithmOutput* pImageAlgorithm = getImageAsAlgorithm(pImage);
 
-// 	vtkSmartPointer< vtkDICOMImageReader > reader = vtkSmartPointer< vtkDICOMImageReader >::New();
-// 	reader->SetDirectoryName(argv[1]);
-// 	reader->Update();
-// 	int imageDims[3];
-// 	reader->GetOutput()->GetDimensions(imageDims);
-	
 	lavtkViewImage2D* pViews[3];
 
-	pViews[0] = InitializeView(pImage,laSliceOrientation::Axial);
-	pViews[1] = InitializeView(pImage,laSliceOrientation::Coronal);
+	pViews[0] = InitializeView(pImageAlgorithm,laSliceOrientation::Axial);
+	pViews[1] = InitializeView(pImageAlgorithm,laSliceOrientation::Coronal);
 	pViews[1]->AddSiblingView(pViews[0]);
-	pViews[2] = InitializeView(pImage,laSliceOrientation::Sagittal);
+	pViews[2] = InitializeView(pImageAlgorithm,laSliceOrientation::Sagittal);
 	pViews[2]->AddSiblingView(pViews[1]);
 	pViews[0]->AddSiblingView(pViews[2]);
 
@@ -204,17 +219,23 @@ int main(int argc, char *argv[])
 	lut->SetTableValue( 6, 1.0, 0.0, 1.0, 0.3 ); //label 6
 	lut->Build(); 
 
+
+	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
+
 	for(int i=0; i < 3;++i) {
 
 #ifndef LIB_SETS_OFFSET
 		pViews[i]->SetFGImage(pMaskImage,lut);
 #else
 
-		auto pSL = vtkImageSliceMapper::New();
-		pSL->SetInputData(pMaskImage);
+// 		auto pSL = vtkImageSliceMapper::New();
+// 		pSL->SetInputData(pMaskImage);
+// 
+// 		pViews[i]->SetFGImage(pSL->GetOutputPort(),lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
+// 		pViews[i]->Render();
 
-		pViews[i]->SetFGImage(pSL->GetOutputPort(),lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
-		pViews[i]->Render();
+		pViews[i]->SetInput(pMaskAlgorithm, 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
+
 #endif //ndef LIB_SETS_OFFSET
 
 	}
