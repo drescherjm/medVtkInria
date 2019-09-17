@@ -20,6 +20,8 @@
 #include <vtkImageAlgorithm.h>
 #include <vtkSimpleImageToImageFilter.h>
 #include <vtkSimpleImageFilterExample.h>
+#include <vtkImageChangeInformation.h>
+#include <vtkImageConstantPad.h>
 
 const int ROWS{ 512 };
 const int COLS{ 512 };
@@ -34,6 +36,7 @@ const int MASK_COLS = COLS - MASK_COL_OFFS - MASK_COL_OFFS;
 const int MASK_SLICES = SLICES - MASK_SLICE_OFFS - MASK_SLICE_OFFS;
 
 #define LIB_SETS_OFFSET
+#define USE_VTKINRIA_LAYER
 
 vtkImageData*  InitializeInputImage()
 {
@@ -112,6 +115,10 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 		}
 		if (pImage != NULL) {
 
+			double spacing[3];
+			pImage->GetSpacing(spacing);
+			retVal->SetSpacing(spacing);
+
 #ifndef LIB_SETS_OFFSET
 			double spacing[3];
 			pImage->GetSpacing(spacing);
@@ -163,9 +170,9 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 
 vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
 {
-	vtkImageAlgorithm* pSM = vtkSimpleImageFilterExample::New();
+	auto pSM = vtkImageChangeInformation::New();
 	pSM->SetInformation(pImage->GetInformation());
-	pSM->SetInputData(pImage);
+	pSM->SetInputDataObject(pImage);
 
  	pSM->Update();
 
@@ -202,7 +209,7 @@ int main(int argc, char *argv[])
 
 	pViews[0]->SetPosition(0, 0);
 	pViews[1]->SetPosition(0, 450);
-	pViews[2]->SetPosition(425, 0); pViews[2]->SetSize(900, 850);
+	pViews[2]->SetPosition(425, 0); pViews[2]->SetSize(900, 875);
 
 	vtkImageData* pMaskImage = InitializeMaskImage(pImage);
 
@@ -219,12 +226,36 @@ int main(int argc, char *argv[])
 	lut->Build(); 
 
 
-// 	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
-// 
-// 	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
-// 	windowLevel->SetLookupTable(lut);
-// 	windowLevel->SetInputConnection(pMaskAlgorithm);
-// 	windowLevel->PassAlphaToOutputOn();
+ 	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
+
+	double spacing[3];
+	pImage->GetSpacing(spacing);
+
+	auto pChangeInfo = vtkImageChangeInformation::New();
+	pChangeInfo->SetInputConnection(pMaskAlgorithm);
+	pChangeInfo->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
+	pChangeInfo->SetOriginTranslation(-MASK_COL_OFFS * spacing[0], -MASK_ROW_OFFS * spacing[1], -MASK_SLICE_OFFS * spacing[2]);
+
+	auto pPadFilter = vtkImageConstantPad::New();
+
+	pPadFilter->SetInputConnection(pChangeInfo->GetOutputPort());
+	int extent[6];
+	pImage->GetExtent(extent);
+	pPadFilter->SetOutputWholeExtent(extent);
+
+	auto pChangeInfo2 = vtkImageChangeInformation::New();
+	pChangeInfo2->SetInputConnection(pPadFilter->GetOutputPort());
+	//pChangeInfo2->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
+	pChangeInfo2->SetOriginTranslation(+MASK_COL_OFFS * spacing[0], +MASK_ROW_OFFS * spacing[1], +MASK_SLICE_OFFS * spacing[2]);
+	//pPadFilter->Update();
+
+#ifdef USE_VTKINRIA_LAYER
+	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
+	windowLevel->SetLookupTable(lut);
+	windowLevel->SetInputConnection(pChangeInfo2->GetOutputPort());
+	windowLevel->PassAlphaToOutputOn();
+	windowLevel->Update();
+#endif
 
 	for(int i=0; i < 3;++i) {
 
@@ -232,14 +263,15 @@ int main(int argc, char *argv[])
 		//pViews[i]->SetFGImage(pMaskImage,lut);
 //#else
 
-// 		auto pSL = vtkImageSliceMapper::New();
-// 		pSL->SetInputData(pMaskImage);
-// 
-//		pViews[i]->SetFGImage(pMaskAlgorithm,lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
-//		pViews[i]->Render();
+#ifndef USE_VTKINRIA_LAYER
+		//auto pSL = vtkImageSliceMapper::New();
+		//pSL->SetInputData(pMaskImage);
 
-// 		pViews[i]->SetInput(windowLevel->GetOutputPort(), 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
-// 
+		pViews[i]->SetFGImage(pMaskAlgorithm,lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
+		pViews[i]->Render();
+#else
+		pViews[i]->SetInput(windowLevel->GetOutputPort(), pViews[i]->GetOrientationMatrix(), lavtkViewImage2D::FG_IMAGE_ACTOR);
+#endif // def USE_VTKINRIA_LAYER
 // 		auto pActor = pViews[i]->GetImageActor(lavtkViewImage2D::FG_IMAGE_ACTOR);
 // 
 // 		pActor->SetOpacity(0.95);
