@@ -214,7 +214,7 @@ vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
 // 	pSM->SetDataExtent(extent);
 // 	pSM->SetDataScalarType(pImage->GetScalarType());
 // 	pSM->Update();
-	//pSM->Update();
+	pSM->Update();
 	return pSM->GetOutputPort();
 }
 
@@ -232,10 +232,10 @@ int main(int argc, char *argv[])
 
 	vtkAlgorithmOutput* pImageAlgorithm = getImageAsAlgorithm(pImage);
 
-	auto pWriter = vtkPNGWriter::New();
-	pWriter->SetInputConnection(pImageAlgorithm);
-	pWriter->SetFileName("test.pnm");
-	pWriter->Write();
+// 	auto pWriter = vtkPNGWriter::New();
+// 	pWriter->SetInputConnection(pImageAlgorithm);
+// 	pWriter->SetFileName("test.png");
+// 	pWriter->Write();
 
 	lavtkViewImage2D* pViews[3];
 
@@ -253,7 +253,7 @@ int main(int argc, char *argv[])
 
 	pViews[0]->SetPosition(0, 0);
 	pViews[1]->SetPosition(0, 450);
-	pViews[2]->SetPosition(425, 450);
+	pViews[2]->SetPosition(425, 0); pViews[2]->SetSize(900, 850);
 
 	vtkImageData* pMaskImage = InitializeMaskImage(pImage);
 
@@ -270,12 +270,12 @@ int main(int argc, char *argv[])
 	lut->Build(); 
 
 
-	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
-
-	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
-	windowLevel->SetLookupTable(lut);
-	windowLevel->SetInputConnection(pMaskAlgorithm);
-	windowLevel->PassAlphaToOutputOn();
+// 	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
+// 
+// 	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
+// 	windowLevel->SetLookupTable(lut);
+// 	windowLevel->SetInputConnection(pMaskAlgorithm);
+// 	windowLevel->PassAlphaToOutputOn();
 
 	for(int i=0; i < 3;++i) {
 
