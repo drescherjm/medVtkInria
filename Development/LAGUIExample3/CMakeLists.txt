@@ -27,6 +27,7 @@ set( ${LOCAL_PROJECT_NAME}_SRCS
 	./src/lavtkKeyEvent.cxx
 	./src/lavtkImageViewCornerAnnotation.cxx
 	./src/lavtkViewImage2DCallback.cxx
+	./src/vtkImageAlgorithmFilter.cxx
 )
 
 set( ${LOCAL_PROJECT_NAME}_HDRS 
@@ -41,6 +42,7 @@ set( ${LOCAL_PROJECT_NAME}_MOC_HDRS
 	./Include/lavtkViewImage2DCallback.h
 	./Include/lavtkInteractorStyleImageView2D.h
 	./Include/lavtkKeyEvent.h
+	./Include/vtkImageAlgorithmFilter.h
 )
 
 add_definitions(-DPREV_VTKRENDERINGADDON_COMPATIBILITY -DUSING_VTKINRIA3D)

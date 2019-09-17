@@ -17,6 +17,11 @@
 #include <vtkImageImport.h>
 #include <vtkImageMapToColors.h>
 #include <vtkImageActor.h>
+#include <vtkImageAlgorithm.h>
+#include <vtkSimpleImageToImageFilter.h>
+#include <vtkSimpleImageFilterExample.h>
+#include "vtkImageAlgorithmFilter.h"
+#include <vtkPNGWriter.h>
 
 const int ROWS{ 512 };
 const int COLS{ 512 };
@@ -158,20 +163,58 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+// vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
+// {
+// 	auto pSM = vtkImageImport::New();
+// 	pSM->SetInformation(pImage->GetInformation());
+// 	pSM->SetImportVoidPointer(pImage->GetScalarPointer());
+// 
+// 	int extent[6];
+// 
+// 	pImage->GetExtent(extent);
+// 	pSM->SetWholeExtent(extent);
+// 	pSM->SetDataExtent(extent);
+// 	pSM->SetDataScalarType(pImage->GetScalarType());
+// 	pSM->Update();
+// 	
+// 	return pSM->GetOutputPort();
+// }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+// vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
+// {
+// 	vtkImageAlgorithm* pSM = vtkSimpleImageFilterExample::New();
+// 	pSM->SetInformation(pImage->GetInformation());
+// 	pSM->SetInputData(pImage);
+// 
+// // 	int extent[6];
+// // 
+// // 	pImage->GetExtent(extent);
+// // 	pSM->SetWholeExtent(extent);
+// // 	pSM->SetDataExtent(extent);
+// // 	pSM->SetDataScalarType(pImage->GetScalarType());
+// // 	pSM->Update();
+// 
+// 	return pSM->GetOutputPort();
+// }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
 {
-	auto pSM = vtkImageImport::New();
+	vtkImageAlgorithm* pSM = vtkImageAlgorithmFilter::New();
 	pSM->SetInformation(pImage->GetInformation());
-	pSM->SetImportVoidPointer(pImage->GetScalarPointer());
+	pSM->SetInputData(pImage);
 
-	int extent[6];
-
-	pImage->GetExtent(extent);
-	pSM->SetWholeExtent(extent);
-	pSM->SetDataExtent(extent);
-	pSM->SetDataScalarType(pImage->GetScalarType());
-	pSM->Update();
-	
+// 	int extent[6];
+// 
+// 	pImage->GetExtent(extent);
+// 	pSM->SetWholeExtent(extent);
+// 	pSM->SetDataExtent(extent);
+// 	pSM->SetDataScalarType(pImage->GetScalarType());
+// 	pSM->Update();
+	//pSM->Update();
 	return pSM->GetOutputPort();
 }
 
@@ -188,6 +231,11 @@ int main(int argc, char *argv[])
 	vtkImageData* pImage = InitializeInputImage();
 
 	vtkAlgorithmOutput* pImageAlgorithm = getImageAsAlgorithm(pImage);
+
+	auto pWriter = vtkPNGWriter::New();
+	pWriter->SetInputConnection(pImageAlgorithm);
+	pWriter->SetFileName("test.pnm");
+	pWriter->Write();
 
 	lavtkViewImage2D* pViews[3];
 
@@ -241,11 +289,11 @@ int main(int argc, char *argv[])
 //		pViews[i]->SetFGImage(pMaskAlgorithm,lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
 //		pViews[i]->Render();
 
-		pViews[i]->SetInput(windowLevel->GetOutputPort(), 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
-
-		auto pActor = pViews[i]->GetImageActor(lavtkViewImage2D::FG_IMAGE_ACTOR);
-
-		pActor->SetOpacity(0.95);
+// 		pViews[i]->SetInput(windowLevel->GetOutputPort(), 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
+// 
+// 		auto pActor = pViews[i]->GetImageActor(lavtkViewImage2D::FG_IMAGE_ACTOR);
+// 
+// 		pActor->SetOpacity(0.95);
 
 //#endif //ndef LIB_SETS_OFFSET
 
