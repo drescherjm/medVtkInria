@@ -282,8 +282,13 @@ void vtkImageView2D::GetSliceRange(int &min, int &max) const
   {
       this->Get2DDisplayMapperInputAlgorithm()->UpdateInformation();
       int* w_ext = this->Get2DDisplayMapperInputAlgorithm()->GetOutputInformation(0)->Get(vtkStreamingDemandDrivenPipeline::WHOLE_EXTENT());
-      min = w_ext[this->SliceOrientation * 2];
-      max = w_ext[this->SliceOrientation * 2 + 1];
+	  if (w_ext) {
+		  min = w_ext[this->SliceOrientation * 2];
+		  max = w_ext[this->SliceOrientation * 2 + 1];
+	  }
+	  else {
+		  min = max = 0;
+	  }
   }
 }
 

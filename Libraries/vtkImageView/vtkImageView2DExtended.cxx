@@ -88,46 +88,48 @@ void vtkImageView2DExtended::UpdateDisplayExtent()
 {
 	Superclass::UpdateDisplayExtent();
 
-// 	auto input = this->FGImage;
-// 	if (!input)
-// 	{
-// 		return;
-// 	}
-// 
-// 	auto pAlgorithm = input->GetProducer();
-// 	
-// 	if (!pAlgorithm) {
-// 		return;
-// 	}
-// 
-// 	pAlgorithm->UpdateInformation();
-// 	int *w_ext = pAlgorithm->GetOutputDataObject(0)->GetWholeExtent();
-// 
-// 	// get and clamp the slice if necessary
-// 	int  slice = this->GetSliceForWorldCoordinates (this->CurrentPoint);
-// 
-// 	int *range = this->GetSliceRange();
-// 	if (range)
-// 	{
-// 		slice = std::max (slice, range[0]);
-// 		slice = std::min (slice, range[1]);
-// 	}
-// 	
-// 	switch (this->SliceOrientation)
-// 	{
-// 	case vtkImageView2D::SLICE_ORIENTATION_XY:
-// 		this->FGImageActor->SetDisplayExtent(w_ext[0], w_ext[1], w_ext[2], w_ext[3], slice, slice);
-// 		break;
-// 
-// 	case vtkImageView2D::SLICE_ORIENTATION_XZ:
-// 		this->FGImageActor->SetDisplayExtent(w_ext[0], w_ext[1], slice, slice, w_ext[4], w_ext[5]);
-// 		break;
-// 
-// 	case vtkImageView2D::SLICE_ORIENTATION_YZ:
-// 	default:
-// 		this->FGImageActor->SetDisplayExtent(slice, slice, w_ext[2], w_ext[3], w_ext[4], w_ext[5]);
-// 		break;
-// 	}
+	auto input = this->FGImage;
+	if (!input)
+	{
+		return;
+	}
+
+	auto pAlgorithm = input->GetProducer();
+	
+	if (!pAlgorithm) {
+		return;
+	}
+
+	pAlgorithm->UpdateInformation();
+	//int *w_ext = pAlgorithm->GetOutputDataObject(0)->GetWholeExtent();
+
+	int* w_ext = this->GetMedVtkImageInfo()->extent;
+
+	// get and clamp the slice if necessary
+	int  slice = this->GetSliceForWorldCoordinates (this->CurrentPoint);
+
+	int *range = this->GetSliceRange();
+	if (range)
+	{
+		slice = std::max (slice, range[0]);
+		slice = std::min (slice, range[1]);
+	}
+	
+	switch (this->SliceOrientation)
+	{
+	case vtkImageView2D::SLICE_ORIENTATION_XY:
+		this->FGImageActor->SetDisplayExtent(w_ext[0], w_ext[1], w_ext[2], w_ext[3], slice, slice);
+		break;
+
+	case vtkImageView2D::SLICE_ORIENTATION_XZ:
+		this->FGImageActor->SetDisplayExtent(w_ext[0], w_ext[1], slice, slice, w_ext[4], w_ext[5]);
+		break;
+
+	case vtkImageView2D::SLICE_ORIENTATION_YZ:
+	default:
+		this->FGImageActor->SetDisplayExtent(slice, slice, w_ext[2], w_ext[3], w_ext[4], w_ext[5]);
+		break;
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

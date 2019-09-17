@@ -15,6 +15,8 @@
 #include <vtkImageSliceMapper.h>
 #include <vtkDICOMImageReader.h>
 #include <vtkImageImport.h>
+#include <vtkImageMapToColors.h>
+#include <vtkImageActor.h>
 
 const int ROWS{ 512 };
 const int COLS{ 512 };
@@ -28,7 +30,7 @@ const int MASK_ROWS = ROWS - MASK_ROW_OFFS - MASK_ROW_OFFS;
 const int MASK_COLS = COLS - MASK_COL_OFFS - MASK_COL_OFFS;
 const int MASK_SLICES = SLICES - MASK_SLICE_OFFS - MASK_SLICE_OFFS;
 
-#define LIB_SETS_OFFSET
+//#define LIB_SETS_OFFSET
 
 vtkImageData*  InitializeInputImage()
 {
@@ -119,7 +121,7 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 			origin[2] += spacing[2] * MASK_SLICE_OFFS;
 			retVal->SetOrigin(origin);
 
-			retVal->Update();
+			//retVal->Update();
 #endif // ndef LIB_SETS_OFFSET
 
 		}
@@ -222,21 +224,30 @@ int main(int argc, char *argv[])
 
 	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
 
+	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
+	windowLevel->SetLookupTable(lut);
+	windowLevel->SetInputConnection(pMaskAlgorithm);
+	windowLevel->PassAlphaToOutputOn();
+
 	for(int i=0; i < 3;++i) {
 
-#ifndef LIB_SETS_OFFSET
-		pViews[i]->SetFGImage(pMaskImage,lut);
-#else
+//#ifndef LIB_SETS_OFFSET
+		//pViews[i]->SetFGImage(pMaskImage,lut);
+//#else
 
 // 		auto pSL = vtkImageSliceMapper::New();
 // 		pSL->SetInputData(pMaskImage);
 // 
-// 		pViews[i]->SetFGImage(pSL->GetOutputPort(),lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
-// 		pViews[i]->Render();
+//		pViews[i]->SetFGImage(pMaskAlgorithm,lut,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
+//		pViews[i]->Render();
 
-		pViews[i]->SetInput(pMaskAlgorithm, 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
+		pViews[i]->SetInput(windowLevel->GetOutputPort(), 0, lavtkViewImage2D::FG_IMAGE_ACTOR);
 
-#endif //ndef LIB_SETS_OFFSET
+		auto pActor = pViews[i]->GetImageActor(lavtkViewImage2D::FG_IMAGE_ACTOR);
+
+		pActor->SetOpacity(0.95);
+
+//#endif //ndef LIB_SETS_OFFSET
 
 	}
 	
