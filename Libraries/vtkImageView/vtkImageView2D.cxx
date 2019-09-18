@@ -1996,22 +1996,24 @@ void vtkImageView2D::SetInput(vtkAlgorithmOutput* pi_poVtkAlgoOutput, vtkMatrix4
   if ( this->GetImage2DDisplayForLayer(layer) )
     renderer->AddViewProp (this->GetImage2DDisplayForLayer(layer)->GetImageActor());
 
-  this->SetCurrentLayer(layer);
-  this->Slice = this->GetSliceForWorldCoordinates (this->CurrentPoint);
-  this->UpdateDisplayExtent();
-  this->UpdateSlicePlane();
-  this->InvokeEvent (vtkImageView2D::SliceChangedEvent);
+  if (layer == 0) {
+	  this->SetCurrentLayer(layer);
+	  this->Slice = this->GetSliceForWorldCoordinates(this->CurrentPoint);
+	  this->UpdateDisplayExtent();
+	  this->UpdateSlicePlane();
+	  this->InvokeEvent(vtkImageView2D::SliceChangedEvent);
 
-  // So ugly to do it, for each new layer,
-  // but it 's the only way i found so far to get the annotation correctly rendered ... - RDE
-  renderer->AddViewProp(this->CornerAnnotation);
-  renderer->AddViewProp(this->ScalarBar);
-  renderer->AddViewProp(this->OrientationAnnotation);
+	  // So ugly to do it, for each new layer,
+	  // but it 's the only way i found so far to get the annotation correctly rendered ... - RDE
+	  renderer->AddViewProp(this->CornerAnnotation);
+	  renderer->AddViewProp(this->ScalarBar);
+	  renderer->AddViewProp(this->OrientationAnnotation);
 
-  if(this->ShowRulerWidget)
-  {
-    this->ShowRulerWidgetOff();
-    this->ShowRulerWidgetOn();
+	  if (this->ShowRulerWidget)
+	  {
+		  this->ShowRulerWidgetOff();
+		  this->ShowRulerWidgetOn();
+	  }
   }
 }
 
