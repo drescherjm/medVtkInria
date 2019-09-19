@@ -14,6 +14,7 @@
 #include <algorithm>
 #include <vtkAlgorithmOutput.h>
 #include "vtkImage2DDisplay.h"
+#include <vtkImageMapper3D.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -58,11 +59,12 @@ void vtkImageView2DExtended::SetFGImage(vtkAlgorithmOutput* pi_poVtkAlgoOutput, 
 	windowLevel->SetLookupTable(lut);
 	windowLevel->SetInputConnection(pi_poVtkAlgoOutput);
 	windowLevel->PassAlphaToOutputOn();
+	windowLevel->Update();
 
 	// set up the vtk pipeline 
 
 	vtkImageActor*	actor = vtkImageActor::New();
-	actor->SetInputData(windowLevel->GetOutput());
+	actor->GetMapper()->SetInputConnection(windowLevel->GetOutputPort());
 
 	FGImageActor = actor;
 	FGWindowLevel = windowLevel;

@@ -335,6 +335,9 @@ vtkAlgorithmOutput* vtkImageView::ResliceImageToInput(vtkAlgorithmOutput* pi_poV
     if (!pi_poVtkAlgoPort || !this->GetMedVtkImageInfo() || !this->GetMedVtkImageInfo()->initialized)
         return NULL;
 
+	image->Print(cout);
+
+	auto pInfo = this->GetMedVtkImageInfo();
 
     if ( pi_poVtkAlgoPort &&
          this->Compare(image->GetOrigin(),      this->GetMedVtkImageInfo()->origin, 3) &&

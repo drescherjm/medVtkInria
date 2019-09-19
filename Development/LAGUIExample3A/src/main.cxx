@@ -153,7 +153,6 @@ lavtkViewImage2D* InitializeView( vtkImageData* pImage, unsigned int orientation
 	return pView;
 }
 
-
 lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orientation)
 {
 	lavtkViewImage2D* pView = lavtkViewImage2D::New();
