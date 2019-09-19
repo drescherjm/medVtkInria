@@ -127,6 +127,9 @@ vtkImageView2DCommand::Execute(vtkObject*    caller,
 
     if (event == vtkImageView2DCommand::CharEvent)
     {
+#if 0
+		// JMD: Disable this.
+
         vtkRenderWindowInteractor *rwi = this->Viewer->GetRenderWindow()->GetInteractor();
 
         if (rwi->GetKeyCode() == 'n')
@@ -135,7 +138,7 @@ vtkImageView2DCommand::Execute(vtkObject*    caller,
             this->Viewer->SetInterpolate ((this->Viewer->GetInterpolate(iLayer) + 1)%2, iLayer);
             this->Viewer->Render();
         }
-
+#endif //
         return;
     }
 
