@@ -23,6 +23,7 @@
 #include <vtkImageChangeInformation.h>
 #include <vtkImageConstantPad.h>
 #include <vtkAlgorithmOutput.h>
+#include <vtkOutputWindow.h>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -280,6 +281,7 @@ int main(int argc, char *argv[])
 
 	for (auto pView : pViews) {
 		pView->SetSize(425, 425);
+		pView->SetVisibility(vtkImageView2DExtended::CROSSHAIR_ACTOR, 1);
 	}
 
 	pViews[0]->SetPosition(0, 0);
@@ -335,6 +337,13 @@ int main(int argc, char *argv[])
 //#endif //ndef LIB_SETS_OFFSET
 
 	}
+
+	vtkObject::SetGlobalWarningDisplay(1);
+
+	vtkSmartPointer<vtkOutputWindow> myOutputWindow = vtkSmartPointer<vtkOutputWindow>::New();
+	myOutputWindow->SetUseStdErrorForAllMessages(true);
+
+	vtkOutputWindow::SetInstance(myOutputWindow);
 	
 	return app.exec();
 
