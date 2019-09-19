@@ -1,9 +1,9 @@
-// LAGUIExample3
+// LAGUIExample3B
 
-// This example tests overlays of a smaller size than the source image. The purpose
-// of this is to verify that the FGImage method will perform efficiently and also 
-// not have to create a RGBA buffer to store the result of the blending of the 
-// two images.
+/*
+ *	This example shows how to use a mask image that is smaller than the original imag
+ *  and has possible padding on the x, y and z planes. 
+ */
 
 #include <QApplication>
 #include <QMainWindow>
@@ -22,13 +22,29 @@
 #include <vtkSimpleImageFilterExample.h>
 #include <vtkImageChangeInformation.h>
 #include <vtkImageConstantPad.h>
+#include <vtkAlgorithmOutput.h>
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename T>
+bool isEqual(T* first, T* second, size_t size)
+{
+	for (size_t i = 0; i < size; ++i) {
+		if (first[i] != second[i]) {
+			return false;
+		}
+	}
+	return true;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 const int ROWS{ 512 };
 const int COLS{ 512 };
 const int SLICES{ 400 };
 
 const int MASK_ROW_OFFS{ 20 };
-const int MASK_COL_OFFS{ 20 };
+const int MASK_COL_OFFS{ 25 };
 const int MASK_SLICE_OFFS{10};
 
 const int MASK_ROWS = ROWS - MASK_ROW_OFFS - MASK_ROW_OFFS;
@@ -68,21 +84,40 @@ vtkImageData*  InitializeInputImage()
 	return pImage;
 }
 
-vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
+vtkImageData*  InitializeMaskImage(vtkImageData* pImage,int nXOffs, int nYOffs, int nZOffs)
 {
 	vtkImageData* retVal = vtkImageData::New();
 	if (retVal != NULL) {
-		retVal->SetDimensions(MASK_COLS,MASK_ROWS,MASK_SLICES);
-		retVal->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+		int extent[6];
+		pImage->GetExtent(extent);
 
+		extent[0] += nXOffs;
+		extent[1] -= nXOffs;
+
+		extent[2] += nYOffs;
+		extent[3] -= nYOffs;
+
+		extent[4] += nZOffs;
+		extent[5] -= nZOffs;
+
+
+		int nMaskSlices = extent[5] - extent[4] + 1;
+		int nMaskRows = extent[3] - extent[2] + 1;
+		int nMaskCols = extent[1] - extent[0] + 1;
+				
+		retVal->SetDimensions(nMaskCols, nMaskRows, nMaskSlices);
+		
+		retVal->SetExtent(extent);
+		retVal->AllocateScalars(VTK_UNSIGNED_CHAR, 1);
+	
 		char* pDest = static_cast<char*>(retVal->GetScalarPointer());
 
 		char sliceVal =0;
-		for(quint16 k=0; k < MASK_SLICES;++k) {
+		for(quint16 k=0; k < nMaskSlices;++k) {
 			
-			if ((k> 128) && (k < 256)) {
+			if ((k> 128 - nZOffs) && (k < 256-nZOffs)) {
 
-				int nColor = ((k - 128) / 22) + 1;
+				int nColor = ((k - 128 - nZOffs) / 22) + 1;
 				sliceVal = nColor;
 			}
 			else {
@@ -90,10 +125,9 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 			}
 
 			char rowVal = sliceVal;
-			for(quint16 j=0; j < MASK_ROWS;++j) {
-				if ((sliceVal != 0) && (j > 128) && (j < 256) ) {
-
-					int nColor = ((j - 128) / 22);
+			for(quint16 j=0; j < nMaskRows;++j) {
+				if ((sliceVal != 0) && (j > 128 - nYOffs) && (j < 256 - nYOffs) ) {
+					int nColor = ((j - 128 - nYOffs) / 22);
 					rowVal = ((sliceVal + nColor) % 6) +1;
 				}
 				else
@@ -101,9 +135,9 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 					rowVal = 0;
 				}
 
-				for(quint16 i=0; i < MASK_COLS;++i) {
-					if ( (rowVal != 0) && (i > 128) && (i < 256) ) {
-						int nColor = ((i - 128) / 22);
+				for(quint16 i=0; i < nMaskCols;++i) {
+					if ( (rowVal != 0) && (i > 128 - nXOffs) && (i < 256 -nXOffs) ) {
+						int nColor = ((i - 128-nXOffs) / 22);
 						*pDest++ = ((rowVal + nColor) % 6) +1;
 					}
 					else
@@ -118,28 +152,70 @@ vtkImageData*  InitializeMaskImage(vtkImageData* pImage)
 			double spacing[3];
 			pImage->GetSpacing(spacing);
 			retVal->SetSpacing(spacing);
-
-#ifndef LIB_SETS_OFFSET
-			double spacing[3];
-			pImage->GetSpacing(spacing);
-			retVal->SetSpacing(spacing);
-
-			double origin[3];
-			pImage->GetOrigin(origin);
-			origin[0] += spacing[0] * MASK_COL_OFFS;
-			origin[1] += spacing[1] * MASK_ROW_OFFS;
-			origin[2] += spacing[2] * MASK_SLICE_OFFS;
-			retVal->SetOrigin(origin);
-
-			//retVal->Update();
-#endif // ndef LIB_SETS_OFFSET
-
 		}
 	}
 	//retVal->Update();
 
 	return retVal;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+ *	The current medVtkInria code requires that the mask image have the same extent
+ *  same origin and same scale. If these are different the image has to get rescalled
+ *	to match. We don't want this at all so we have to adjust the mask.
+ */
+
+vtkAlgorithmOutput* resizeMaskToMatchImage(vtkAlgorithmOutput* pMaskAlgorithm, vtkImageData* pImage)
+{
+	vtkAlgorithmOutput* retVal = pMaskAlgorithm;
+
+	auto pAlgorithm = pMaskAlgorithm->GetProducer();
+	vtkImageAlgorithm* pImageAlgorithm = vtkImageAlgorithm::SafeDownCast(pAlgorithm);
+
+	if (pImageAlgorithm) {
+
+		vtkImageData* pImageDataMask = pImageAlgorithm->GetOutput();
+
+		int extentMask[6];
+		pImageDataMask->GetExtent(extentMask);
+		
+		double spacingMask[3];
+		pImageDataMask->GetSpacing(spacingMask);
+		
+		int extentImage[6];
+		pImage->GetExtent(extentImage);
+				
+		if ((extentMask[0] > 0) || (extentMask[2] > 0) || (extentMask[4] > 0) || !isEqual(extentMask,extentImage,6)) {
+
+			double spacingMask[3];
+			pImageDataMask->GetSpacing(spacingMask);
+
+			// Shift the origin to negative the to pad from the left
+			auto pChangeInfo = vtkImageChangeInformation::New();
+			pChangeInfo->SetInputConnection(pMaskAlgorithm);
+			//pChangeInfo->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
+			pChangeInfo->SetOriginTranslation(-extentMask[0] * spacingMask[0], -extentMask[2] * spacingMask[1], -extentMask[4] * spacingMask[2]);
+
+
+			auto pPadFilter = vtkImageConstantPad::New();
+			pPadFilter->SetInputConnection(pChangeInfo->GetOutputPort());
+			pPadFilter->SetOutputWholeExtent(extentImage);
+
+			auto pChangeInfo2 = vtkImageChangeInformation::New();
+			pChangeInfo2->SetInputConnection(pPadFilter->GetOutputPort());
+			//pChangeInfo2->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
+			pChangeInfo2->SetOriginTranslation(extentMask[0] * spacingMask[0], extentMask[2] * spacingMask[1], extentMask[4] * spacingMask[2]);
+
+			retVal = pChangeInfo2->GetOutputPort();
+		}
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 lavtkViewImage2D* InitializeView( vtkImageData* pImage, unsigned int orientation )
 {
@@ -210,7 +286,7 @@ int main(int argc, char *argv[])
 	pViews[1]->SetPosition(0, 450);
 	pViews[2]->SetPosition(425, 0); pViews[2]->SetSize(900, 875);
 
-	vtkImageData* pMaskImage = InitializeMaskImage(pImage);
+	vtkImageData* pMaskImage = InitializeMaskImage(pImage,MASK_COL_OFFS,MASK_ROW_OFFS,MASK_SLICE_OFFS);
 
 	vtkLookupTable* lut = vtkLookupTable::New(); 
 	lut->SetNumberOfTableValues(7); 
@@ -227,31 +303,12 @@ int main(int argc, char *argv[])
 
  	vtkAlgorithmOutput* pMaskAlgorithm = getImageAsAlgorithm(pMaskImage);
 
-	double spacing[3];
-	pImage->GetSpacing(spacing);
-
-	auto pChangeInfo = vtkImageChangeInformation::New();
-	pChangeInfo->SetInputConnection(pMaskAlgorithm);
-	pChangeInfo->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
-	pChangeInfo->SetOriginTranslation(-MASK_COL_OFFS * spacing[0], -MASK_ROW_OFFS * spacing[1], -MASK_SLICE_OFFS * spacing[2]);
-
-	auto pPadFilter = vtkImageConstantPad::New();
-
-	pPadFilter->SetInputConnection(pChangeInfo->GetOutputPort());
-	int extent[6];
-	pImage->GetExtent(extent);
-	pPadFilter->SetOutputWholeExtent(extent);
-
-	auto pChangeInfo2 = vtkImageChangeInformation::New();
-	pChangeInfo2->SetInputConnection(pPadFilter->GetOutputPort());
-	//pChangeInfo2->SetExtentTranslation(MASK_COL_OFFS, MASK_ROW_OFFS, MASK_SLICE_OFFS);
-	pChangeInfo2->SetOriginTranslation(+MASK_COL_OFFS * spacing[0], +MASK_ROW_OFFS * spacing[1], +MASK_SLICE_OFFS * spacing[2]);
-	//pPadFilter->Update();
+	pMaskAlgorithm = resizeMaskToMatchImage(pMaskAlgorithm, pImage);
 
 #ifdef USE_VTKINRIA_LAYER
 	vtkImageMapToColors* windowLevel = vtkImageMapToColors::New();
 	windowLevel->SetLookupTable(lut);
-	windowLevel->SetInputConnection(pChangeInfo2->GetOutputPort());
+	windowLevel->SetInputConnection(pMaskAlgorithm);
 	windowLevel->PassAlphaToOutputOn();
 	windowLevel->Update();
 #endif
