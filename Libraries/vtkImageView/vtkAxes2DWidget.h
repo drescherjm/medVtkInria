@@ -84,6 +84,7 @@ protected:
   
   vtkUnsignedCharArray* ColorArray;
   int Enabled;
+  double Radius;
 
 private:
   vtkAxes2DWidget(const vtkAxes2DWidget&);  //Not implemented

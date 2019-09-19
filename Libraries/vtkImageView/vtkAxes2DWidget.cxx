@@ -72,12 +72,26 @@ vtkAxes2DWidget::vtkAxes2DWidget()
     this->Points->InsertNextPoint (0, 0, 0);
     this->Points->InsertNextPoint (0, 0, 0);
 
+#ifndef USE_ORIGINAL_AXES
+	this->Points->InsertNextPoint(0, 0, 0);
+	this->Points->InsertNextPoint(0, 0, 0);
+	this->Points->InsertNextPoint(0, 0, 0);
+	this->Points->InsertNextPoint(0, 0, 0);
+#endif //USE_ORIGINAL_AXES
+	
     this->Source->Allocate();
     vtkIdType line[2];
     line[0] = 0; line[1] = 1;
     this->Source->InsertNextCell (VTK_LINE, 2, line);
     line[0] = 2; line[1] = 3;
     this->Source->InsertNextCell (VTK_LINE, 2, line);
+
+#ifndef USE_ORIGINAL_AXES
+	line[0] = 4; line[1] = 5;
+	this->Source->InsertNextCell(VTK_LINE, 2, line);
+	line[0] = 6; line[1] = 7;
+	this->Source->InsertNextCell(VTK_LINE, 2, line);
+#endif //USE_ORIGINAL_AXES
 
     this->Command = vtkAxes2DWidgetCommand::New();
     this->Command->SetWidget (this);
@@ -91,10 +105,17 @@ vtkAxes2DWidget::vtkAxes2DWidget()
     this->ColorArray->InsertNextTypedTuple (red);
     this->ColorArray->InsertNextTypedTuple (red);
     this->ColorArray->InsertNextTypedTuple (red);
+#ifndef USE_ORIGINAL_AXES
+	this->ColorArray->InsertNextTypedTuple(red);
+	this->ColorArray->InsertNextTypedTuple(red);
+	this->ColorArray->InsertNextTypedTuple(red);
+	this->ColorArray->InsertNextTypedTuple(red);
+#endif // USE_ORIGINAL_AXES
 
     this->Source->GetPointData()->SetScalars (this->ColorArray);
 
     this->Enabled = 0;
+	this->Radius = 4;
 }
 
 //----------------------------------------------------------------------------------
@@ -218,6 +239,21 @@ void vtkAxes2DWidget::ComputePlanes()
     this->ColorArray->SetTypedTuple (1, colorX);
     this->ColorArray->SetTypedTuple (2, colorY);
     this->ColorArray->SetTypedTuple (3, colorY);
+#ifdef USE_ORIGINAL_AXES
+	this->ColorArray->SetTypedTuple(0, colorX);
+	this->ColorArray->SetTypedTuple(1, colorX);
+	this->ColorArray->SetTypedTuple(2, colorY);
+	this->ColorArray->SetTypedTuple(3, colorY);
+#else
+	this->ColorArray->SetTypedTuple(0, colorX);
+	this->ColorArray->SetTypedTuple(1, colorX);
+	this->ColorArray->SetTypedTuple(2, colorX);
+	this->ColorArray->SetTypedTuple(3, colorX);
+	this->ColorArray->SetTypedTuple(4, colorY);
+	this->ColorArray->SetTypedTuple(5, colorY);
+	this->ColorArray->SetTypedTuple(6, colorY);
+	this->ColorArray->SetTypedTuple(7, colorY);
+#endif // !USE_ORIGINAL_AXES
 
     vtkCamera *cam = this->ImageView->GetRenderer()->GetActiveCamera();
     double *normal = cam->GetViewPlaneNormal();
@@ -260,6 +296,7 @@ void vtkAxes2DWidget::ComputeLyingPoints(double *pos)
 {
     //this->ComputePlanes(); // image may have changed, so we need to re-compute planes
 
+#ifdef USE_ORIGINAL_AXES
     double p0[3], p1[3], p2[3], p3[3];
 
     vtkPlane::ProjectPoint (pos, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), p0);
@@ -292,6 +329,78 @@ void vtkAxes2DWidget::ComputeLyingPoints(double *pos)
     this->Points->SetPoint (1, p1);
     this->Points->SetPoint (2, p2);
     this->Points->SetPoint (3, p3);
+#else
+	double p0[3], p1[3], p2[3], p3[3], r0[3], r1[3], r2[3], r3[3];
+
+	for (unsigned int i = 0; i < 3; i++)
+	{
+		r0[i] = pos[i] - this->Radius * this->PlaneXmin->GetNormal()[i];
+		r1[i] = pos[i] + this->Radius * this->PlaneXmin->GetNormal()[i];
+		r2[i] = pos[i] - this->Radius * this->PlaneYmin->GetNormal()[i];
+		r3[i] = pos[i] + this->Radius * this->PlaneYmin->GetNormal()[i];
+	}
+
+	vtkPlane::ProjectPoint(pos, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), p0);
+	vtkPlane::ProjectPoint(pos, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), p1);
+	vtkPlane::ProjectPoint(pos, this->PlaneYmin->GetOrigin(), this->PlaneYmin->GetNormal(), p2);
+	vtkPlane::ProjectPoint(pos, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), p3);
+
+	if (this->PlaneYmax->EvaluateFunction(pos) > 0)
+	{
+		vtkPlane::ProjectPoint(p0, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), p0);
+		vtkPlane::ProjectPoint(p1, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), p1);
+		vtkPlane::ProjectPoint(r0, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), r0);
+		vtkPlane::ProjectPoint(r1, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), r1);
+	}
+	if (this->PlaneYmin->EvaluateFunction(pos) < 0)
+	{
+		vtkPlane::ProjectPoint(p0, this->PlaneYmin->GetOrigin(), this->PlaneYmin->GetNormal(), p0);
+		vtkPlane::ProjectPoint(p1, this->PlaneYmin->GetOrigin(), this->PlaneYmin->GetNormal(), p1);
+		vtkPlane::ProjectPoint(r0, this->PlaneYmin->GetOrigin(), this->PlaneYmin->GetNormal(), r0);
+		vtkPlane::ProjectPoint(r1, this->PlaneYmin->GetOrigin(), this->PlaneYmin->GetNormal(), r1);
+	}
+	if (this->PlaneXmax->EvaluateFunction(pos) > 0)
+	{
+		vtkPlane::ProjectPoint(p2, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), p2);
+		vtkPlane::ProjectPoint(p3, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), p3);
+		vtkPlane::ProjectPoint(r2, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), r2);
+		vtkPlane::ProjectPoint(r3, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), r3);
+	}
+	if (this->PlaneXmin->EvaluateFunction(pos) < 0)
+	{
+		vtkPlane::ProjectPoint(p2, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), p2);
+		vtkPlane::ProjectPoint(p3, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), p3);
+		vtkPlane::ProjectPoint(r2, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), r2);
+		vtkPlane::ProjectPoint(r3, this->PlaneXmin->GetOrigin(), this->PlaneXmin->GetNormal(), r3);
+	}
+
+	if (this->PlaneXmax->EvaluateFunction(r0) > 0)
+		vtkPlane::ProjectPoint(r0, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), r0);
+	if (this->PlaneXmax->EvaluateFunction(r1) > 0)
+		vtkPlane::ProjectPoint(r1, this->PlaneXmax->GetOrigin(), this->PlaneXmax->GetNormal(), r1);
+	if (this->PlaneXmin->EvaluateFunction(r0) < 0)
+		vtkPlane::ProjectPoint(r0, this->PlaneXmin->GetOrigin(), this->PlaneXmax->GetNormal(), r0);
+	if (this->PlaneXmin->EvaluateFunction(r1) < 0)
+		vtkPlane::ProjectPoint(r1, this->PlaneXmin->GetOrigin(), this->PlaneXmax->GetNormal(), r1);
+
+	if (this->PlaneYmax->EvaluateFunction(r2) > 0)
+		vtkPlane::ProjectPoint(r2, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), r2);
+	if (this->PlaneYmax->EvaluateFunction(r3) > 0)
+		vtkPlane::ProjectPoint(r3, this->PlaneYmax->GetOrigin(), this->PlaneYmax->GetNormal(), r3);
+	if (this->PlaneYmin->EvaluateFunction(r2) < 0)
+		vtkPlane::ProjectPoint(r2, this->PlaneYmin->GetOrigin(), this->PlaneYmax->GetNormal(), r2);
+	if (this->PlaneYmin->EvaluateFunction(r3) < 0)
+		vtkPlane::ProjectPoint(r3, this->PlaneYmin->GetOrigin(), this->PlaneYmax->GetNormal(), r3);
+
+	this->Points->SetPoint(0, p0);
+	this->Points->SetPoint(1, r0);
+	this->Points->SetPoint(2, p1);
+	this->Points->SetPoint(3, r1);
+	this->Points->SetPoint(4, p2);
+	this->Points->SetPoint(5, r2);
+	this->Points->SetPoint(6, p3);
+	this->Points->SetPoint(7, r3);
+#endif
 
     this->Points->Modified();
 }
@@ -302,11 +411,6 @@ void vtkAxes2DWidget::PrintSelf(ostream& os, vtkIndent indent)
     //Superclass typedef defined in vtkTypeMacro() found in vtkSetGet.h
     this->Superclass::PrintSelf(os, indent);
 }
-
-
-
-
-
 
 //----------------------------------------------------------------------------------
 void vtkAxes2DWidgetCommand::Execute(vtkObject *caller, unsigned long event, void *callData)
