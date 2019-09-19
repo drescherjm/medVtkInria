@@ -40,7 +40,10 @@ vtkImageViewCornerAnnotation::vtkImageViewCornerAnnotation()
     this->ImageView = nullptr;
 }
 
-vtkImageViewCornerAnnotation::~vtkImageViewCornerAnnotation() = default;
+vtkImageViewCornerAnnotation::~vtkImageViewCornerAnnotation()
+{
+
+}
 
 void vtkImageViewCornerAnnotation::TextReplace(vtkImageActor *ia,
                                                vtkImageMapToWindowLevelColors *wl)
