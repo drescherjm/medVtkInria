@@ -20,10 +20,10 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
       CACHE STRING "")
 endif()
 
-PROJECT(vtkINRIA3D)
+project(medVtkInriaEx)
 cmake_minimum_required(VERSION 3.12)
 
-set (${PROJECT_NAME}_VERSION_MAJOR 2)
+set (${PROJECT_NAME}_VERSION_MAJOR 3)
 set (${PROJECT_NAME}_VERSION_MINOR 0)
 set (${PROJECT_NAME}_VERSION_PATCH 0)
 
@@ -34,7 +34,7 @@ if(COMMAND cmake_policy)
   cmake_policy(SET CMP0020 NEW)
 endif(COMMAND cmake_policy)
 
-set(TARGET_NAME medVtkInria)
+set(TARGET_NAME ${PROJECT_NAME})
 
 #Use solution folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
