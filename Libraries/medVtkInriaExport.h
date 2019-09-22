@@ -14,7 +14,7 @@
 #pragma once
 
 #ifdef WIN32
- #if defined (medVtkInria_EXPORTS)
+ #if defined (medVtkInriaEx_EXPORTS)
   #define MEDVTKINRIA_EXPORT __declspec( dllexport )
  #else
   #define MEDVTKINRIA_EXPORT __declspec( dllimport )

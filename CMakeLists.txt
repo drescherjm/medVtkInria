@@ -141,3 +141,7 @@ endif()
 if(${PROJECT_NAME}_BUILD_DEVELOPMENT)
   add_subdirectory(Development)
 endif()
+
+
+#install(TARGETS medVtkInriaEx DESTINATION ${CMAKE_BINARY_DIR} EXPORT medVtkInriaEx)
+#install(EXPORT medVtkInriaEx DESTINATION ${CMAKE_BINARY_DIR})
