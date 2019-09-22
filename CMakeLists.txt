@@ -143,5 +143,8 @@ if(${PROJECT_NAME}_BUILD_DEVELOPMENT)
 endif()
 
 
-#install(TARGETS medVtkInriaEx DESTINATION ${CMAKE_BINARY_DIR} EXPORT medVtkInriaEx)
-#install(EXPORT medVtkInriaEx DESTINATION ${CMAKE_BINARY_DIR})
+# install(TARGETS medVtkInriaEx EXPORT medVtkInriaEx)
+# install(EXPORT medVtkInriaEx DESTINATION cmake)
+
+export(TARGETS ${TARGET_NAME} FILE "${PROJECT_BINARY_DIR}/${PROJECT_NAME}Config.cmake")
+
