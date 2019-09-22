@@ -60,7 +60,7 @@ target_link_libraries(${PROJECT_NAME}
   #vtkCommon
   #vtkRendering 
   #vtkImaging
-  medVtkInria
+  ${TARGET_NAME}
   )
 
 
