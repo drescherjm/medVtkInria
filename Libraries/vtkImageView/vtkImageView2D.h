@@ -384,6 +384,10 @@ public:
     virtual vtkRenderer * GetRenderer() const;
     vtkImageAlgorithm * GetImageAlgorithmForLayer(int layer) const;
 
+	// Get layer specific renderer.
+	vtkImage2DDisplay* GetImage2DDisplayForLayer(int layer) const;
+	vtkRenderer* GetRendererForLayer(int layer) const;
+
 protected:
     vtkImageView2D();
     ~vtkImageView2D();
@@ -440,12 +444,6 @@ protected:
    and update things accordingly in the view (i.e. the slice number when moving slice).
    */
     vtkImageView2DCommand* Command;
-
-    // Get layer specific renderer.
-    vtkImage2DDisplay * GetImage2DDisplayForLayer(int layer) const;
-    vtkRenderer * GetRendererForLayer(int layer) const;
-
-
 
     //BTX
     std::list<vtkDataSet2DWidget*>::iterator FindDataSetWidget(vtkPointSet* arg);

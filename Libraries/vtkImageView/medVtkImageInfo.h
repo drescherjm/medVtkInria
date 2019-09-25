@@ -1,6 +1,8 @@
 #pragma once
 
-struct medVtkImageInfo
+#include <medVtkInriaExport.h>
+
+struct MEDVTKINRIA_EXPORT medVtkImageInfo
 {
     int    dimensions[3];
     int    extent[6];

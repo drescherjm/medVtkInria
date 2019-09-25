@@ -1,4 +1,5 @@
 #pragma once
+#include <medVtkInriaExport.h>
 #include <vtkImageData.h>
 #include <vtkImageActor.h>
 #include <vtkImageMapToColors.h>
@@ -9,7 +10,7 @@
 #include "medVtkImageInfo.h"
 
 
-class vtkImage2DDisplay : public vtkObject
+class MEDVTKINRIA_EXPORT vtkImage2DDisplay : public vtkObject
 {
 public:
   static vtkImage2DDisplay * New();

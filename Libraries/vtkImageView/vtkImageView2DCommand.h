@@ -74,9 +74,9 @@ class MEDVTKINRIA_EXPORT vtkImageView2DCommand : public vtkCommand
   // was invoked (e.g., progress value in the vtkCommand::ProgressEvent).
   virtual void Execute(vtkObject *caller,unsigned long event, void *vtkNotUsed(callData));
 
-  virtual void SetViewer(vtkImageView2D *viewer)
-  { this->Viewer = viewer; }
+  virtual void SetViewer(vtkImageView2D *viewer) { this->Viewer = viewer; }
 
+  virtual vtkImageView2D* GetViewer() const { return Viewer; }
 
  protected:
   vtkImageView2DCommand();
