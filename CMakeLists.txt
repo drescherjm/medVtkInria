@@ -121,7 +121,7 @@ include(UnoptimizedRelWithDebInfo)
 include(SetupProject)
 include(SupportQt)
 
-dump_all_variables()
+#dump_all_variables()
 
 setup_project(${PROJECT_NAME})
 
