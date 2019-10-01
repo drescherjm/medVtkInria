@@ -1,4 +1,4 @@
-myproject(QtVTKRenderWindows_2)
+myproject(FourPaneUsingQVTKWIDGET_0)
 
 find_package(VTK
   COMPONENTS
