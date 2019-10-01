@@ -34,6 +34,12 @@
 #include "vtkResliceImageViewerMeasurements.h"
 #include <vtkImageView2D.h>
 #include <vtkImageView2DExtended.h>
+#include <vtkPointHandleRepresentation2D.h>
+#include <vtkSeedRepresentation.h>
+#include <vtkSeedWidget.h>
+#include <vtkProperty2D.h>
+
+#define TEST_SEED_WIDGET
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -165,6 +171,26 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	this->ui->view1->show();
 	this->ui->view2->show();
 	this->ui->view3->show();
+
+#ifdef TEST_SEED_WIDGET
+	// Create the representation for the seed widget and for its handles
+	auto handleRep = vtkPointHandleRepresentation2D::New();
+	handleRep->GetProperty()->SetColor(1, 0, 0); // Make the handles red
+	auto widgetRep = vtkSmartPointer<vtkSeedRepresentation>::New();
+	widgetRep->SetHandleRepresentation(handleRep);
+
+	// Create the seed widget
+	auto seedWidget = vtkSeedWidget::New();
+
+	auto pInteractor = riw[0]->GetInteractor();
+	if (pInteractor) {
+		seedWidget->SetInteractor(pInteractor);
+		seedWidget->SetRepresentation(widgetRep);
+	}
+
+	seedWidget->On();
+
+#endif
 
 	// Set up action signals and slots
 	connect(this->ui->actionExit, SIGNAL(triggered()), this, SLOT(slotExit()));
