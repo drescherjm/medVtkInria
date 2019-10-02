@@ -1225,6 +1225,12 @@ void vtkImageView2D::SetAnnotationsFromOrientation()
 
   switch(this->AnnotationStyle)
   {
+	case AnnotationStyleUser:
+		osSW << m_mapAnnotations[vtkOrientationAnnotation::LowerLeft];
+		osSE << m_mapAnnotations[vtkOrientationAnnotation::LowerRight];
+		osNW << m_mapAnnotations[vtkOrientationAnnotation::UpperLeft];
+		osNE << m_mapAnnotations[vtkOrientationAnnotation::UpperRight];
+	  break;
     case AnnotationStyle2:
       osNW << "<size>\n"
       << "<spacing>\n"
@@ -1247,18 +1253,20 @@ void vtkImageView2D::SetAnnotationsFromOrientation()
       osNW<< "<window_level>";
       osNE << "<patient>\n<study>\n<series>";
 
-      switch( this->ViewOrientation )
-    {
-      case vtkImageView2D::VIEW_ORIENTATION_AXIAL:
-          osSE << "Axial View";
-          break;
-      case vtkImageView2D::VIEW_ORIENTATION_CORONAL:
-          osSE << "Coronal View";
-          break;
-      case vtkImageView2D::VIEW_ORIENTATION_SAGITTAL:
-          osSE << "Sagittal View";
-          break;
-    }
+	  if (HasLayer(0)) {
+		  switch (this->ViewOrientation)
+		  {
+		  case vtkImageView2D::VIEW_ORIENTATION_AXIAL:
+			  osSE << "Axial View";
+			  break;
+		  case vtkImageView2D::VIEW_ORIENTATION_CORONAL:
+			  osSE << "Coronal View";
+			  break;
+		  case vtkImageView2D::VIEW_ORIENTATION_SAGITTAL:
+			  osSE << "Sagittal View";
+			  break;
+		  }
+	  }
       break;
   }
 
@@ -2478,6 +2486,15 @@ vtkRenderer * vtkImageView2D::GetRendererForLayer( int layer ) const
     }
     else return nullptr;
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void vtkImageView2D::setUserAnnotation(vtkOrientationAnnotation::TextPosition nPos, std::string strAnnotation)
+{
+	m_mapAnnotations[nPos] = strAnnotation;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 vtkImageAlgorithm * vtkImageView2D::GetImageAlgorithmForLayer(int layer) const
 {

@@ -22,7 +22,7 @@
 #include <vtkSmartPointer.h>
 
 #include <vector>
-
+#include <vtkOrientationAnnotation.h>
 #include <QObject>
 
 class vtkImageActor;
@@ -205,7 +205,8 @@ public:
     enum AnnotationStyleIds
     {
         AnnotationStyle1 = 0,
-        AnnotationStyle2
+        AnnotationStyle2,
+		AnnotationStyleUser,
     };
     //ETX
 
@@ -388,6 +389,8 @@ public:
 	vtkImage2DDisplay* GetImage2DDisplayForLayer(int layer) const;
 	vtkRenderer* GetRendererForLayer(int layer) const;
 
+	virtual void setUserAnnotation(vtkOrientationAnnotation::TextPosition nPos, std::string strAnnotation);
+
 protected:
     vtkImageView2D();
     ~vtkImageView2D();
@@ -464,6 +467,8 @@ protected:
     int ShowImageAxis;
 
     unsigned int AnnotationStyle;
+
+	std::map<vtkOrientationAnnotation::TextPosition, std::string>  m_mapAnnotations;
 
     int CursorFollowMouse;
     int Slice;
