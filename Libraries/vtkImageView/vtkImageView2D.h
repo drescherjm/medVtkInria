@@ -18,11 +18,12 @@
 
 #include <vtkImageView.h>
 #include <vtkInteractorStyleImageView2D.h>
+#include <vtkImageViewCornerAnnotation.h>
 
 #include <vtkSmartPointer.h>
 
+#include <map>
 #include <vector>
-#include <vtkOrientationAnnotation.h>
 #include <QObject>
 
 class vtkImageActor;
@@ -389,7 +390,7 @@ public:
 	vtkImage2DDisplay* GetImage2DDisplayForLayer(int layer) const;
 	vtkRenderer* GetRendererForLayer(int layer) const;
 
-	virtual void setUserAnnotation(vtkOrientationAnnotation::TextPosition nPos, std::string strAnnotation);
+	virtual void setUserAnnotation(vtkImageViewCornerAnnotation::TextPosition nPos, std::string strAnnotation);
 
 protected:
     vtkImageView2D();
@@ -468,7 +469,7 @@ protected:
 
     unsigned int AnnotationStyle;
 
-	std::map<vtkOrientationAnnotation::TextPosition, std::string>  m_mapAnnotations;
+	std::map<vtkImageViewCornerAnnotation::TextPosition, std::string>  m_mapAnnotations;
 
     int CursorFollowMouse;
     int Slice;

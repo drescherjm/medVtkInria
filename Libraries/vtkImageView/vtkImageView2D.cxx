@@ -1226,10 +1226,10 @@ void vtkImageView2D::SetAnnotationsFromOrientation()
   switch(this->AnnotationStyle)
   {
 	case AnnotationStyleUser:
-		osSW << m_mapAnnotations[vtkOrientationAnnotation::LowerLeft];
-		osSE << m_mapAnnotations[vtkOrientationAnnotation::LowerRight];
-		osNW << m_mapAnnotations[vtkOrientationAnnotation::UpperLeft];
-		osNE << m_mapAnnotations[vtkOrientationAnnotation::UpperRight];
+		osSW << m_mapAnnotations[vtkImageViewCornerAnnotation::LowerLeft];
+		osSE << m_mapAnnotations[vtkImageViewCornerAnnotation::LowerRight];
+		osNW << m_mapAnnotations[vtkImageViewCornerAnnotation::UpperLeft];
+		osNE << m_mapAnnotations[vtkImageViewCornerAnnotation::UpperRight];
 	  break;
     case AnnotationStyle2:
       osNW << "<size>\n"
@@ -2489,7 +2489,7 @@ vtkRenderer * vtkImageView2D::GetRendererForLayer( int layer ) const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void vtkImageView2D::setUserAnnotation(vtkOrientationAnnotation::TextPosition nPos, std::string strAnnotation)
+void vtkImageView2D::setUserAnnotation(vtkImageViewCornerAnnotation::TextPosition nPos, std::string strAnnotation)
 {
 	m_mapAnnotations[nPos] = strAnnotation;
 }
