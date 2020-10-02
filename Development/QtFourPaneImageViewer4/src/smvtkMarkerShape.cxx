@@ -501,35 +501,72 @@ void smvtkMarkerShape::drawTriangle( vtkPoints * newPts, vtkCellArray * newLines
 
 void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines)
 {
-	double x[3];
+	double voxel[3];
 	vtkIdType ptIds[5];
 
-	int pt = 0;
+	int index = 0;
 
-	x[0] = this->ModelBounds[0];  // X0
-	x[1] = this->ModelBounds[2];  // Y0
-	x[2] = this->ModelBounds[4];
-	ptIds[pt++] = newPts->InsertNextPoint(x);
+	double x0{ this->ModelBounds[0] };
+	double x1{ this->ModelBounds[1] };
+	double y0{ this->ModelBounds[2] };
+	double y1{ this->ModelBounds[3] };
+	
+	voxel[0] = x0;  // X0
+	voxel[1] = y0;  // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
 
-	x[0] = this->ModelBounds[1];   // X1
-	x[1] = this->ModelBounds[2];   // Y0
-	x[2] = this->ModelBounds[4];
-	ptIds[pt++] = newPts->InsertNextPoint(x);
+	voxel[0] = x1;   // X1
+	voxel[1] = y0;   // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
 
-	x[0] = this->ModelBounds[1];   // X1
-	x[1] = this->ModelBounds[3];   // Y1
-	x[2] = this->ModelBounds[4];
-	ptIds[pt++] = newPts->InsertNextPoint(x);
+	voxel[0] = x1;   // X1
+	voxel[1] = y1;   // Y1
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
 
-	x[0] = this->ModelBounds[0];    // X0
-	x[1] = this->ModelBounds[3];    // Y1
-	x[2] = this->ModelBounds[4];
-	ptIds[pt++] = newPts->InsertNextPoint(x);
+	voxel[0] = x0;    // X0
+	voxel[1] = y1;    // Y1
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
 
-	x[0] = this->ModelBounds[0];    // X0
-	x[1] = this->ModelBounds[2];    // Y0
-	x[2] = this->ModelBounds[4];
-	ptIds[pt++] = newPts->InsertNextPoint(x);
+	voxel[0] = x0;    // X0
+	voxel[1] = y0;    // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
 
-	newLines->InsertNextCell(pt, ptIds);
+	newLines->InsertNextCell(index, ptIds);
+
+	x0++; y0++; 
+	x1--; y1--;
+
+	index = 0;
+
+	voxel[0] = x0;  // X0
+	voxel[1] = y0;  // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x1;   // X1
+	voxel[1] = y0;   // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x1;   // X1
+	voxel[1] = y1;   // Y1
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x0;    // X0
+	voxel[1] = y1;    // Y1
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x0;    // X0
+	voxel[1] = y0;    // Y0
+	voxel[2] = this->ModelBounds[4];
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	newLines->InsertNextCell(index, ptIds);
 }
