@@ -1,19 +1,30 @@
 #include <QApplication>
 #include <QSurfaceFormat>
+#include <QMessageBox>
 
 #include "QVTKOpenGLWidget.h"
 #include "QtVTKRenderWindows.h"
 
 int main( int argc, char** argv )
 {
-  // needed to ensure appropriate OpenGL context is created for VTK rendering.
-  QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
+	if (argc > 1) {
 
-  // QT Stuff
-  QApplication app( argc, argv );
+		// needed to ensure appropriate OpenGL context is created for VTK rendering.
+		QSurfaceFormat::setDefaultFormat(QVTKOpenGLWidget::defaultFormat());
 
-  QtVTKRenderWindows myQtVTKRenderWindows(argc, argv);
-  myQtVTKRenderWindows.show();
+		// QT Stuff
+		QApplication app(argc, argv);
 
-  return app.exec();
+		QtVTKRenderWindows myQtVTKRenderWindows(argc, argv);
+		myQtVTKRenderWindows.show();
+
+		return app.exec();
+	}
+	else {
+		QMessageBox::warning(nullptr, "The application will close.", 
+			"This program requires 1 command line argument which is the path of a folder containing a DICOM series.");
+
+	}
+
+	return -1;
 }
