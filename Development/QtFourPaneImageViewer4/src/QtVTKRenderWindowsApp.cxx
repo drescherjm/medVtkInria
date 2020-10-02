@@ -5,6 +5,11 @@
 #include "QVTKOpenGLWidget.h"
 #include "QtVTKRenderWindows.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////
+// This example aims to pull in the advanced seed widget from StudyManager to test
+// its functionality espcially its use when the software reneder is enabled.
+
+
 int main( int argc, char** argv )
 {
 	if (argc > 1) {

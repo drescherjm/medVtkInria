@@ -38,6 +38,7 @@
 #include <vtkSeedRepresentation.h>
 #include <vtkSeedWidget.h>
 #include <vtkProperty2D.h>
+#include "smvtkMarkerShape.h"
 
 #define TEST_SEED_WIDGET
 
@@ -175,6 +176,20 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 #ifdef TEST_SEED_WIDGET
 	// Create the representation for the seed widget and for its handles
 	auto handleRep = vtkPointHandleRepresentation2D::New();
+
+	auto markerStyle = smvtkMarkerShape::New();
+
+	markerStyle->OutlineOff();
+	markerStyle->setShapeType(smvtkMarkerShape::Rectangle);
+
+	handleRep->SetCursorShape(markerStyle->GetOutput());
+	
+
+	// The following line causes a need for the shader that causes the marker to not be displayed in the software Mesa renderer. 
+	// handleRep->GetProperty()->SetLineWidth(2.0);
+
+	markerStyle->Update();
+
 	handleRep->GetProperty()->SetColor(1, 0, 0); // Make the handles red
 	auto widgetRep = vtkSmartPointer<vtkSeedRepresentation>::New();
 	widgetRep->SetHandleRepresentation(handleRep);

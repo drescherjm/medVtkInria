@@ -27,11 +27,17 @@ endif ()
 set(Srcs
   src/QtVTKRenderWindowsApp.cxx
   src/QtVTKRenderWindows.cxx
-  src/vtkResliceCursorCallback.cxx)
+  src/vtkResliceCursorCallback.cxx
+  #src/smvtkMarkerHandleRepresentation.cxx
+  src/smvtkMarkerShape.cxx
+)
 
 set(Hdrs
   Include/QtVTKRenderWindows.h
-  Include/vtkResliceCursorCallback.h)
+  Include/vtkResliceCursorCallback.h
+  #Include/smvtkMarkerHandleRepresentation.h
+  Include/smvtkMarkerShape.h
+)
 
 set(UIs
   rc/QtVTKRenderWindows.ui)
