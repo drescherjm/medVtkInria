@@ -179,6 +179,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	auto markerStyle = smvtkMarkerShape::New();
 
+	markerStyle->PointOff();
 	markerStyle->OutlineOff();
 	markerStyle->setShapeType(smvtkMarkerShape::Rectangle);
 
