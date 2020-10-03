@@ -60,6 +60,11 @@ public:
 	  Star,
 	  Triangle,
 	  Rectangle,
+      Diamond,
+      Pentagon,
+      Hexagon,
+      Heptagon,
+      Octagon,
 	  NUM_SHAPES
   };
   // Description:
@@ -149,6 +154,7 @@ protected:
   void	drawStar( vtkPoints * newPts, vtkCellArray * newLines );
   void	drawTriangle( vtkPoints * newPts, vtkCellArray * newLines );
   void	drawRectangle(vtkPoints* newPts, vtkCellArray* newLines);
+  void	drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, uint8_t nSides);
 
 protected:
   double		ModelBounds[6];

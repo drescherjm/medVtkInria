@@ -42,6 +42,79 @@
 
 #define TEST_SEED_WIDGET
 
+
+#ifdef TEST_SEED_WIDGET
+
+class vtkSeedCallback : public vtkCommand
+{
+public:
+	static vtkSeedCallback* New()
+	{
+		return new vtkSeedCallback;
+	}
+
+	vtkSeedCallback() {}
+
+	virtual void Execute(vtkObject*, unsigned long event, void* calldata)
+	{
+		if (event == vtkCommand::PlacePointEvent)
+		{
+			std::cout << "Point placed, total of: "
+				<< this->SeedRepresentation->GetNumberOfSeeds() << std::endl;
+			
+			auto pHandleRep = this->SeedRepresentation->GetHandleRepresentation();
+
+			if (pHandleRep) {
+				auto handleRep = dynamic_cast<vtkPointHandleRepresentation2D*>(pHandleRep);
+				if (handleRep) {
+
+					static int nShapes = smvtkMarkerShape::Hexagon;
+
+					nShapes = nShapes + 1;
+
+					nShapes %= smvtkMarkerShape::NUM_SHAPES;
+
+					auto markerStyle = smvtkMarkerShape::New();
+
+					markerStyle->PointOff();
+					markerStyle->OutlineOff();
+					markerStyle->setShapeType(static_cast<smvtkMarkerShape::ShapeType>(nShapes));
+					markerStyle->Update();
+
+					handleRep->SetCursorShape(markerStyle->GetOutput());
+				}
+			}
+		}
+		if (event == vtkCommand::InteractionEvent)
+		{
+			if (calldata)
+			{
+				std::cout << "Interacting with seed : "
+					<< *(static_cast<int*>(calldata)) << std::endl;
+			}
+		}
+		if (event == vtkCommand::EndInteractionEvent) {
+
+
+		}
+
+		std::cout << "List of seeds (Display coordinates):" << std::endl;
+		for (vtkIdType i = 0; i < this->SeedRepresentation->GetNumberOfSeeds(); i++)
+		{
+			double pos[3];
+			this->SeedRepresentation->GetSeedDisplayPosition(i, pos);
+			std::cout << "(" << pos[0] << " " << pos[1] << " " << pos[2] << ")" << std::endl;
+		}
+
+	}
+
+	void SetRepresentation(vtkSmartPointer<vtkSeedRepresentation> rep) { this->SeedRepresentation = rep; }
+private:
+	vtkSmartPointer<vtkSeedRepresentation> SeedRepresentation;
+};
+
+#endif //def TEST_SEED_WIDGET
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
@@ -181,7 +254,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	markerStyle->PointOff();
 	markerStyle->OutlineOff();
-	markerStyle->setShapeType(smvtkMarkerShape::Rectangle);
+	markerStyle->setShapeType(smvtkMarkerShape::Hexagon);
 
 	handleRep->SetCursorShape(markerStyle->GetOutput());
 	
@@ -197,6 +270,14 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	// Create the seed widget
 	auto seedWidget = vtkSeedWidget::New();
+
+	vtkSmartPointer<vtkSeedCallback> seedCallback =
+		vtkSmartPointer<vtkSeedCallback>::New();
+	seedCallback->SetRepresentation(widgetRep);
+	seedWidget->AddObserver(vtkCommand::PlacePointEvent, seedCallback);
+	seedWidget->AddObserver(vtkCommand::InteractionEvent, seedCallback);
+	seedWidget->AddObserver(vtkCommand::EndInteractionEvent, seedCallback);
+
 
 	auto pInteractor = riw[0]->GetInteractor();
 	if (pInteractor) {

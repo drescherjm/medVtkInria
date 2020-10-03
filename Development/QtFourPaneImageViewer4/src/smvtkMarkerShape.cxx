@@ -21,7 +21,10 @@
 #include "vtkInformationVector.h"
 #include "vtkObjectFactory.h"
 #include "vtkPolyData.h"
-#include <math.h>
+#include <cmath>
+
+#include <array>
+#include <complex>
 
 #if VTK_MAJOR_VERSION < 6
 vtkCxxRevisionMacro(smvtkMarkerShape, "$Revision: 4388 $");
@@ -179,6 +182,21 @@ int smvtkMarkerShape::RequestData(
 			break;
 			case Rectangle:
 				drawRectangle(newPts, newLines);
+			break;
+			case Diamond:
+				drawNSidedShape(newPts, newLines, 4);
+			break;
+			case Pentagon:
+				drawNSidedShape(newPts, newLines, 5);
+			break;
+			case Hexagon:
+				drawNSidedShape(newPts, newLines,6);
+			break;
+			case Heptagon:
+				drawNSidedShape(newPts, newLines, 7);
+			break;
+			case Octagon:
+				drawNSidedShape(newPts, newLines, 8);
 			break;
 		}
 
@@ -499,74 +517,120 @@ void smvtkMarkerShape::drawTriangle( vtkPoints * newPts, vtkCellArray * newLines
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+void drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, double x0, double x1, double y0, double y1, double z0)
+{
+	int index = 0;
+	double voxel[3];
+	std::array<vtkIdType, 5> ptIds;
+
+	voxel[0] = x0;  // X0
+	voxel[1] = y0;  // Y0
+	voxel[2] = z0;
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x1;   // X1
+	voxel[1] = y0;   // Y0
+	voxel[2] = z0;
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x1;   // X1
+	voxel[1] = y1;   // Y1
+	voxel[2] = z0;
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x0;    // X0
+	voxel[1] = y1;    // Y1
+	voxel[2] = z0;
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	voxel[0] = x0;    // X0
+	voxel[1] = y0;    // Y0
+	voxel[2] = z0;
+	ptIds[index++] = newPts->InsertNextPoint(voxel);
+
+	newLines->InsertNextCell(index, ptIds.data());
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void drawShape(vtkPoints* newPts, vtkCellArray* newLines, int nRadius, int nSides, int fpx, int fpy, int z0)
+{
+	static auto pi = acos(-1);
+
+	std::vector<vtkIdType> ptIds;
+	ptIds.reserve(nSides+1);
+
+	double degrees = 90;
+
+	auto radians = (degrees * pi) / 180;
+
+	double angle = radians;
+	double incr = 2.0 * pi / nSides;
+
+	double newX = nRadius * cos(angle) + fpx;
+	double newY = nRadius * sin(angle) + fpy;
+
+	double voxel[3];
+	voxel[2] = z0;
+
+	voxel[0] = newX;
+	voxel[1] = newY;
+
+	ptIds.push_back(newPts->InsertNextPoint(voxel));
+
+	for (int i = 0; i < nSides-1; i++)
+	{
+		//int oldX = newX;
+		//int oldY = newY;
+		angle += incr;
+		newX = nRadius * cos(angle) + fpx;
+		newY = nRadius * sin(angle) + fpy;
+
+		voxel[0] = newX;
+		voxel[1] = newY;
+
+		ptIds.push_back(newPts->InsertNextPoint(voxel));
+		
+	}
+
+	ptIds.push_back(0);
+
+	newLines->InsertNextCell(ptIds.size(), ptIds.data());
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines)
 {
-	double voxel[3];
-	vtkIdType ptIds[5];
-
-	int index = 0;
-
 	double x0{ this->ModelBounds[0] };
 	double x1{ this->ModelBounds[1] };
 	double y0{ this->ModelBounds[2] };
 	double y1{ this->ModelBounds[3] };
+	double z0{ this->ModelBounds[4] };
 	
-	voxel[0] = x0;  // X0
-	voxel[1] = y0;  // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y0;   // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y1;   // Y1
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y1;    // Y1
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y0;    // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	newLines->InsertNextCell(index, ptIds);
+	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
 
 	x0++; y0++; 
 	x1--; y1--;
 
-	index = 0;
+	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
 
-	voxel[0] = x0;  // X0
-	voxel[1] = y0;  // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y0;   // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y1;   // Y1
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y1;    // Y1
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y0;    // Y0
-	voxel[2] = this->ModelBounds[4];
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	newLines->InsertNextCell(index, ptIds);
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void smvtkMarkerShape::drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, uint8_t nSides)
+{
+	double x0{ this->ModelBounds[0] };
+	double x1{ this->ModelBounds[1] };
+	double y0{ this->ModelBounds[2] };
+	double y1{ this->ModelBounds[3] };
+	double z0{ this->ModelBounds[4] };
+
+	int nRadius = std::min(x1 - x0, y1 - y0) / 2;
+
+	drawShape(newPts, newLines, nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
+	drawShape(newPts, newLines, --nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
