@@ -7,7 +7,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 // This example aims to pull in the advanced seed widget from StudyManager to test
-// its functionality espcially its use when the software reneder is enabled.
+// its functionality especially its use when the software renderer is enabled.
 
 
 int main( int argc, char** argv )
@@ -26,6 +26,8 @@ int main( int argc, char** argv )
 		return app.exec();
 	}
 	else {
+		QApplication app(argc, argv);
+
 		QMessageBox::warning(nullptr, "The application will close.", 
 			"This program requires 1 command line argument which is the path of a folder containing a DICOM series.");
 
