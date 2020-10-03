@@ -553,7 +553,7 @@ void drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, double x0, double 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void drawShape(vtkPoints* newPts, vtkCellArray* newLines, int nRadius, int nSides, int fpx, int fpy, int z0)
+void drawShape(vtkPoints* newPts, vtkCellArray* newLines, double nRadius, int nSides, int fpx, int fpy, int z0)
 {
 	static auto pi = acos(-1);
 
@@ -627,10 +627,12 @@ void smvtkMarkerShape::drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines
 	double y1{ this->ModelBounds[3] };
 	double z0{ this->ModelBounds[4] };
 
-	int nRadius = std::min(x1 - x0, y1 - y0) / 2;
+	double nRadius = std::min(x1 - x0, y1 - y0) / 2;
 
 	drawShape(newPts, newLines, nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
 	drawShape(newPts, newLines, --nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
+	//drawShape(newPts, newLines, nRadius+.5, nSides, FocalPoint[0], FocalPoint[1], z0);
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
