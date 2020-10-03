@@ -58,14 +58,15 @@ public:
   enum ShapeType {
 	  Axes,
 	  Star,
+      Circle,
 	  Triangle,
 	  Rectangle,
       Diamond,
       Pentagon,
       Hexagon,
-      Heptagon,
+      NUM_SHAPES,
+      Heptagon,       
       Octagon,
-	  NUM_SHAPES
   };
   // Description:
   // Construct with model bounds = (-10,10,-10,10), focal point = (0,0),
@@ -154,7 +155,9 @@ protected:
   void	drawStar( vtkPoints * newPts, vtkCellArray * newLines );
   void	drawTriangle( vtkPoints * newPts, vtkCellArray * newLines );
   void	drawRectangle(vtkPoints* newPts, vtkCellArray* newLines);
-  void	drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, uint8_t nSides);
+  void	drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides);
+
+  void	drawNSidedShapeThick(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides);
 
 protected:
   double		ModelBounds[6];
