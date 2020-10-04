@@ -151,8 +151,8 @@ protected:
   ~smvtkMarkerShape();
 
   int	RequestData(vtkInformation*, vtkInformationVector**, vtkInformationVector*);
-  void	drawAxes( vtkPoints * newPts, vtkCellArray * newLines );
-  void	drawStar( vtkPoints * newPts, vtkCellArray * newLines );
+  void	drawAxes( vtkPoints * newPts, vtkCellArray * newLines, vtkCellArray* newPolygons, double nThickness );
+  void	drawStar( vtkPoints * newPts, vtkCellArray * newLines, vtkCellArray* newPolygons, double nThickness);
   void	drawTriangle( vtkPoints * newPts, vtkCellArray * newLines );
   void	drawRectangle(vtkPoints* newPts, vtkCellArray* newLines);
   void	drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides);
