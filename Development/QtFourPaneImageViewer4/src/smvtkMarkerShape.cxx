@@ -43,7 +43,7 @@ vtkStandardNewMacro(smvtkMarkerShape);
 // radius=2, all parts of cursor visible, and wrapping off.
 smvtkMarkerShape::smvtkMarkerShape()
 {
-	constexpr double sz = 15;
+	constexpr double sz = 12;
 
   this->ModelBounds[0] = -sz;
   this->ModelBounds[1] = sz;
@@ -193,7 +193,7 @@ int smvtkMarkerShape::RequestData(
 				drawNSidedShapeThick(newPts, newLines, newPolygons, 3);
 			break;
 			case Rectangle:
-				drawRectangle(newPts, newLines);
+				drawRectangle(newPts, newLines,newPolygons,1.5);
 			break;
 			case Diamond:
 				drawNSidedShapeThick(newPts, newLines, newPolygons, 4);
@@ -444,62 +444,12 @@ void  drawThickLine(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* new
 
 void smvtkMarkerShape::drawAxes( vtkPoints * newPts, vtkCellArray * newLines, vtkCellArray* newPolygons, double nThickness)
 {
-	double x[3];
-	vtkIdType ptIds[2];
-
-	// The lines making up the x axis
-// 	x[0] = this->ModelBounds[0]; 
-// 	x[1] = this->FocalPoint[1]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[0] = newPts->InsertNextPoint(x);
-// 
-// 	x[0] = this->FocalPoint[0] - this->Radius; 
-// 	x[1] = this->FocalPoint[1]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[1] = newPts->InsertNextPoint(x);
-// 	newLines->InsertNextCell(2,ptIds);
-
-	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[0], this->FocalPoint[0] - this->Radius, FocalPoint[1], FocalPoint[1], ModelBounds[4]);
-
-// 	x[0] = this->FocalPoint[0] + this->Radius; 
-// 	x[1] = this->FocalPoint[1]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[0] = newPts->InsertNextPoint(x);
-// 
-// 	x[0] = this->ModelBounds[1]; 
-// 	x[1] = this->FocalPoint[1]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[1] = newPts->InsertNextPoint(x);
-// 	newLines->InsertNextCell(2,ptIds);
-
+	// Horizontal Lines
+	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[0], FocalPoint[0]-Radius, FocalPoint[1], FocalPoint[1], ModelBounds[4]);
 	drawThickLine(newPts, newLines, newPolygons, nThickness, FocalPoint[0]+Radius, ModelBounds[1], FocalPoint[1], FocalPoint[1], ModelBounds[4]);
 
-	// The lines making up the y axis
-// 	x[0] = this->FocalPoint[0]; 
-// 	x[1] = this->ModelBounds[2]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[0] = newPts->InsertNextPoint(x);
-// 
-// 	x[0] = this->FocalPoint[0]; 
-// 	x[1] = this->FocalPoint[1] - Radius;
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[1] = newPts->InsertNextPoint(x);
-// 	newLines->InsertNextCell(2,ptIds);
-
+	// Vertical Lines
 	drawThickLine(newPts, newLines, newPolygons, nThickness, FocalPoint[0], FocalPoint[0], ModelBounds[2], FocalPoint[1] - Radius, ModelBounds[4]);
-
-
-// 	x[0] = this->FocalPoint[0];
-// 	x[1] = this->FocalPoint[1] + this->Radius; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[0] = newPts->InsertNextPoint(x);
-// 
-// 	x[0] = this->FocalPoint[0];
-// 	x[1] = this->ModelBounds[3]; 
-// 	x[2] = this->ModelBounds[4];
-// 	ptIds[1] = newPts->InsertNextPoint(x);
-// 	newLines->InsertNextCell(2,ptIds);
-
 	drawThickLine(newPts, newLines, newPolygons, nThickness, FocalPoint[0], FocalPoint[0], FocalPoint[1] + Radius, ModelBounds[3], ModelBounds[4]);
 
 }
@@ -511,54 +461,18 @@ void smvtkMarkerShape::drawStar( vtkPoints * newPts, vtkCellArray * newLines, vt
 
 	drawAxes(newPts,newLines,newPolygons,nThickness);
 
-	double x[3];
-	vtkIdType ptIds[2];
+	// Lower Left
+	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[0] + Radius, FocalPoint[0] - Radius, ModelBounds[2]+Radius, FocalPoint[1] - Radius, ModelBounds[4]);
 
-	x[0] = this->ModelBounds[0]; 
-	x[1] = this->ModelBounds[2]; 
-	x[2] = this->ModelBounds[4];
-	ptIds[0] = newPts->InsertNextPoint(x);
+	// Upper Left
+	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[0] + Radius, FocalPoint[0] - Radius, ModelBounds[3] - Radius, FocalPoint[1] + Radius, ModelBounds[4]);
 
-	x[0] = this->FocalPoint[0] - this->Radius; 
-	x[1] = this->FocalPoint[1] - this->Radius; 
-	x[2] = this->ModelBounds[4];
-	ptIds[1] = newPts->InsertNextPoint(x);
-	newLines->InsertNextCell(2,ptIds);
+	// Upper Right
+	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[1] - Radius, FocalPoint[0] + Radius, ModelBounds[3] - Radius, FocalPoint[1] + Radius, ModelBounds[4]);
 
-	x[0] = this->ModelBounds[0]; 
-	x[1] = this->ModelBounds[3]; 
-	x[2] = this->ModelBounds[4];
-	ptIds[0] = newPts->InsertNextPoint(x);
+	// Lower Right
+	drawThickLine(newPts, newLines, newPolygons, nThickness, ModelBounds[1] - Radius, FocalPoint[0] + Radius, ModelBounds[2] + Radius, FocalPoint[1] - Radius, ModelBounds[4]);
 
-	x[0] = this->FocalPoint[0] - this->Radius; 
-	x[1] = this->FocalPoint[1] + this->Radius; 
-	x[2] = this->ModelBounds[4];
-	ptIds[1] = newPts->InsertNextPoint(x);
-	newLines->InsertNextCell(2,ptIds);
-
-
-	x[0] = this->ModelBounds[1]; 
-	x[1] = this->ModelBounds[3]; 
-	x[2] = this->ModelBounds[4];
-	ptIds[0] = newPts->InsertNextPoint(x);
-
-	x[0] = this->FocalPoint[0] + this->Radius; 
-	x[1] = this->FocalPoint[1] + this->Radius; 
-	x[2] = this->ModelBounds[4];
-	ptIds[1] = newPts->InsertNextPoint(x);
-	newLines->InsertNextCell(2,ptIds);
-
-	x[0] = this->ModelBounds[1]; 
-	x[1] = this->ModelBounds[2]; 
-	x[2] = this->ModelBounds[4];
-	ptIds[0] = newPts->InsertNextPoint(x);
-
-	x[0] = this->FocalPoint[0] + this->Radius; 
-	x[1] = this->FocalPoint[1] - this->Radius; 
-	x[2] = this->ModelBounds[4];
-	ptIds[1] = newPts->InsertNextPoint(x);
-	newLines->InsertNextCell(2,ptIds);
-	
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -595,39 +509,39 @@ void smvtkMarkerShape::drawTriangle( vtkPoints * newPts, vtkCellArray * newLines
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, double x0, double x1, double y0, double y1, double z0)
-{
-	int index = 0;
-	double voxel[3];
-	std::array<vtkIdType, 5> ptIds;
-
-	voxel[0] = x0;  // X0
-	voxel[1] = y0;  // Y0
-	voxel[2] = z0;
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y0;   // Y0
-	voxel[2] = z0;
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x1;   // X1
-	voxel[1] = y1;   // Y1
-	voxel[2] = z0;
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y1;    // Y1
-	voxel[2] = z0;
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	voxel[0] = x0;    // X0
-	voxel[1] = y0;    // Y0
-	voxel[2] = z0;
-	ptIds[index++] = newPts->InsertNextPoint(voxel);
-
-	newLines->InsertNextCell(index, ptIds.data());
-}
+// void drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, double x0, double x1, double y0, double y1, double z0)
+// {
+// 	int index = 0;
+// 	double voxel[3];
+// 	std::array<vtkIdType, 5> ptIds;
+// 
+// 	voxel[0] = x0;  // X0
+// 	voxel[1] = y0;  // Y0
+// 	voxel[2] = z0;
+// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
+// 
+// 	voxel[0] = x1;   // X1
+// 	voxel[1] = y0;   // Y0
+// 	voxel[2] = z0;
+// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
+// 
+// 	voxel[0] = x1;   // X1
+// 	voxel[1] = y1;   // Y1
+// 	voxel[2] = z0;
+// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
+// 
+// 	voxel[0] = x0;    // X0
+// 	voxel[1] = y1;    // Y1
+// 	voxel[2] = z0;
+// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
+// 
+// 	voxel[0] = x0;    // X0
+// 	voxel[1] = y0;    // Y0
+// 	voxel[2] = z0;
+// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
+// 
+// 	newLines->InsertNextCell(index, ptIds.data());
+// }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -680,7 +594,7 @@ void drawShape(vtkPoints* newPts, vtkCellArray* newLines, double nRadius, int nS
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines)
+void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, double nThickness)
 {
 	double x0{ this->ModelBounds[0] };
 	double x1{ this->ModelBounds[1] };
@@ -688,12 +602,17 @@ void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines)
 	double y1{ this->ModelBounds[3] };
 	double z0{ this->ModelBounds[4] };
 	
-	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
+// 	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
+// 
+// 	x0++; y0++; 
+// 	x1--; y1--;
+// 
+// 	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
 
-	x0++; y0++; 
-	x1--; y1--;
-
-	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
+	drawThickLine(newPts, newLines, newPolygons, nThickness, x0, y0, x1, y0, ModelBounds[4]); // Top
+	drawThickLine(newPts, newLines, newPolygons, nThickness, x1, y0, x1, y1, ModelBounds[4]); // Right
+	drawThickLine(newPts, newLines, newPolygons, nThickness, x1, y1, x0, y1, ModelBounds[4]); // Bottom
+	drawThickLine(newPts, newLines, newPolygons, nThickness, x0, y1, x0, y0, ModelBounds[4]); // Left
 
 }
 
@@ -711,7 +630,6 @@ void smvtkMarkerShape::drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines
 
 	drawShape(newPts, newLines, nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
 	drawShape(newPts, newLines, --nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
-	//drawShape(newPts, newLines, nRadius+.5, nSides, FocalPoint[0], FocalPoint[1], z0);
 
 }
 
@@ -760,8 +678,6 @@ std::vector < vtkIdType> drawShapeThick(vtkPoints* newPts, vtkCellArray* newLine
 	}
 
 	retVal.push_back(first);
-
-	//newLines->InsertNextCell(retVal.size(), retVal.data());
 
 	return retVal;
 }
