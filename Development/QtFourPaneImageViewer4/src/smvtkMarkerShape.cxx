@@ -30,6 +30,8 @@
 
 static auto pi = acos(-1);
 
+bool smvtkMarkerShape::g_bUsePolygonsForThickLines{ false };
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 #if VTK_MAJOR_VERSION < 6
@@ -72,7 +74,6 @@ smvtkMarkerShape::smvtkMarkerShape()
 
 smvtkMarkerShape::~smvtkMarkerShape()
 {
-	std::cout << __FUNCTION__;
 }
 
 //---------------------------------------------------------------------------
@@ -176,42 +177,49 @@ int smvtkMarkerShape::RequestData(
     newVerts->Delete();
     }
 
+  double nThickness = 1.0;
+  if (g_bUsePolygonsForThickLines) {
+	  nThickness = 1.5;
+  }
+
+
   // Create Shape
   //
   if ( this->Shape ) 
     {
+
 		switch(this->st) {
 
 			case Axes:
-				drawAxes(newPts, newLines,newPolygons,1.5);
+				drawAxes(newPts, newLines,newPolygons,nThickness);
 			break;
 			case Star:
-				drawStar(newPts, newLines,newPolygons,1.5);
+				drawStar(newPts, newLines,newPolygons,nThickness);
 			break;
 			case Triangle:
 				//drawTriangle(newPts,newLines);
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 3);
+				drawNSidedShapeThick(newPts, newLines, newPolygons,nThickness, 3);
 			break;
 			case Rectangle:
-				drawRectangle(newPts, newLines,newPolygons,1.5);
+				drawRectangle(newPts, newLines,newPolygons,nThickness);
 			break;
 			case Diamond:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 4);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 4);
 			break;
 			case Pentagon:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 5);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 5);
 			break;
 			case Hexagon:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 6);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 6);
 			break;
 			case Heptagon:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 7);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 7);
 			break;
 			case Octagon:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 8);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 8);
 			break;
 			case Circle:
-				drawNSidedShapeThick(newPts, newLines, newPolygons, 12);
+				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 12);
 			break;
 		}
 
@@ -509,42 +517,6 @@ void smvtkMarkerShape::drawTriangle( vtkPoints * newPts, vtkCellArray * newLines
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-// void drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, double x0, double x1, double y0, double y1, double z0)
-// {
-// 	int index = 0;
-// 	double voxel[3];
-// 	std::array<vtkIdType, 5> ptIds;
-// 
-// 	voxel[0] = x0;  // X0
-// 	voxel[1] = y0;  // Y0
-// 	voxel[2] = z0;
-// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
-// 
-// 	voxel[0] = x1;   // X1
-// 	voxel[1] = y0;   // Y0
-// 	voxel[2] = z0;
-// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
-// 
-// 	voxel[0] = x1;   // X1
-// 	voxel[1] = y1;   // Y1
-// 	voxel[2] = z0;
-// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
-// 
-// 	voxel[0] = x0;    // X0
-// 	voxel[1] = y1;    // Y1
-// 	voxel[2] = z0;
-// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
-// 
-// 	voxel[0] = x0;    // X0
-// 	voxel[1] = y0;    // Y0
-// 	voxel[2] = z0;
-// 	ptIds[index++] = newPts->InsertNextPoint(voxel);
-// 
-// 	newLines->InsertNextCell(index, ptIds.data());
-// }
-
-/////////////////////////////////////////////////////////////////////////////////////////
-
 void drawShape(vtkPoints* newPts, vtkCellArray* newLines, double nRadius, int nSides, int fpx, int fpy, int z0)
 {
 	
@@ -602,13 +574,6 @@ void smvtkMarkerShape::drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, 
 	double y1{ this->ModelBounds[3] };
 	double z0{ this->ModelBounds[4] };
 	
-// 	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
-// 
-// 	x0++; y0++; 
-// 	x1--; y1--;
-// 
-// 	::drawRectangle(newPts, newLines, x0, x1, y0, y1, z0);
-
 	drawThickLine(newPts, newLines, newPolygons, nThickness, x0, y0, x1, y0, ModelBounds[4]); // Top
 	drawThickLine(newPts, newLines, newPolygons, nThickness, x1, y0, x1, y1, ModelBounds[4]); // Right
 	drawThickLine(newPts, newLines, newPolygons, nThickness, x1, y1, x0, y1, ModelBounds[4]); // Bottom
@@ -684,30 +649,35 @@ std::vector < vtkIdType> drawShapeThick(vtkPoints* newPts, vtkCellArray* newLine
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void smvtkMarkerShape::drawNSidedShapeThick(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides)
+void smvtkMarkerShape::drawNSidedShapeThick(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, double nThickness, uint8_t nSides)
 {
-	double x0{ this->ModelBounds[0] };
-	double x1{ this->ModelBounds[1] };
-	double y0{ this->ModelBounds[2] };
-	double y1{ this->ModelBounds[3] };
-	double z0{ this->ModelBounds[4] };
-
-	double nRadius = std::min(x1 - x0, y1 - y0) / 2;
-
-	auto v0 = drawShapeThick(newPts, newLines, nRadius, nSides, FocalPoint[0], FocalPoint[1], z0);
-	auto v1 = drawShapeThick(newPts, newLines, nRadius - 3, nSides, FocalPoint[0], FocalPoint[1], z0);
-
-	if (v0.size() > 1 && (v0.size() == v1.size())) {
-		for (uint16_t i = 0; i < v0.size() - 1;i++) {
-			std::array<vtkIdType, 4> ptsInThickLine{ v0[i],v0[i + 1],v1[i + 1],v1[i] };
-			newPolygons->InsertNextCell(ptsInThickLine.size(), ptsInThickLine.data());
-		}
-
+	if (nThickness == 1.0) {
+		drawNSidedShape(newPts, newLines, newPolygons, nSides);
 	}
 	else {
-		assert(false);
+
+		double x0{ this->ModelBounds[0] };
+		double x1{ this->ModelBounds[1] };
+		double y0{ this->ModelBounds[2] };
+		double y1{ this->ModelBounds[3] };
+		double z0{ this->ModelBounds[4] };
+
+		double nRadiusOfShape = std::min(x1 - x0, y1 - y0) / 2;
+
+		auto v0 = drawShapeThick(newPts, newLines, nRadiusOfShape, nSides, FocalPoint[0], FocalPoint[1], z0);
+		auto v1 = drawShapeThick(newPts, newLines, nRadiusOfShape - 2 * nThickness, nSides, FocalPoint[0], FocalPoint[1], z0);
+
+		if (v0.size() > 1 && (v0.size() == v1.size())) {
+			for (uint16_t i = 0; i < v0.size() - 1; i++) {
+				std::array<vtkIdType, 4> ptsInThickLine{ v0[i],v0[i + 1],v1[i + 1],v1[i] };
+				newPolygons->InsertNextCell(ptsInThickLine.size(), ptsInThickLine.data());
+			}
+
+		}
+		else {
+			assert(false);
+		}
 	}
-	
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -157,7 +157,7 @@ protected:
   void	drawRectangle(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, double nThickness);
   void	drawNSidedShape(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides);
 
-  void	drawNSidedShapeThick(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, uint8_t nSides);
+  void	drawNSidedShapeThick(vtkPoints* newPts, vtkCellArray* newLines, vtkCellArray* newPolygons, double nThickness, uint8_t nSides);
 
 protected:
   double		ModelBounds[6];
@@ -169,7 +169,10 @@ protected:
   int			TranslationMode;
   int			Wrap;
   ShapeType		st;
-  
+
+public:
+    static bool g_bUsePolygonsForThickLines;
+
 private:
   smvtkMarkerShape(const smvtkMarkerShape&);  // Not implemented.
   void operator=(const smvtkMarkerShape&);  // Not implemented.

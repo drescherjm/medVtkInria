@@ -30,6 +30,7 @@ set(Srcs
   src/vtkResliceCursorCallback.cxx
   #src/smvtkMarkerHandleRepresentation.cxx
   src/smvtkMarkerShape.cxx
+  src/vtkSystemInformation.cxx
 )
 
 set(Hdrs
@@ -37,6 +38,7 @@ set(Hdrs
   Include/vtkResliceCursorCallback.h
   #Include/smvtkMarkerHandleRepresentation.h
   Include/smvtkMarkerShape.h
+  Include/vtkSystemInformation.h
 )
 
 set(UIs
