@@ -27,12 +27,9 @@ bool checkRenderingCapabilities()
 	qWarning("Graphics capability of this computer is not sufficient to run this application");
 
 	QString message = QObject::tr("Graphics capability of this computer is not sufficient to "
-		"run this application. The application most likely will not function properly.");
+		"run this application.");
 
-	QString details = QObject::tr(
-		"See more information and help at:\nhttps://www.slicer.org/wiki/Documentation/Nightly/FAQ/General#Slicer_does_not_start \n\n"
-		"Graphics capabilities of this computer:\n\n");
-	details += systemInfo->GetRenderingCapabilitiesDetails().c_str();
+	QString details = systemInfo->GetRenderingCapabilitiesDetails().c_str();
 
 	QMessageBox* messageBox = new QMessageBox(0);
 	messageBox->setAttribute(Qt::WA_DeleteOnClose, true);
