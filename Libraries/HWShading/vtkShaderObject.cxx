@@ -48,7 +48,6 @@ PURPOSE.  See the above copyright notices for more information.
 #include <vtkIOStream.h>
 
 
-
 vtkShaderObject::vtkShaderObject()
 {
   //this->SourceFileName = NULL;
@@ -175,7 +174,7 @@ void vtkShaderObject::ReadSourceTextFromFile(const char* filename)
   int length;
   char * buffer;
 
-  ifstream is;
+  std::ifstream is;
   is.open (filename, ios::binary );
 
   // get length of file:

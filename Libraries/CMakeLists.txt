@@ -112,6 +112,11 @@ target_include_directories(${TARGET_NAME}
 ## Link
 ## #############################################################################
 
+
+message (STATUS "VTK_LIBRARIES: ${VTK_LIBRARIES}")
+
+if (VTK_VERSION VERSION_LESS "8.90.0")
+
 target_link_libraries(${TARGET_NAME}
   ${OPENGL_LIBRARIES}
   Qt5::Core
@@ -142,7 +147,19 @@ target_link_libraries(${TARGET_NAME}
   vtkFiltersGeometry
   vtksys
   )
+else() 
+  target_link_libraries(${TARGET_NAME}
+	${OPENGL_LIBRARIES}
+	Qt5::Core
+	Qt5::Widgets
+	${VTK_LIBRARIES}
+  )
 
+  vtk_module_autoinit(
+    TARGETS ${TARGET_NAME}
+    MODULES ${VTK_LIBRARIES}
+    )
+endif()
 
 ## #############################################################################
 ## install

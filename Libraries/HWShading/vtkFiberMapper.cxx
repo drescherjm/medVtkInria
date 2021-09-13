@@ -269,7 +269,13 @@ void vtkFiberMapper::DrawLines(vtkPoints* points, vtkCellArray* lineStrips,
   assert(lineStrips != NULL);
 
   int i; int j;
-  vtkIdType *pts = 0;
+
+#ifdef VTK_CELL_ARRAY_V2
+  vtkIdType const *pts = 0;
+#else
+  vtkIdType* pts = 0;
+#endif
+
   vtkIdType npts = 0;
   unsigned short count = 0;
   vtkIdType cellNum = 0;

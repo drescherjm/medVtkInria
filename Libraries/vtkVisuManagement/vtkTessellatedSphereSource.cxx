@@ -185,22 +185,30 @@ void TesselateTriangles(vtkPoints* oldVertices,vtkCellArray* oldTriangles,
     MidPointIds ids;
 
     vtkIdType numCellPts = 0;
-    vtkIdType* pts;
+    
+#ifdef VTK_CELL_ARRAY_V2
+	vtkIdType const* pts = 0;
+#else
+	vtkIdType* pts = 0;
+#endif
+
     oldTriangles->InitTraversal();
     for (int current2P=oldPoints;oldTriangles->GetNextCell(numCellPts,pts);) {
+
+        std::vector<vtkIdType> ptsVec(pts, pts + numCellPts);
 
         //  Get point coordinates of the triangle vertices.
 
         double points[3][3];
         for (unsigned i=0;i<3;++i)
-            oldVertices->GetPoint(pts[i],points[i]);
+            oldVertices->GetPoint(ptsVec[i],points[i]);
 
         //  Compute the mid points for the current triangle.
 
         vtkIdType triPointsIds[3] = {-1,-1,-1};
         for (unsigned i=0,l=2;i<3;++i)
             for (unsigned j=i+1;j<3;++j,--l) {
-                const BiPoint key = (pts[i]<pts[j]) ? std::make_pair(pts[i],pts[j]) : std::make_pair(pts[j],pts[i]);
+                const BiPoint key = (ptsVec[i]<ptsVec[j]) ? std::make_pair(ptsVec[i],ptsVec[j]) : std::make_pair(ptsVec[j],ptsVec[i]);
                 const MidPointIds::const_iterator iter = ids.find(key);
 
                 if (iter!=ids.end()) {
@@ -225,13 +233,14 @@ void TesselateTriangles(vtkPoints* oldVertices,vtkCellArray* oldTriangles,
         const vtkIdType c3 = 3;
         triangles->InsertNextCell(c3,triPointsIds);
         std::swap(triPointsIds[0],triPointsIds[1]);
-        std::swap(pts[0],pts[1]);
+        std::swap(ptsVec[0],ptsVec[1]);
 
-        for (int j=0;j<3;++j) {
-            std::swap(triPointsIds[j],pts[j]);
-            triangles->InsertNextCell(c3,triPointsIds);
-            std::swap(triPointsIds[j],pts[j]);
-        }
+		for (int j = 0; j < 3; ++j) {
+			std::swap(triPointsIds[j], ptsVec[j]);
+			triangles->InsertNextCell(c3, triPointsIds);
+			std::swap(triPointsIds[j], ptsVec[j]);
+	    }
+
     }
 }
 

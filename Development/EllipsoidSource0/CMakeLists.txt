@@ -1,5 +1,6 @@
 myproject(EllipsoidSource0)
 
+if (VTK_VERSION VERSION_LESS "8.90.0")
 find_package(VTK
   COMPONENTS
     vtkCommonCore
@@ -10,6 +11,19 @@ find_package(VTK
     vtkInteractionImage
     vtkInteractionStyle
     vtkInteractionWidgets)
+else()
+find_package(VTK
+  COMPONENTS
+    CommonCore
+    GUISupportQt
+    IOImage
+    ImagingColor
+    ImagingGeneral
+    InteractionImage
+    InteractionStyle
+    InteractionWidgets)
+endif()
+
 if (NOT VTK_FOUND)
   message("Skipping example: ${VTK_NOT_FOUND_MESSAGE}")
   return ()

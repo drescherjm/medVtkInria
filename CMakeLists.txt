@@ -22,6 +22,8 @@ endif()
 
 cmake_policy(SET CMP0003 NEW)
 cmake_policy(SET CMP0020 NEW)
+cmake_policy(SET CMP0074 NEW)
+cmake_policy(SET CMP0011 NEW)
 
 project(medVtkInriaEx)
 cmake_minimum_required(VERSION 3.12)
@@ -62,8 +64,37 @@ endif()
 ## Find required
 ## #############################################################################
 
-find_package(VTK REQUIRED COMPONENTS vtkRenderingVolumeOpenGL2 vtkInteractionWidgets vtkRenderingAnnotation vtkInteractionStyle vtkImagingStatistics vtkIOLegacy )
+if (VTK_VERSION VERSION_LESS "8.90.0")
+find_package(VTK REQUIRED COMPONENTS 
+  vtkCommonCore   
+  vtkViewsQt
+  vtkGUISupportQt
+  vtkRenderingQt
+  vtkRenderingVolumeOpenGL2 
+  vtkInteractionWidgets 
+  vtkRenderingAnnotation 
+  vtkInteractionStyle 
+  vtkImagingStatistics 
+  vtkIOLegacy 
+)
+else()
+find_package(VTK REQUIRED COMPONENTS 
+  CommonCore   
+  ViewsQt
+  GUISupportQt
+  RenderingQt
+  RenderingVolumeOpenGL2 
+  InteractionWidgets 
+  RenderingAnnotation 
+  InteractionStyle 
+  ImagingStatistics 
+  IOLegacy 
+)
+endif()
+
 include(${VTK_USE_FILE})
+
+message (STATUS "VTK_VERSION: ${VTK_VERSION}")
 
 find_package(OpenGL REQUIRED)
 

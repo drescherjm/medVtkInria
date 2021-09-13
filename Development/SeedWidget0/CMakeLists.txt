@@ -5,7 +5,7 @@ find_package(VTK COMPONENTS
   vtkFiltersSources
   vtkInteractionStyle
   vtkInteractionWidgets
-  vtkRenderingContextOpenGL2
+  #vtkRenderingContextOpenGL2
   vtkRenderingCore
   vtkRenderingFreeType
   vtkRenderingGL2PSOpenGL2
