@@ -76,6 +76,10 @@ find_package(VTK REQUIRED COMPONENTS
   vtkInteractionStyle 
   vtkImagingStatistics 
   vtkIOLegacy 
+  vtkCommonDataModel
+  vtkFiltersCore
+  vtkFiltersGeometry
+  vtkImagingSources
 )
 else()
 find_package(VTK REQUIRED COMPONENTS 
@@ -88,7 +92,11 @@ find_package(VTK REQUIRED COMPONENTS
   RenderingAnnotation 
   InteractionStyle 
   ImagingStatistics 
+  ImagingSources
   IOLegacy 
+  FiltersCore
+  CommonDataModel
+  FiltersGeometry
 )
 endif()
 

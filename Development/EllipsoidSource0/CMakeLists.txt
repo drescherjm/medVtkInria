@@ -11,6 +11,9 @@ find_package(VTK
     vtkInteractionImage
     vtkInteractionStyle
     vtkInteractionWidgets)
+	
+	include(${VTK_USE_FILE})
+	
 else()
 find_package(VTK
   COMPONENTS
@@ -28,10 +31,9 @@ if (NOT VTK_FOUND)
   message("Skipping example: ${VTK_NOT_FOUND_MESSAGE}")
   return ()
 endif ()
-include(${VTK_USE_FILE})
 
-find_package( ITK REQUIRED )
-include( ${ITK_USE_FILE} )
+#find_package( ITK REQUIRED )
+#include( ${ITK_USE_FILE} )
 
 set( ${LOCAL_PROJECT_NAME}_SRCS
 	./src/main.cxx

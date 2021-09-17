@@ -32,8 +32,8 @@ if (NOT VTK_FOUND)
   return ()
 endif ()
 
-find_package( ITK REQUIRED )
-include( ${ITK_USE_FILE} )
+#find_package( ITK REQUIRED )
+#include( ${ITK_USE_FILE} )
 
 set( ${LOCAL_PROJECT_NAME}_SRCS
 	./src/main.cxx

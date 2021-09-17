@@ -1,6 +1,7 @@
+if (VTK_VERSION VERSION_LESS "8.90.0")
+
 myproject(FourPaneUsingQVTKWIDGET_0)
 
-if (VTK_VERSION VERSION_LESS "8.90.0")
 find_package(VTK
   COMPONENTS
     vtkCommonCore
@@ -12,21 +13,9 @@ find_package(VTK
     vtkInteractionStyle
     vtkInteractionWidgets)
 	
-	include(${VTK_USE_FILE})
+	include(${VTK_USE_FILE}
+)
 	
-else()
-find_package(VTK
-  COMPONENTS
-    CommonCore
-    GUISupportQt
-    IOImage
-    ImagingColor
-    ImagingGeneral
-    InteractionImage
-    InteractionStyle
-    InteractionWidgets)
-endif()
-
 if (NOT VTK_FOUND)
   message("Skipping example: ${VTK_NOT_FOUND_MESSAGE}")
   return ()
@@ -68,3 +57,5 @@ target_link_libraries(${LOCAL_PROJECT_NAME}
 
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE Include)
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES FOLDER Development)
+
+endif(VTK_VERSION VERSION_LESS "8.90.0")
