@@ -606,6 +606,12 @@ void vtkImageView2D::SetViewConvention(int convention)
 		z_watcher = 1;
 		this->ConventionMatrix->SetElement(1, 2, 1);
 		break;
+    case vtkImageView2D::VIEW_CONVENTION_HOLOGIC_LEFT:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = 1;
+		this->ConventionMatrix->SetElement(1, 2, -1);
+		break;
 	case vtkImageView2D::VIEW_CONVENTION_NEUROLOGICAL:
 		x_watcher = 1;
 		y_watcher = 1;
