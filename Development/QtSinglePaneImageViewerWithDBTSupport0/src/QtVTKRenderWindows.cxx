@@ -49,6 +49,8 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	this->ui = new Ui_QtVTKRenderWindow;
 	this->ui->setupUi(this);
 
+	setWindowState(Qt::WindowFullScreen);
+
 	vtkSmartPointer< vtkDICOMReader > reader = vtkSmartPointer< vtkDICOMReader >::New();
 	reader->SetFileName(argv[1]);
 	reader->SetMemoryRowOrderToFileNative();
@@ -160,7 +162,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 #ifdef TEST_SEED_WIDGET
 	// Create the representation for the seed widget and for its handles
 	auto handleRep = vtkPointHandleRepresentation2D::New();
-	handleRep->GetProperty()->SetColor(1, 0, 0); // Make the handles red
+	handleRep->GetProperty()->SetColor(1, 1, 1); // Make the handles red
 	auto widgetRep = vtkSmartPointer<vtkSeedRepresentation>::New();
 	widgetRep->SetHandleRepresentation(handleRep);
 
