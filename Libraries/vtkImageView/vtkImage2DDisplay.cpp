@@ -21,6 +21,15 @@ vtkImage2DDisplay::vtkImage2DDisplay()
 
 vtkImage2DDisplay::~vtkImage2DDisplay()
 {
+    //this->ImageActor->GetMapper()->RemoveAllInputs();
+    //this->ImageActor->Delete();
+    //this->WindowLevel->Delete();
+
+   // this->WindowLevel->RemoveAllInputs();
+    
+    this->ImageActor->Print(std::cout);
+    this->InputProducer->Print(std::cout);
+	this->WindowLevel->Print(std::cout);
 }
 
 void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
@@ -31,7 +40,14 @@ void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
         {
             vtkAlgorithmOutput *poVtkAlgoPortTmp = pi_poVtkAlgoPort;
             vtkImageAlgorithm *poVtkImgAlgoTmp = static_cast<vtkImageAlgorithm*>(pi_poVtkAlgoPort->GetProducer());
-            vtkImageData *poVtkImgTmp = poVtkImgAlgoTmp->GetOutput();
+
+			if (poVtkImgAlgoTmp != nullptr) {
+				poVtkImgAlgoTmp->Print(std::cout);
+			}
+
+            //vtkImageData *poVtkImgTmp = poVtkImgAlgoTmp->GetOutput();
+
+            vtkSmartPointer<vtkImageData> poVtkImgTmp = poVtkImgAlgoTmp->GetOutput();
             
             InputProducer = poVtkImgAlgoTmp;
             
@@ -50,6 +66,10 @@ void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
                 poVtkAlgoPortTmp = this->WindowLevel->GetOutputPort();
             }
             this->ImageActor->GetMapper()->SetInputConnection(poVtkAlgoPortTmp);
+
+			this->ImageActor->Print(std::cout);
+			this->InputProducer->Print(std::cout);
+
         }
         else
         {

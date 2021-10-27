@@ -172,7 +172,7 @@ vtkImageView2D::~vtkImageView2D()
 {
 // Deletion of objects in the LayerInfoMap is handled by the SmartPointers.
   this->LayerInfoVec.clear();
-
+  
   this->Axes2DWidget->SetImageView(nullptr);
 
   this->Axes2DWidget->Delete();
