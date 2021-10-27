@@ -4,6 +4,8 @@
 #include "QVTKOpenGLWidget.h"
 #include "QtVTKRenderWindows.h"
 
+#include <vtkDebugLeaks.h>
+
 int main( int argc, char** argv )
 {
   // needed to ensure appropriate OpenGL context is created for VTK rendering.
@@ -12,8 +14,16 @@ int main( int argc, char** argv )
   // QT Stuff
   QApplication app( argc, argv );
 
-  QtVTKRenderWindows myQtVTKRenderWindows(argc, argv);
-  myQtVTKRenderWindows.show();
+  bool retVal;
+  
+  {
+	  QtVTKRenderWindows myQtVTKRenderWindows(argc, argv);
+	  myQtVTKRenderWindows.show();
 
-  return app.exec();
+	  retVal = app.exec();
+  }
+
+  vtkDebugLeaks::PrintCurrentLeaks();
+
+  return retVal;
 }

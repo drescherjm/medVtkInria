@@ -261,8 +261,8 @@ view->SetInput (image2, mat2, 1);
 
   
   // remove layers
-  view->RemoveLayer (1);
-  view->RemoveLayer (2);
+  //view->RemoveLayer (1);
+  //view->RemoveLayer (2);
   view->GetCornerAnnotation()->SetText (3, "Remove layers");
   view->Render();
 

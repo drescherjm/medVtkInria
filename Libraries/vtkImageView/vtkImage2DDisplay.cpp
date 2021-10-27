@@ -9,8 +9,8 @@ vtkStandardNewMacro(vtkImage2DDisplay);
 vtkImage2DDisplay::vtkImage2DDisplay()
 {
     this->InputProducer     = 0;
-    this->ImageActor        = vtkImageActor::New();
-    this->WindowLevel       = vtkImageMapToColors::New();
+    this->ImageActor        = vtkSmartPointer<vtkImageActor>::New();
+    this->WindowLevel       = vtkSmartPointer < vtkImageMapToColors>::New();
     this->WindowLevel->SetOutputFormatToRGBA();
     this->ColorWindow       = 1e-3 * VTK_DOUBLE_MAX;
     this->ColorLevel        = 0;
@@ -21,6 +21,9 @@ vtkImage2DDisplay::vtkImage2DDisplay()
 
 vtkImage2DDisplay::~vtkImage2DDisplay()
 {
+//     this->ImageActor->Delete();
+//     this->WindowLevel->Delete();
+
     //this->ImageActor->GetMapper()->RemoveAllInputs();
     //this->ImageActor->Delete();
     //this->WindowLevel->Delete();
@@ -66,6 +69,8 @@ void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
                 poVtkAlgoPortTmp = this->WindowLevel->GetOutputPort();
             }
             this->ImageActor->GetMapper()->SetInputConnection(poVtkAlgoPortTmp);
+
+            //poVtkImgTmp->Delete();
 
 			this->ImageActor->Print(std::cout);
 			this->InputProducer->Print(std::cout);

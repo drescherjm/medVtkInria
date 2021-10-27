@@ -12,6 +12,8 @@
 // Forward Qt class declarations
 class Ui_QtVTKRenderWindow;
 
+using VTKView = vtkImageView2DExtended;
+
 class QtVTKRenderWindows : public QMainWindow
 {
   Q_OBJECT
@@ -19,7 +21,7 @@ public:
 
   // Constructor/Destructor
   QtVTKRenderWindows(int argc, char *argv[]);
-  ~QtVTKRenderWindows() override {}
+  ~QtVTKRenderWindows();
 
 public slots:
 
@@ -36,9 +38,7 @@ public slots:
   //virtual void AddDistanceMeasurementToView( int );
 
 protected:
-  vtkSmartPointer< vtkImageView2DExtended > riw;
-//   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];
-//   vtkSmartPointer< vtkDistanceWidget > DistanceWidget[3];
+  vtkSmartPointer< VTKView > riw;
   vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
 protected slots:

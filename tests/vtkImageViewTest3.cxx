@@ -85,6 +85,9 @@ int vtkImageViewTest3(int argc, char *argv[])
     std::cerr<<"view->GetSliceOrientation() : "<<view->GetSliceOrientation()<<std::endl;
     return EXIT_FAILURE;
   }
+
+  iren->Start();
+
   matrix1->Delete();
   std::cout<<" success." <<std::endl;
 
@@ -216,6 +219,8 @@ int vtkImageViewTest3(int argc, char *argv[])
 
   view->Delete();
   iren->Delete();
+
+  rwin->Print(std::cout);
   rwin->Delete();
   renderer->Delete();
   imageSource->Delete();

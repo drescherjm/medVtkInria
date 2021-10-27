@@ -26,6 +26,7 @@ vtkImageView2DExtended::vtkImageView2DExtended()
 {
 	// Remove the old corner annotation from the view.
 	this->GetRenderer()->RemoveViewProp(this->CornerAnnotation);
+	this->CornerAnnotation->Delete();
 
 	this->CornerAnnotation = vtkImageViewCornerAnnotationEx::New();
 	this->CornerAnnotation->SetNonlinearFontScaleFactor (0.3);

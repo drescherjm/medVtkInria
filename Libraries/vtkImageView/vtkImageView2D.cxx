@@ -171,8 +171,10 @@ vtkImageView2D::vtkImageView2D()
 vtkImageView2D::~vtkImageView2D()
 {
 // Deletion of objects in the LayerInfoMap is handled by the SmartPointers.
-  this->LayerInfoVec.clear();
+ // this->LayerInfoVec.clear();
   
+    RemoveAllLayers();
+
   this->Axes2DWidget->SetImageView(nullptr);
 
   this->Axes2DWidget->Delete();
@@ -184,7 +186,6 @@ vtkImageView2D::~vtkImageView2D()
   this->Command->Delete();
   this->OrientationAnnotation->Delete();
 
-
   for (std::list<vtkDataSet2DWidget*>::iterator it3 = this->DataSetWidgets.begin();
       it3!=this->DataSetWidgets.end(); ++it3)
   {
@@ -192,6 +193,7 @@ vtkImageView2D::~vtkImageView2D()
     (*it3)->SetImageView (nullptr);
     (*it3)->Delete();
   }
+
 }
 
 //----------------------------------------------------------------------------
@@ -2431,7 +2433,9 @@ void vtkImageView2D::RemoveLayer(int layer)
   {
     renderer->RemoveAllViewProps();
     renderer->Render();
-    this->GetRenderWindow()->RemoveRenderer(renderer);
+    if (this->GetRenderWindow()) {
+        this->GetRenderWindow()->RemoveRenderer(renderer);
+    }
     this->Modified();
   }
 
