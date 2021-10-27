@@ -42,7 +42,7 @@
 
 #include <vtkDebugLeaks.h>
 
-//#define TEST_SEED_WIDGET
+#define TEST_SEED_WIDGET
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -62,7 +62,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	reader->GetOutput()->GetDimensions(imageDims);
 
 	riw = vtkSmartPointer< VTKView >::New();
-	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkGenericOpenGLRenderWindow::New();
+	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
 	riw->SetViewConvention(VTKView::VIEW_CONVENTION_HOLOGIC_LEFT);
 
@@ -76,8 +76,13 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	riw->ShowScalarBarOff();
 	riw->SetAnnotationStyle(1);
 		
+#if VTK_VERSION_NUMBER >=  VTK_VERSION_CHECK(9,0,0) 
+	this->ui->view->setRenderWindow(riw->GetRenderWindow());
+	riw->SetupInteractor(this->ui->view->renderWindow()->GetInteractor());
+#else
 	this->ui->view->SetRenderWindow(riw->GetRenderWindow());
 	riw->SetupInteractor(this->ui->view->GetRenderWindow()->GetInteractor());
+#endif
 
 	riw->SetInput(reader->GetOutputPort());
 
@@ -90,13 +95,14 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 #ifdef TEST_SEED_WIDGET
 	// Create the representation for the seed widget and for its handles
-	auto handleRep = vtkPointHandleRepresentation2D::New();
+	vtkNew<vtkPointHandleRepresentation2D> handleRep;
 	handleRep->GetProperty()->SetColor(1, 1, 1); // Make the handles red
-	auto widgetRep = vtkSmartPointer<vtkSeedRepresentation>::New();
+
+	vtkNew< vtkSeedRepresentation> widgetRep;
 	widgetRep->SetHandleRepresentation(handleRep);
 
 	// Create the seed widget
-	auto seedWidget = vtkSeedWidget::New();
+	vtkNew<vtkSeedWidget> seedWidget;
 
 	auto pInteractor = riw->GetInteractor();
 	if (pInteractor) {
@@ -109,7 +115,9 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 #endif
 
 	renderWindow->Print(std::cout);
-	renderWindow->Delete();
+	//renderWindow->Delete(); // We don't need to free this if we use
+	// vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New(); 
+	// instead of  vtkSmartPointer<vtkRenderWindow> renderWindow = vtkGenericOpenGLRenderWindow::New();
 
 	pren->Print(std::cout);
 	//pren->Delete();
@@ -223,14 +231,14 @@ void QtVTKRenderWindows::ResetViews()
 
 void QtVTKRenderWindows::Render()
 {
-//   for (int i = 0; i < 3; i++)
-//   {
-//     riw[i]->Render();
-//   }
-//   this->ui->view3->GetRenderWindow()->Render();
-
 	riw->Render();
+
+#if VTK_VERSION_NUMBER >=  VTK_VERSION_CHECK(9,0,0) 
+	this->ui->view->renderWindow()->Render();
+#else
 	this->ui->view->GetRenderWindow()->Render();
+#endif 
+
 }
 
 void QtVTKRenderWindows::AddDistanceMeasurementToView1()
