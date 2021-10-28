@@ -88,6 +88,9 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
+
+	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
+
 	riw->SetColorLevel(512.0);
 	riw->SetColorWindow(512.0);
 

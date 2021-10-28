@@ -42,11 +42,15 @@ endif ()
 set(Srcs
   src/QtVTKRenderWindowsApp.cxx
   src/QtVTKRenderWindows.cxx
-  src/vtkResliceCursorCallback.cxx)
+  src/vtkResliceCursorCallback.cxx
+  src/smvtkImageView2D.cxx
+  src/smvtkImageView2DCommand.cxx)
 
 set(Hdrs
   Include/QtVTKRenderWindows.h
-  Include/vtkResliceCursorCallback.h)
+  Include/vtkResliceCursorCallback.h
+  Include/smvtkImageView2D.h
+  Include/smvtkImageView2DCommand.h)
 
 set(UIs
   rc/QtVTKRenderWindow.ui)
