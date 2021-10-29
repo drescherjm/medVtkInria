@@ -171,9 +171,9 @@ vtkImageView2D::vtkImageView2D()
 vtkImageView2D::~vtkImageView2D()
 {
 // Deletion of objects in the LayerInfoMap is handled by the SmartPointers.
- // this->LayerInfoVec.clear();
+    this->LayerInfoVec.clear();
   
-    RemoveAllLayers();
+// RemoveAllLayers();
 
   this->Axes2DWidget->SetImageView(nullptr);
 
@@ -613,6 +613,12 @@ void vtkImageView2D::SetViewConvention(int convention)
 		y_watcher = 1;
 		z_watcher = 1;
 		this->ConventionMatrix->SetElement(1, 2, -1);
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_HOLOGIC_LEFT_NO_INVERT:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = -1;
+		//this->ConventionMatrix->SetElement(1, 2, -1);
 		break;
 	case vtkImageView2D::VIEW_CONVENTION_NEUROLOGICAL:
 		x_watcher = 1;
@@ -1761,24 +1767,11 @@ void vtkImageView2D::UnInstallPipeline()
 {
   if ( this->GetRenderer() )
   {
-    //this->GetRenderer()->RemoveViewProp ( this->ImageActor );
     this->GetRenderer()->RemoveViewProp ( this->OrientationAnnotation );
-    //this->ImageActor->SetInput (nullptr);
   }
 
   if( this->InteractorStyle )
   {
-    /*
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::SliceMoveEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::RequestedPositionEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::ResetViewerEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::StartWindowLevelEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::WindowLevelEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::CharEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::DefaultMoveEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::CameraZoomEvent);
-    this->InteractorStyle->RemoveObservers(vtkImageView2DCommand::CameraPanEvent);
-    */
     this->InteractorStyle->RemoveObserver ( this->Command );
   }
 
@@ -2433,6 +2426,13 @@ void vtkImageView2D::RemoveLayer(int layer)
   {
     renderer->RemoveAllViewProps();
     renderer->Render();
+
+	for (auto poWidget : this->DataSetWidgets)
+	{
+		poWidget->SetImageView(nullptr);
+		poWidget->Off();
+	}
+
     if (this->GetRenderWindow()) {
         this->GetRenderWindow()->RemoveRenderer(renderer);
     }
