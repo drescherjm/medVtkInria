@@ -24,25 +24,32 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "vtkRenderWindowInteractor.h"
-#include "vtkResliceImageViewer.h"
+//#include "vtkResliceImageViewer.h"
 #include "vtkResliceCursorLineRepresentation.h"
 #include "vtkResliceCursorThickLineRepresentation.h"
 #include "vtkResliceCursorWidget.h"
 #include "vtkResliceCursorActor.h"
 #include "vtkResliceCursorPolyDataAlgorithm.h"
 #include "vtkResliceCursor.h"
-#include "vtkResliceImageViewerMeasurements.h"
+//#include "vtkResliceImageViewerMeasurements.h"
 #include <vtkImageView2D.h>
 #include <vtkImageView2DExtended.h>
 #include <vtkPointHandleRepresentation2D.h>
 #include <vtkSeedRepresentation.h>
 #include <vtkSeedWidget.h>
 #include <vtkProperty2D.h>
+
+#include <vtkNew.h>
+
+#ifndef VTK_DICOM_MODULE
 #include "dicom/vtkDICOMReader.h"
+#else
+#include <X:\x64.20\VC.142\Install\Libraries\VTK-7.1.1\include\vtk-7.1\vtkDICOMReader.h>
+#endif
 
 #include <vtkDebugLeaks.h>
 
-#define TEST_SEED_WIDGET
+//#define TEST_SEED_WIDGET
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -76,7 +83,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	riw->ShowScalarBarOff();
 	riw->SetAnnotationStyle(1);
 		
-#if VTK_VERSION_NUMBER >=  VTK_VERSION_CHECK(9,0,0) 
+#if VTK_MAJOR_VERSION >= 9
 	this->ui->view->setRenderWindow(riw->GetRenderWindow());
 	riw->SetupInteractor(this->ui->view->renderWindow()->GetInteractor());
 #else
@@ -89,7 +96,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
 
-	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
+//	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
 
 	riw->SetColorLevel(512.0);
 	riw->SetColorWindow(512.0);
@@ -102,7 +109,12 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	handleRep->GetProperty()->SetColor(1, 1, 1); // Make the handles red
 
 	vtkNew< vtkSeedRepresentation> widgetRep;
+
+#if VTK_MAJOR_VERSION >= 9
 	widgetRep->SetHandleRepresentation(handleRep);
+#else 
+	widgetRep->SetHandleRepresentation(handleRep.Get());
+#endif 
 
 	// Create the seed widget
 	vtkNew<vtkSeedWidget> seedWidget;
@@ -110,7 +122,11 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	auto pInteractor = riw->GetInteractor();
 	if (pInteractor) {
 		seedWidget->SetInteractor(pInteractor);
+#if VTK_MAJOR_VERSION >= 9
 		seedWidget->SetRepresentation(widgetRep);
+#else	
+		seedWidget->SetRepresentation(widgetRep.Get());
+#endif 
 	}
 
 	seedWidget->On();
@@ -236,7 +252,7 @@ void QtVTKRenderWindows::Render()
 {
 	riw->Render();
 
-#if VTK_VERSION_NUMBER >=  VTK_VERSION_CHECK(9,0,0) 
+#if VTK_MAJOR_VERSION >= 9
 	this->ui->view->renderWindow()->Render();
 #else
 	this->ui->view->GetRenderWindow()->Render();

@@ -168,5 +168,10 @@ endif()
 set_lib_install_rules(${TARGET_NAME}
   ${${TARGET_NAME}_HEADERS}
   )
+    
+add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
+  COMMAND ${CMAKE_COMMAND} -E copy $<TARGET_RUNTIME_DLLS:${TARGET_NAME}> $<TARGET_FILE_DIR:${TARGET_NAME}>
+  COMMAND_EXPAND_LISTS
+  )
 
 set_target_properties(${TARGET_NAME} PROPERTIES FOLDER Libraries)

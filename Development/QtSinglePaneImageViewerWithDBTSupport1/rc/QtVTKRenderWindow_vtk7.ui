@@ -28,7 +28,7 @@
     <item row="0" column="0">
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
-       <widget class="VTKQtWidget" name="view" native="true"/>
+       <widget class="QVTKWidget" name="view" native="true"/>
       </item>
      </layout>
     </item>
@@ -227,9 +227,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>VTKQtWidget</class>
+   <class>QVTKWidget</class>
    <extends>QWidget</extends>
-   <header>VTKQtWidget.h</header>
+   <header>QVTKWidget.h</header>
   </customwidget>
  </customwidgets>
  <resources>

@@ -2,10 +2,10 @@
 #define QtVTKRenderWindows_H
 
 #include "vtkSmartPointer.h"
-#include "vtkResliceImageViewer.h"
+//#include "vtkResliceImageViewer.h"
 #include "vtkImagePlaneWidget.h"
 #include "vtkDistanceWidget.h"
-#include "vtkResliceImageViewerMeasurements.h"
+//#include "vtkResliceImageViewerMeasurements.h"
 #include <QMainWindow>
 #include "vtkImageView2DExtended.h"
 
@@ -39,7 +39,7 @@ protected:
   vtkSmartPointer< vtkImageView2DExtended > riw;
 //   vtkSmartPointer< vtkImagePlaneWidget > planeWidget[3];
 //   vtkSmartPointer< vtkDistanceWidget > DistanceWidget[3];
-  vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
+//  vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
 protected slots:
 

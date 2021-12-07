@@ -159,6 +159,7 @@ include(SubversionVersionInfo)
 include(UnoptimizedRelWithDebInfo)
 include(SetupProject)
 include(SupportQt)
+include(GetRuntime)
 
 #dump_all_variables()
 
@@ -181,6 +182,11 @@ if(${PROJECT_NAME}_BUILD_DEVELOPMENT)
   add_subdirectory(Development)
 endif()
 
+#set (QT_LIBRARIES Qt5::Core Qt5::Network Qt5::Sql Qt5::Widgets Qt5::Gui Qt5::WinMain Qt5::Xml Qt5::PrintSupport)
+#set (QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::Widgets Qt5::Gui Qt5::WinMain Qt5::Xml Qt5::PrintSupport)
+set (QT_PLATFORM_MODULES Qt5::QWindowsIntegrationPlugin)
+
+include(GetQtRuntime)
 
 # install(TARGETS medVtkInriaEx EXPORT medVtkInriaEx)
 # install(EXPORT medVtkInriaEx DESTINATION cmake)

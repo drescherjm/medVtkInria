@@ -24,14 +24,14 @@
 #include <vtkRenderer.h>
 #include <vtkRenderWindow.h>
 #include "vtkRenderWindowInteractor.h"
-#include "vtkResliceImageViewer.h"
+//#include "vtkResliceImageViewer.h"
 #include "vtkResliceCursorLineRepresentation.h"
 #include "vtkResliceCursorThickLineRepresentation.h"
 #include "vtkResliceCursorWidget.h"
 #include "vtkResliceCursorActor.h"
 #include "vtkResliceCursorPolyDataAlgorithm.h"
 #include "vtkResliceCursor.h"
-#include "vtkResliceImageViewerMeasurements.h"
+//#include "vtkResliceImageViewerMeasurements.h"
 #include <vtkImageView2D.h>
 #include <vtkImageView2DExtended.h>
 #include <vtkPointHandleRepresentation2D.h>

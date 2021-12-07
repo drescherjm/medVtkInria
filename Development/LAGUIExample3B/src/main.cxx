@@ -341,7 +341,10 @@ int main(int argc, char *argv[])
 	vtkObject::SetGlobalWarningDisplay(1);
 
 	vtkSmartPointer<vtkOutputWindow> myOutputWindow = vtkSmartPointer<vtkOutputWindow>::New();
+
+#if VTK_MAJOR_VERSION >= 9
 	myOutputWindow->SetUseStdErrorForAllMessages(true);
+#endif
 
 	vtkOutputWindow::SetInstance(myOutputWindow);
 	
