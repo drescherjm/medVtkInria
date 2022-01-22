@@ -71,7 +71,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 	riw = vtkSmartPointer< VTKView >::New();
 	vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-	riw->SetViewConvention(VTKView::VIEW_CONVENTION_HOLOGIC_LEFT);
+	riw->SetViewConvention(VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
 
 	vtkSmartPointer<vtkRenderer> pren = vtkSmartPointer<vtkRenderer>::New();
 
@@ -95,6 +95,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
+	riw->SetOrientationMatrix(reader->GetPatientMatrix());
 
 //	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
 
