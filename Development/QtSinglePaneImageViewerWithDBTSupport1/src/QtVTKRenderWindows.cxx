@@ -39,6 +39,7 @@
 #include <vtkSeedWidget.h>
 #include <vtkProperty2D.h>
 
+#include <vtkCamera.h>
 #include <vtkNew.h>
 
 #ifndef VTK_DICOM_MODULE
@@ -57,6 +58,8 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 {
 	this->ui = new Ui_QtVTKRenderWindow;
 	this->ui->setupUi(this);
+
+	ui->spinBoxCamera->setMaximum(VTKView::MAX_VIEW_CONVENTIONS - 1);
 
 	vtkSmartPointer< vtkDICOMReader > reader = vtkSmartPointer< vtkDICOMReader >::New();
 	reader->SetFileName(argv[1]);
@@ -95,14 +98,20 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
-	riw->SetOrientationMatrix(reader->GetPatientMatrix());
+	//riw->SetOrientationMatrix(reader->GetPatientMatrix());
 
-//	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
+	//riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
 
 	riw->SetColorLevel(512.0);
 	riw->SetColorWindow(512.0);
 
 	this->ui->view->show();
+
+	auto pCamera = riw->GetRenderer()->GetActiveCamera();
+
+	if (pCamera) {
+		pCamera->Print(std::cout);
+	}
 
 #ifdef TEST_SEED_WIDGET
 	// Create the representation for the seed widget and for its handles
@@ -264,6 +273,34 @@ void QtVTKRenderWindows::Render()
 void QtVTKRenderWindows::AddDistanceMeasurementToView1()
 {
  // this->AddDistanceMeasurementToView(1);
+}
+
+
+void QtVTKRenderWindows::on_spinBoxCamera_valueChanged(int nValue)
+{
+	std::cout << nValue << std::endl;
+
+// 	if (nValue >= VTKView::MAX_VIEW_CONVENTIONS) {
+// 		nValue = 0;
+// 		spinBox
+// 	}
+
+	riw->SetViewConvention(nValue);
+}
+
+void QtVTKRenderWindows::on_pushButtonHorizontal_clicked(bool)
+{
+	riw->flipHorizontal();
+}
+
+void QtVTKRenderWindows::on_pushButtonHorizontalAndVertical_clicked(bool)
+{
+	riw->flipVerticalAndHorizontal();
+}
+
+void QtVTKRenderWindows::on_pushButtonVertical_clicked(bool)
+{
+	riw->flipVertical();
 }
 
 // void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)

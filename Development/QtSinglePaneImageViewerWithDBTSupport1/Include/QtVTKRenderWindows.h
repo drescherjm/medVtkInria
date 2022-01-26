@@ -14,7 +14,7 @@
 class Ui_QtVTKRenderWindow;
 
 //using VTKView = vtkImageView2DExtended;
-using VTKView = vtkImageView2D;
+using VTKView = smvtkImageView2D;
 
 class QtVTKRenderWindows : public QMainWindow
 {
@@ -44,6 +44,10 @@ protected:
  // vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
 protected slots:
+	void on_spinBoxCamera_valueChanged(int nValue);
+	void on_pushButtonHorizontal_clicked(bool);
+	void on_pushButtonHorizontalAndVertical_clicked(bool);
+	void on_pushButtonVertical_clicked(bool);
 
 private:
 

@@ -286,8 +286,26 @@ void smvtkImageView2D::flipVertical()
 			this->ConventionMatrix->SetElement(2,3,this->ConventionMatrix->GetElement(2,3) * -1.0);
 		break;
 	}
+	this->ConventionMatrix->Print(std::cout);
+	this->UpdateOrientation();
 }
 
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void smvtkImageView2D::flipHorizontal()
+{
+	switch (this->SliceOrientation) {
+	case vtkImageView2D::SLICE_ORIENTATION_XY:
+		this->ConventionMatrix->SetElement(1, 2, this->ConventionMatrix->GetElement(1, 2) * 1.0);
+		this->ConventionMatrix->SetElement(2, 3, this->ConventionMatrix->GetElement(2, 3) * -1.0);
+
+		this->ConventionMatrix->SetElement(3, 0, -1.0);
+		break;
+	}
+	this->ConventionMatrix->Print(std::cout);
+	this->UpdateOrientation();
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -301,6 +319,8 @@ void smvtkImageView2D::flipVerticalAndHorizontal()
 		this->ConventionMatrix->SetElement(3,0,-1.0);
 		break;
 	}
+	this->ConventionMatrix->Print(std::cout);
+	this->UpdateOrientation();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

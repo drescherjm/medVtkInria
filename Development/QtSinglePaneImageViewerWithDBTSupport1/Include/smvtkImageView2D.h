@@ -87,7 +87,7 @@ public:
 	virtual void UpdateSlicePlane (void);
 
 	virtual void flipVertical();
-
+	virtual void flipHorizontal();
 	virtual void flipVerticalAndHorizontal();
 
 	virtual void UpdateCenter (void);

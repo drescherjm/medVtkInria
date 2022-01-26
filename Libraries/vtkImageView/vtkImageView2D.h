@@ -192,6 +192,10 @@ public:
 		VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_SAGITTAL = 5,
         VIEW_CONVENTION_HOLOGIC_LEFT                 = 6,
         VIEW_CONVENTION_HOLOGIC_LEFT_NO_INVERT       = 7,
+        VIEW_CONVENTION_DBT_LEFT                     = 8,
+		VIEW_CONVENTION_DBT_LEFT_B                   = 9,
+
+        MAX_VIEW_CONVENTIONS,
     };
 
     // Description:
@@ -417,7 +421,7 @@ protected:
 
     /**
    The ViewConvention instance explains where to place the camera around
-   the patient. Default behaviour is Radiological convention, meaning
+   the patient. Default behavior is Radiological convention, meaning
    we respectively look at the patient from his feet, his face and his left ear.
 
    For Neurological convention, we respectively look from the top of his head,

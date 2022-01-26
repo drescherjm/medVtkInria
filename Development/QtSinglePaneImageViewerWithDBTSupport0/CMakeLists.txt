@@ -63,7 +63,7 @@ add_executable(${LOCAL_PROJECT_NAME}
 target_link_libraries(${LOCAL_PROJECT_NAME} 
   PRIVATE
     ${VTK_LIBRARIES}
-	VTK::DICOM
+	vtkDICOM
     Qt5::Widgets 
 	${TARGET_NAME})
 

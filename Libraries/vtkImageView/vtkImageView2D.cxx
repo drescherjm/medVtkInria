@@ -171,9 +171,7 @@ vtkImageView2D::vtkImageView2D()
 vtkImageView2D::~vtkImageView2D()
 {
 // Deletion of objects in the LayerInfoMap is handled by the SmartPointers.
-    this->LayerInfoVec.clear();
-  
-// RemoveAllLayers();
+  this->LayerInfoVec.clear();
 
   this->Axes2DWidget->SetImageView(nullptr);
 
@@ -194,6 +192,12 @@ vtkImageView2D::~vtkImageView2D()
     (*it3)->Delete();
   }
 
+  if (m_vtkImageFromBoundsSourceGenerator)
+  {
+	  m_vtkImageFromBoundsSourceGenerator->Delete();
+  }
+
+  delete qtSignalHandler;
 }
 
 //----------------------------------------------------------------------------
@@ -517,7 +521,7 @@ void vtkImageView2D::UpdateDisplayExtent()
       // direction given by ViewOrientation. It allows to automatically clip polygonal datasets
       // without having to use a time consuming vtkCutter. In case of oblique slices (i.e., when
       // a non-identity OrientationTransform is used, a large margin is used
-      // resulting in a too large clipping range. To be futher investigated.
+      // resulting in a too large clipping range. To be further investigated.
       vtkCamera *cam = this->GetRenderer()->GetActiveCamera();
       if (cam)
       {
@@ -533,6 +537,7 @@ void vtkImageView2D::UpdateDisplayExtent()
             distance += (pos[i]-position[i]) * -vn[i];
 
         double avg_spacing = this->GetMedVtkImageInfo()->spacing[this->ViewOrientation] * 0.5;
+
         cam->SetClippingRange(distance - avg_spacing, distance + avg_spacing);
     }
   }
@@ -614,6 +619,18 @@ void vtkImageView2D::SetViewConvention(int convention)
 		z_watcher = 1;
 		this->ConventionMatrix->SetElement(1, 2, -1);
 		break;
+	case vtkImageView2D::VIEW_CONVENTION_DBT_LEFT:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = -1;
+		this->ConventionMatrix->SetElement(1, 2, 1);
+		break;
+	case vtkImageView2D::VIEW_CONVENTION_DBT_LEFT_B:
+		x_watcher = 1;
+		y_watcher = 1;
+		z_watcher = 1;
+		this->ConventionMatrix->SetElement(1, 2, 1);
+		break;
 	case vtkImageView2D::VIEW_CONVENTION_HOLOGIC_LEFT_NO_INVERT:
 		x_watcher = 1;
 		y_watcher = 1;
@@ -653,7 +670,7 @@ void vtkImageView2D::SetViewConvention(int convention)
 	this->ConventionMatrix->SetElement(1, 3, y_watcher);
 	this->ConventionMatrix->SetElement(2, 3, z_watcher);
 
-	//this->ConventionMatrix->Print(std::cout);
+	this->ConventionMatrix->Print(std::cout);
 
 	this->UpdateOrientation();
 }
@@ -2434,7 +2451,7 @@ void vtkImageView2D::RemoveLayer(int layer)
 	}
 
     if (this->GetRenderWindow()) {
-        this->GetRenderWindow()->RemoveRenderer(renderer);
+    this->GetRenderWindow()->RemoveRenderer(renderer);
     }
     this->Modified();
   }

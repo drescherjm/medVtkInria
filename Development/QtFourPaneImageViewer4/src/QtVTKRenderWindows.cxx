@@ -82,6 +82,13 @@ public:
 					markerStyle->Update();
 
 					handleRep->SetCursorShape(markerStyle->GetOutput());
+
+					if (nShapes == smvtkMarkerShape::Hidden) {
+						handleRep->GetProperty()->SetOpacity(0.0);
+					}
+					else {
+						handleRep->GetProperty()->SetOpacity(1.0);
+					}
 				}
 			}
 		}
@@ -171,6 +178,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 		riw[i]->SetColorLevel(-600.0);
 		riw[i]->SetColorWindow(1500.0);
+		riw[i]->SetZoom(0.5);
 
 	}
 

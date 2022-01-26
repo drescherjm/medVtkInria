@@ -218,6 +218,7 @@ int smvtkMarkerShape::RequestData(
 			case Octagon:
 				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 8);
 			break;
+			case Hidden:
 			case Circle:
 				drawNSidedShapeThick(newPts, newLines, newPolygons, nThickness, 12);
 			break;

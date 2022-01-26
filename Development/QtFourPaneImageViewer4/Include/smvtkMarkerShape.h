@@ -64,6 +64,7 @@ public:
       Diamond,
       Pentagon,
       Hexagon,
+      Hidden,
       NUM_SHAPES,
       Heptagon,       
       Octagon,
