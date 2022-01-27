@@ -100,7 +100,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	//riw->SetOrientationMatrix(reader->GetPatientMatrix());
 
-	//riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
+	riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
 
 	riw->SetColorLevel(512.0);
 	riw->SetColorWindow(512.0);

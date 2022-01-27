@@ -76,6 +76,7 @@ smvtkImageView2D::smvtkImageView2D()
 	SetAnnotationStyle(3);
 	
 	// Replace command handler from base with ours..
+	this->InteractorStyle->RemoveObserver(this->Command); // 2022_01_26 - This fixes the double slice bug.
 	this->Command->Delete();
 	this->Command = smvtkImageView2DCommand::New();
 	this->Command->SetViewer(this);
@@ -431,7 +432,9 @@ void smvtkImageView2D::UpdateAlignment()
 		vtkImageActor* pImageActor = GetImageActor();
 
 		double bounds[6];
-		pImageActor->GetDisplayBounds(bounds);
+		//pImageActor->GetDisplayBounds(bounds);
+
+		pRenderer->ComputeVisiblePropBounds(bounds);
 
 		pRenderer->SetWorldPoint(bounds[0],bounds[2],bounds[4],0);
 		pRenderer->WorldToDisplay();
