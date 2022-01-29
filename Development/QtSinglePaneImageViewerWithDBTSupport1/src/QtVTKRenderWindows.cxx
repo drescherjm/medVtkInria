@@ -286,33 +286,39 @@ void QtVTKRenderWindows::on_spinBoxCamera_valueChanged(int nValue)
 // 	}
 
 	riw->SetViewConvention(nValue);
+	riw->Render();
 }
 
 void QtVTKRenderWindows::on_pushButtonHorizontal_clicked(bool)
 {
 	riw->flipHorizontal();
+	riw->Render();
 }
 
 void QtVTKRenderWindows::on_pushButtonHorizontalAndVertical_clicked(bool)
 {
 	riw->flipVerticalAndHorizontal();
+	riw->Render();
 }
 
 void QtVTKRenderWindows::on_pushButtonVertical_clicked(bool)
 {
 	riw->flipVertical();
+	riw->Render();
 }
 
 void QtVTKRenderWindows::on_pushButtonAlignLeft_clicked(bool)
 {
 	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
 	riw->UpdateAlignment();
+	riw->Render();
 }
 
 void QtVTKRenderWindows::on_pushButtonAlignRight_clicked(bool)
 {
 	riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
 	riw->UpdateAlignment();
+	riw->Render();
 }
 
 // void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
