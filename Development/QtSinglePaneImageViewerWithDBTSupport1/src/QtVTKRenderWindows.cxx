@@ -303,6 +303,18 @@ void QtVTKRenderWindows::on_pushButtonVertical_clicked(bool)
 	riw->flipVertical();
 }
 
+void QtVTKRenderWindows::on_pushButtonAlignLeft_clicked(bool)
+{
+	riw->setImageAlignment(VTKView::IA_Left | VTKView::IA_VCenter);
+	riw->UpdateAlignment();
+}
+
+void QtVTKRenderWindows::on_pushButtonAlignRight_clicked(bool)
+{
+	riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
+	riw->UpdateAlignment();
+}
+
 // void QtVTKRenderWindows::AddDistanceMeasurementToView(int i)
 // {
 //   // remove existing widgets.

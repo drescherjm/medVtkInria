@@ -423,41 +423,53 @@ void smvtkImageView2D::UpdateAlignment()
 		SetPan(pan);
 	}
 #else
-	// First reset the pan.
-	double pan[2] = {0,0};
-	SetPan(pan);
-
 	if (!m_pPrivate->m_imageAlign == static_cast<ImageAlignmentFlags>(IA_HCenter | IA_VCenter)) {
+
+		// First reset the pan.
+		double pan[2] = { 0,0 };
+		SetPan(pan);
+
 		vtkRenderer* pRenderer = GetRenderer();
 		vtkImageActor* pImageActor = GetImageActor();
 
 		double bounds[6];
-		//pImageActor->GetDisplayBounds(bounds);
+		pImageActor->GetDisplayBounds(bounds);
 
-		pRenderer->ComputeVisiblePropBounds(bounds);
+		/*
+		* The following code determines the position of the top left corner of the 
+		* image in display coordinates from the world coordinates. The reason
+		* for the std::min() is depending on the camera the minimum world cooridnate for
+		* example 0,0 may translate into any one of the 4 corners of the display.
+		*/
+		
+		double displayBL[2][3];
 
-		pRenderer->SetWorldPoint(bounds[0],bounds[2],bounds[4],0);
-		pRenderer->WorldToDisplay();
+		for (int i = 0; i < 2; ++i) {
+			pRenderer->SetWorldPoint(bounds[0+i], bounds[2+i], bounds[4+i], 0);
+			pRenderer->WorldToDisplay();
+			pRenderer->GetDisplayPoint(displayBL[i]);
+		}
 
-		double displayBL[3];
-		pRenderer->GetDisplayPoint(displayBL);
+		for (int i = 0; i < 3; ++i) {
+			displayBL[0][i] = std::min(displayBL[0][i], displayBL[1][i]);
+		}
 
 		// Calculate the horizontal pan
 		if (m_pPrivate->m_imageAlign.testFlag(IA_Left)) {
-			pan[0] = displayBL[0] -m_pPrivate->m_nXOffs;
+			pan[0] = displayBL[0][0] -m_pPrivate->m_nXOffs;
 		}
 		else
 			if (m_pPrivate->m_imageAlign.testFlag(IA_Right)) {
-				pan[0] = m_pPrivate->m_nXOffs - displayBL[0];
+				pan[0] = m_pPrivate->m_nXOffs - displayBL[0][0];
 			}
 		
 		// Calculate the vertical pan
 		if (m_pPrivate->m_imageAlign.testFlag(IA_Top)) {
-			pan[1] = displayBL[2] -m_pPrivate->m_nYOffs;
+			pan[1] = displayBL[0][1] -m_pPrivate->m_nYOffs;
 		}
 		else
 			if (m_pPrivate->m_imageAlign.testFlag(IA_Bottom)) {
-				pan[1] = m_pPrivate->m_nYOffs - displayBL[2];
+				pan[1] = m_pPrivate->m_nYOffs - displayBL[0][1];
 			}
 
 		SetPan(pan);

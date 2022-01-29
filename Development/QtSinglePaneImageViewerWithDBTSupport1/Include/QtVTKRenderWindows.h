@@ -48,6 +48,8 @@ protected slots:
 	void on_pushButtonHorizontal_clicked(bool);
 	void on_pushButtonHorizontalAndVertical_clicked(bool);
 	void on_pushButtonVertical_clicked(bool);
+	void on_pushButtonAlignLeft_clicked(bool);
+	void on_pushButtonAlignRight_clicked(bool);
 
 private:
 
