@@ -55,7 +55,7 @@ class MEDVTKINRIA_EXPORT vtkImageView2DCommand : public vtkCommand
     CameraZoomEvent,
     CameraPanEvent,
     DefaultMoveEvent,
-    RequestedCursorInformationEvent
+    RequestedCursorInformationEvent,
   };
   //ETX
 
@@ -65,6 +65,7 @@ class MEDVTKINRIA_EXPORT vtkImageView2DCommand : public vtkCommand
 	  ZSliceMoveEvent = SliceMoveEvent,
 	  ZoomEvent = CameraZoomEvent,
   };
+
   //ETX
 
   // Description:

@@ -1770,6 +1770,10 @@ void vtkImageView2D::InstallPipeline()
     if( !this->InteractorStyle->HasObserver (vtkImageView2DCommand::CameraZoomEvent, this->Command) )
       this->InteractorStyle->AddObserver (vtkImageView2DCommand::CameraZoomEvent, this->Command, 10);
 
+//     if (this->GetRenderWindow() && !this->GetRenderWindow()->HasObserver(vtkCommand::WindowResizeEvent)) {
+//         this->GetRenderWindow()->AddObserver(vtkCommand::WindowResizeEvent, this->Command, 10);
+//     }
+
     // if( !this->InteractorStyle->HasObserver (vtkImageView2DCommand::CameraPanEvent, this->Command) )
     //   this->InteractorStyle->AddObserver (vtkImageView2DCommand::CameraPanEvent, this->Command, 10);
   }

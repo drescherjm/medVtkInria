@@ -357,9 +357,12 @@ void smvtkImageView2D::InstallPipeline( void )
 	this->Superclass::InstallPipeline();
 	if( this->InteractorStyle )
 	{
-		if ( !this->InteractorStyle->HasObserver(smvtkImageView2DCommand::WindowSizeChanged, this->Command)) {
-			this->InteractorStyle->AddObserver (smvtkImageView2DCommand::WindowSizeChanged, this->Command, 10);
+		if (this->GetRenderWindow() && !this->GetRenderWindow()->HasObserver(vtkCommand::WindowResizeEvent)) {
+			this->GetRenderWindow()->AddObserver(vtkCommand::WindowResizeEvent, this->Command, 10);
 		}
+// 		if ( !this->InteractorStyle->HasObserver(smvtkImageView2DCommand::WindowSizeChanged, this->Command)) {
+// 			this->InteractorStyle->AddObserver (smvtkImageView2DCommand::WindowSizeChanged, this->Command, 10);
+// 		}
 		if ( !this->InteractorStyle->HasObserver (smvtkImageView2DCommand::AlignLeft, this->Command) )
 			this->InteractorStyle->AddObserver (smvtkImageView2DCommand::AlignLeft, this->Command, 10);
 		if ( !this->InteractorStyle->HasObserver (smvtkImageView2DCommand::AlignRight, this->Command) )

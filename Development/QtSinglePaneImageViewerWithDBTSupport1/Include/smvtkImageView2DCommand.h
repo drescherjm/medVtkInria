@@ -22,10 +22,11 @@ public:
 #endif
 
 public:
-	enum EventIds {
-		WindowSizeChanged = vtkImageView2DCommand::DefaultMoveEvent+1,
+	enum ExEventIds {
+		WindowSizeChanged = vtkImageView2DCommand::SliceMoveEvent+50,
 		AlignLeft,
 		AlignRight,
+		//WindowSizeChanged = vtkCommand::WindowResizeEvent,
 	};
 protected:
 	smvtkImageView2DCommand();

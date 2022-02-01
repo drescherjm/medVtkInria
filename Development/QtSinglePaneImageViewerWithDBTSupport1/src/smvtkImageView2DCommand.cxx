@@ -289,6 +289,14 @@ void smvtkImageView2DCommand::Execute( vtkObject *caller,unsigned long event, vo
 			}
 			//m_pPrivate->alignRight(this);
 			break;
+		case vtkCommand::WindowResizeEvent:
+			{
+				smvtkImageView2D* psmViewer = smvtkImageView2D::SafeDownCast(pViewer);
+				if (psmViewer != nullptr) {
+					psmViewer->UpdateAlignment();
+				}
+			}
+			break;
 		case smvtkImageView2DCommand::WindowSizeChanged:
 			{
 				smvtkImageView2D* psmViewer = smvtkImageView2D::SafeDownCast(pViewer);
