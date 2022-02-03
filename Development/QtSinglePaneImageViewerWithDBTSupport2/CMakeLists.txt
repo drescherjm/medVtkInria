@@ -1,5 +1,7 @@
 myproject(QtSinglePaneImageViewerWithDBTSupport_2)
 
+find_package( Boost REQUIRED )
+
 if (VTK_VERSION VERSION_LESS "8.90.0")
 find_package(VTK
   COMPONENTS

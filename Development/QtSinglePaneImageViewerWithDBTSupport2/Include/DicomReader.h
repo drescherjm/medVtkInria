@@ -5,6 +5,8 @@
 
 #include <string>
 #include <memory>
+#include <utility>
+#include <boost/optional.hpp>
 
 class vtkImageData;
 class vtkAlgorithmOutput;
@@ -20,6 +22,10 @@ public:
 public:
 	vtkImageData* GetOutput();
 	vtkAlgorithmOutput* GetOutputPort();
+
+	bool isMultiframeDicom();
+
+	boost::optional<std::pair<double, double>> getDefaultWindow();
 
 private:
 	class Private;

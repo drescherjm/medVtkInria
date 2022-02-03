@@ -78,6 +78,10 @@ void QtVTKRenderWindows::setupImage()
 
 		auto pImageData = m_pReader->GetOutput();
 
+		if (m_pReader->isMultiframeDicom()) {
+			std::cout << "We are loading a multi-frame dicom file" << std::endl;
+		}
+
 		int imageDims[3];
 		pImageData->GetDimensions(imageDims);
 
@@ -112,8 +116,15 @@ void QtVTKRenderWindows::setupImage()
 
 		riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
 
-		riw->SetColorLevel(512.0);
-		riw->SetColorWindow(512.0);
+		auto wl = m_pReader->getDefaultWindow();
+		if (!wl) {
+			riw->SetColorLevel(512.0);
+			riw->SetColorWindow(512.0);
+		}
+		else {
+			riw->SetColorLevel(wl->second);
+			riw->SetColorWindow(wl->first);
+		}
 
 		this->ui->view->show();
 
