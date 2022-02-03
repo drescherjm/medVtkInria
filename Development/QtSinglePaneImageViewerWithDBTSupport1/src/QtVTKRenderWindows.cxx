@@ -63,7 +63,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int vtkNotUsed(argc), char* argv[])
 
 	vtkSmartPointer< vtkDICOMReader > reader = vtkSmartPointer< vtkDICOMReader >::New();
 	reader->SetFileName(argv[1]);
-	reader->SetMemoryRowOrderToFileNative();
+	//reader->SetMemoryRowOrderToFileNative();
 	reader->Update();
 
 	reader->Print(std::cout);
