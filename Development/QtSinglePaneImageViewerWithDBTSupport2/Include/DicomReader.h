@@ -23,9 +23,16 @@ public:
 	vtkImageData* GetOutput();
 	vtkAlgorithmOutput* GetOutputPort();
 
+public:
+	bool CanReadFile();
+	bool Read();
 	bool isMultiframeDicom();
 
-	boost::optional<std::pair<double, double>> getDefaultWindow();
+	boost::optional<std::pair<double, double>> getDefaultWindowLevel();
+
+	std::string GetViewCodeSequence();
+	std::string GetImageLaterality();
+	bool		isAnatomicRegionBreast();
 
 private:
 	class Private;

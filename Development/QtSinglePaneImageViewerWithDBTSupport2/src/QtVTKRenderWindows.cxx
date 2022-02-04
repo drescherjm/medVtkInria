@@ -74,9 +74,21 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 
 void QtVTKRenderWindows::setupImage()
 {
-	if (m_pReader) {
+	if (m_pReader && m_pReader->Read()) {
 
 		auto pImageData = m_pReader->GetOutput();
+
+		auto strCode = m_pReader->GetViewCodeSequence();
+		if (!strCode.empty()) {
+			std::cout << "ViewCodeSequence: " << strCode << std::endl;
+		}
+
+		if (m_pReader->isAnatomicRegionBreast()) {
+			std::cout << "AnatomicRegion: Breast" << std::endl;
+		}
+		else {
+			std::cout << "AnatomicRegion: Not found or Unexpected" << std::endl;
+		}
 
 		if (m_pReader->isMultiframeDicom()) {
 			std::cout << "We are loading a multi-frame dicom file" << std::endl;
@@ -112,11 +124,21 @@ void QtVTKRenderWindows::setupImage()
 
 		riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
-		//riw->SetOrientationMatrix(reader->GetPatientMatrix());
+		std::string strLaterality = m_pReader->GetImageLaterality();
+		
+		smvtkImageView2D::ImageAlignmentFlags align = VTKView::IA_VCenter;
 
-		riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
+		if (strLaterality == "L") {
+			align |= VTKView::IA_Left;
+		}
+		else {
+			align |= VTKView::IA_Right;
+		}
 
-		auto wl = m_pReader->getDefaultWindow();
+		riw->setImageAlignment(align);
+
+
+		auto wl = m_pReader->getDefaultWindowLevel();
 		if (!wl) {
 			riw->SetColorLevel(512.0);
 			riw->SetColorWindow(512.0);
