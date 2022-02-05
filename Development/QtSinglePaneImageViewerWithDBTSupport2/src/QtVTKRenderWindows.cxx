@@ -138,8 +138,7 @@ void QtVTKRenderWindows::setupImage()
 		}
 
 		riw->setImageAlignment(align);
-		riw->UpdateAlignment();
-
+		
 		auto wl = m_pReader->getDefaultWindowLevel();
 		if (!wl) {
 			riw->SetColorLevel(512.0);
@@ -156,6 +155,11 @@ void QtVTKRenderWindows::setupImage()
 
 		if (pCamera) {
 			pCamera->Print(std::cout);
+		}
+
+		if (!align == static_cast<smvtkImageView2D::ImageAlignmentFlags>(smvtkImageView2D::IA_HCenter | smvtkImageView2D::IA_VCenter)) {
+			riw->UpdateAlignment();
+			riw->Render();
 		}
 
 #ifdef TEST_SEED_WIDGET
