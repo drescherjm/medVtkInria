@@ -1,5 +1,6 @@
 #include "DicomReader.h"
 #include <vtkSmartPointer.h>
+#include <map>
 
 #include <boost/algorithm/string/predicate.hpp>
 
@@ -100,7 +101,7 @@ vtkAlgorithmOutput* DicomReader::GetOutputPort()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::CanReadFile()
+bool DicomReader::CanReadFile() const
 {
 	return m_pPrivate->reader->CanReadFile(m_pPrivate->reader->GetFileName());
 }
@@ -124,14 +125,14 @@ bool DicomReader::Read()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isMultiframeDicom()
+bool DicomReader::isMultiframeDicom() const
 {
 	return m_pPrivate->meta->Has(DC::SharedFunctionalGroupsSequence);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-boost::optional<std::pair<double, double>> DicomReader::getDefaultWindowLevel()
+boost::optional<std::pair<double, double>> DicomReader::getDefaultWindowLevel() const
 {
 	boost::optional<std::pair<double, double>> retVal;
 
@@ -163,7 +164,7 @@ boost::optional<std::pair<double, double>> DicomReader::getDefaultWindowLevel()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetViewCodeSequence()
+std::string DicomReader::GetViewCodeSequence() const
 {
 	/*
 	 *	A Sequence looks like the following
@@ -189,7 +190,43 @@ std::string DicomReader::GetViewCodeSequence()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetImageLaterality()
+std::string DicomReader::GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const
+{
+	// See: https://dicom.nema.org/dicom/2013/output/chtml/part16/sect_CID_4014.html
+
+	static std::map<std::string, std::string> mapCodes{ 
+		{"R-10224","ML"},
+		{"R-10226","MLO"},
+		{"R-10228","LM"},
+		{"R-10230","LMO"},
+		{"R-10242","CC"},
+		{"R-10244","FB"},
+		{"R-40AAA","ISO"},
+		{"R-102D0","SIO"},
+		{"R-1024A","XCCL"},
+		{"Y-X1770","XCCL"},
+		{"R-1024B","XCCM"},
+		{"Y-X1771","XCCM"},
+		{"R-102C2","TAN"},
+	};
+	
+	std::string retVal;
+
+	auto it = mapCodes.find(strViewCode);
+
+	if (it != mapCodes.end()) {
+		retVal = it->second;
+	}
+	else if (!strViewCode.empty()) {
+		retVal = strViewCode;
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+std::string DicomReader::GetImageLaterality() const
 {
 	std::string retVal;
 	if (isMultiframeDicom()) {
@@ -226,9 +263,9 @@ std::string DicomReader::GetImageLaterality()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isAnatomicRegionBreast()
+std::string DicomReader::GetAnatomicRegion() const
 {
-	bool retVal = false;
+	std::string retVal;
 
 	if (isMultiframeDicom()) {
 		/*
@@ -242,15 +279,6 @@ bool DicomReader::isAnatomicRegionBreast()
 			(0020,9072) CS "FrameLaterality" : [L] (2 bytes)
 		*/
 
-		// 		auto value = m_pPrivate->meta->Get(DC::SharedFunctionalGroupsSequence);
-		// 		if (value.IsValid()) {
-		// 			auto seqShared = value.GetSequenceData();
-		// 			auto valueFAS = seqShared->Get(DC::FrameAnatomySequence);
-		// 			if (valueFAS.IsValid()) {
-		// 				auto valueARS = valueFAS.GetSequenceData()->Get()
-		// 			}
-		// 		}
-
 		auto valueSFGS = m_pPrivate->meta->Get(DC::SharedFunctionalGroupsSequence);
 		if (valueSFGS.IsValid()) {
 			auto value = valueSFGS.GetSequenceData()->Get(
@@ -260,7 +288,7 @@ bool DicomReader::isAnatomicRegionBreast()
 			);
 
 			if (value.IsValid()) {
-				retVal = (boost::iequals(value.AsString(), "Breast"));
+				retVal = value.AsString();
 			}
 		}
 	}
@@ -271,7 +299,7 @@ bool DicomReader::isAnatomicRegionBreast()
 		);
 
 		if (value.IsValid()) {
-			retVal = (boost::iequals(value.AsString(), "Breast"));
+			retVal = value.AsString();
 		}
 	}
 
@@ -280,3 +308,44 @@ bool DicomReader::isAnatomicRegionBreast()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+std::string DicomReader::GetImageOrientationPatient() const
+{
+	/*
+	*   
+	(0020,9116) SQ "PlaneOrientationSequence" : (1 item)
+		---- SQ Item 0001 at offset 14630 ----
+		(0020,0037) DS "ImageOrientationPatient" : [0\-1\0\0.003\0\-1.000] (22 bytes)
+	*/
+
+	std::string retVal;
+
+	if (isMultiframeDicom()) {
+		auto value = m_pPrivate->meta->Get(
+			vtkDICOMTagPath(DC::SharedFunctionalGroupsSequence,0,
+				DC::PlaneOrientationSequence, 0,
+				DC::ImageOrientationPatient)
+		);
+
+		if (value.IsValid()) {
+			retVal = value.AsString();
+		}
+	}
+	else {
+		auto value = m_pPrivate->meta->Get(DC::ImageOrientationPatient);
+	
+		if (value.IsValid()) {
+			retVal = value.AsString();
+		}
+	}
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool DicomReader::isAnatomicRegionBreast() const
+{
+	auto strAnatomicRegion = GetAnatomicRegion();
+	return (boost::iequals(strAnatomicRegion, "Breast"));
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////

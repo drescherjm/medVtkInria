@@ -24,15 +24,18 @@ public:
 	vtkAlgorithmOutput* GetOutputPort();
 
 public:
-	bool CanReadFile();
+	bool CanReadFile() const;
 	bool Read();
-	bool isMultiframeDicom();
+	bool isMultiframeDicom() const;
 
-	boost::optional<std::pair<double, double>> getDefaultWindowLevel();
+	boost::optional<std::pair<double, double>> getDefaultWindowLevel() const;
 
-	std::string GetViewCodeSequence();
-	std::string GetImageLaterality();
-	bool		isAnatomicRegionBreast();
+	std::string GetViewCodeSequence() const;
+	std::string GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const;
+	std::string GetImageLaterality() const;
+	std::string GetAnatomicRegion() const;
+	std::string GetImageOrientationPatient() const;
+	bool		isAnatomicRegionBreast() const;
 
 private:
 	class Private;

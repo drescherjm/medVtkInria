@@ -80,7 +80,7 @@ void QtVTKRenderWindows::setupImage()
 
 		auto strCode = m_pReader->GetViewCodeSequence();
 		if (!strCode.empty()) {
-			std::cout << "ViewCodeSequence: " << strCode << std::endl;
+			std::cout << "ViewCodeSequence: " << strCode << " MQCM: " << m_pReader->GetMammographyACR_MQCM_CodeFromViewCodeSequence(strCode) << std::endl;
 		}
 
 		if (m_pReader->isAnatomicRegionBreast()) {
@@ -89,6 +89,8 @@ void QtVTKRenderWindows::setupImage()
 		else {
 			std::cout << "AnatomicRegion: Not found or Unexpected" << std::endl;
 		}
+
+		std::cout << "ImageOrientationPatient: " << m_pReader->GetImageOrientationPatient() << std::endl;
 
 		if (m_pReader->isMultiframeDicom()) {
 			std::cout << "We are loading a multi-frame dicom file" << std::endl;
@@ -136,7 +138,7 @@ void QtVTKRenderWindows::setupImage()
 		}
 
 		riw->setImageAlignment(align);
-
+		riw->UpdateAlignment();
 
 		auto wl = m_pReader->getDefaultWindowLevel();
 		if (!wl) {
