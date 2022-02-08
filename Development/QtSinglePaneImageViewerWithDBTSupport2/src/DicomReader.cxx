@@ -22,6 +22,7 @@ public:
 	bool updateWindowAndLevelForMultiframe(vtkMedicalImageProperties* pProps);
 
 public:
+	bool m_bFlipZ{ false };
 	vtkSmartPointer< vtkDICOMReader > reader;
 	vtkSmartPointer<vtkDICOMMetaData> meta = vtkSmartPointer<vtkDICOMMetaData>::New();
 };
@@ -110,6 +111,9 @@ bool DicomReader::CanReadFile() const
 
 bool DicomReader::Read()
 {
+	if (m_pPrivate->m_bFlipZ) {
+		m_pPrivate->reader->SetMemoryRowOrderToFileNative();
+	}
 	m_pPrivate->reader->Update();
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
 
@@ -128,6 +132,13 @@ bool DicomReader::Read()
 bool DicomReader::isMultiframeDicom() const
 {
 	return m_pPrivate->meta->Has(DC::SharedFunctionalGroupsSequence);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void DicomReader::setFlipZ(bool bFlip)
+{
+	m_pPrivate->m_bFlipZ = bFlip;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -308,7 +319,7 @@ std::string DicomReader::GetAnatomicRegion() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetImageOrientationPatient() const
+std::string DicomReader::GetImageOrientationPatientString() const
 {
 	/*
 	*   
@@ -342,10 +353,89 @@ std::string DicomReader::GetImageOrientationPatient() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+std::vector<double> DicomReader::GetImageOrientationPatientVector() const
+{
+	/*
+	*   
+	(0020,9116) SQ "PlaneOrientationSequence" : (1 item)
+		---- SQ Item 0001 at offset 14630 ----
+		(0020,0037) DS "ImageOrientationPatient" : [0\-1\0\0.003\0\-1.000] (22 bytes)
+	*/
+
+	std::vector<double> retVal;
+
+	if (isMultiframeDicom()) {
+		auto value = m_pPrivate->meta->Get(
+			vtkDICOMTagPath(DC::SharedFunctionalGroupsSequence,0,
+				DC::PlaneOrientationSequence, 0,
+				DC::ImageOrientationPatient)
+		);
+
+		if (value.IsValid()) {
+			auto size = value.GetNumberOfValues();
+			if (size > 0) {
+				retVal.resize(size);
+				value.GetValues(retVal.data(), size);
+			}
+		}
+	}
+	else {
+		auto value = m_pPrivate->meta->Get(DC::ImageOrientationPatient);
+	
+		if (value.IsValid()) {
+			auto size = value.GetNumberOfValues();
+			if (size > 0) {
+				retVal.resize(size);
+				value.GetValues(retVal.data(), size);
+			}
+		}
+	}
+	return retVal;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 bool DicomReader::isAnatomicRegionBreast() const
 {
 	auto strAnatomicRegion = GetAnatomicRegion();
 	return (boost::iequals(strAnatomicRegion, "Breast"));
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool DicomReader::isImageLateralityLeft(std::string strLaterality) const
+{
+	bool retVal{ false };
+
+	if (strLaterality.empty()) {
+		strLaterality = GetImageLaterality();
+	}
+
+	if (!strLaterality.empty()) {
+		retVal = ((strLaterality[0] == 'L') || (strLaterality[0] == 'l'));
+	}
+
+	return retVal;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool DicomReader::isImageLateralityRight(std::string strLaterality) const
+{
+	bool retVal{ false };
+
+	if (strLaterality.empty()) {
+		strLaterality = GetImageLaterality();
+	}
+
+	if (!strLaterality.empty()) {
+		retVal = ((strLaterality[0] == 'R') || (strLaterality[0] == 'r'));
+	}
+
+	return retVal;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////

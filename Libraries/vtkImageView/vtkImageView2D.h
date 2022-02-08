@@ -361,6 +361,8 @@ public:
     void SetAnnotationStyle (unsigned int arg);
     vtkGetMacro (AnnotationStyle, unsigned int);
 
+    vtkGetMacro(ConventionMatrix,vtkMatrix4x4* );
+    vtkSetMacro(ConventionMatrix, vtkMatrix4x4*);
 
     virtual void AddLayer(int);
     virtual void RemoveLayer(int layer);
@@ -397,6 +399,7 @@ public:
 	vtkRenderer* GetRendererForLayer(int layer) const;
 
 	virtual void setUserAnnotation(vtkImageViewCornerAnnotation::TextPosition nPos, std::string strAnnotation);
+    virtual void UpdateOrientation();
 
 protected:
     vtkImageView2D();
@@ -406,7 +409,7 @@ protected:
 
     virtual void UpdateSlicePlane();
     virtual void UpdateCenter();
-    virtual void UpdateOrientation();
+    
 
     virtual void SetSlicePlaneFromOrientation();
     virtual int GetViewOrientationFromSliceOrientation(int sliceorientation, double* cam_pos = 0, double* cam_focus = 0);

@@ -52,160 +52,145 @@
       <property name="frameShadow">
        <enum>QFrame::Raised</enum>
       </property>
-      <widget class="QCheckBox" name="resliceModeCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>20</y>
-         <width>141</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Oblique Reslice</string>
-       </property>
-      </widget>
-      <widget class="QCheckBox" name="thickModeCheckBox">
-       <property name="geometry">
-        <rect>
-         <x>30</x>
-         <y>80</y>
-         <width>101</width>
-         <height>17</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Thick Slab</string>
-       </property>
-      </widget>
-      <widget class="QGroupBox" name="blendModeGroupBox">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>120</y>
-         <width>181</width>
-         <height>91</height>
-        </rect>
-       </property>
-       <property name="title">
-        <string>Blend mode</string>
-       </property>
-       <widget class="QRadioButton" name="radioButton_Min">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>20</y>
-          <width>161</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Min Intensity Blend</string>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioButton_Max">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>40</y>
-          <width>161</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Max Intensity Blend</string>
-        </property>
-       </widget>
-       <widget class="QRadioButton" name="radioButton_Mean">
-        <property name="geometry">
-         <rect>
-          <x>10</x>
-          <y>60</y>
-          <width>111</width>
-          <height>17</height>
-         </rect>
-        </property>
-        <property name="text">
-         <string>Mean Blend</string>
-        </property>
-       </widget>
-      </widget>
-      <widget class="QPushButton" name="resetButton">
-       <property name="geometry">
-        <rect>
-         <x>10</x>
-         <y>220</y>
-         <width>51</width>
-         <height>21</height>
-        </rect>
-       </property>
-       <property name="text">
-        <string>Reset</string>
-       </property>
-      </widget>
-      <widget class="QFrame" name="frame_2">
-       <property name="geometry">
-        <rect>
-         <x>0</x>
-         <y>250</y>
-         <width>176</width>
-         <height>162</height>
-        </rect>
-       </property>
-       <property name="frameShape">
-        <enum>QFrame::StyledPanel</enum>
-       </property>
-       <property name="frameShadow">
-        <enum>QFrame::Raised</enum>
-       </property>
-       <layout class="QGridLayout" name="gridLayout_3">
-        <item row="0" column="0" colspan="2">
-         <widget class="QPushButton" name="AddDistance1Button">
+      <layout class="QVBoxLayout" name="verticalLayout">
+       <item>
+        <widget class="QCheckBox" name="resliceModeCheckBox">
+         <property name="text">
+          <string>Oblique Reslice</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QCheckBox" name="thickModeCheckBox">
+         <property name="text">
+          <string>Thick Slab</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QGroupBox" name="blendModeGroupBox">
+         <property name="title">
+          <string>Blend mode</string>
+         </property>
+         <widget class="QRadioButton" name="radioButton_Min">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>20</y>
+            <width>161</width>
+            <height>17</height>
+           </rect>
+          </property>
           <property name="text">
-           <string>Add Distance On View 1</string>
+           <string>Min Intensity Blend</string>
           </property>
          </widget>
-        </item>
-        <item row="1" column="0">
-         <widget class="QSpinBox" name="spinBoxCamera"/>
-        </item>
-        <item row="2" column="0">
-         <widget class="QPushButton" name="pushButtonVertical">
+         <widget class="QRadioButton" name="radioButton_Max">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>40</y>
+            <width>161</width>
+            <height>17</height>
+           </rect>
+          </property>
           <property name="text">
-           <string>Vertical</string>
+           <string>Max Intensity Blend</string>
           </property>
          </widget>
-        </item>
-        <item row="2" column="1">
-         <widget class="QPushButton" name="pushButtonHorizontal">
+         <widget class="QRadioButton" name="radioButton_Mean">
+          <property name="geometry">
+           <rect>
+            <x>10</x>
+            <y>60</y>
+            <width>111</width>
+            <height>17</height>
+           </rect>
+          </property>
           <property name="text">
-           <string>Horizontal</string>
+           <string>Mean Blend</string>
           </property>
          </widget>
-        </item>
-        <item row="3" column="0" colspan="2">
-         <widget class="QPushButton" name="pushButtonHorizontalAndVertical">
-          <property name="text">
-           <string>Horizontal And Vertical</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="0">
-         <widget class="QPushButton" name="pushButtonAlignLeft">
-          <property name="text">
-           <string>LeftAlign</string>
-          </property>
-         </widget>
-        </item>
-        <item row="4" column="1">
-         <widget class="QPushButton" name="pushButtonAlignRight">
-          <property name="text">
-           <string>AlignRight</string>
-          </property>
-         </widget>
-        </item>
-       </layout>
-      </widget>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="resetButton">
+         <property name="text">
+          <string>Reset</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QFrame" name="frame_2">
+         <property name="frameShape">
+          <enum>QFrame::StyledPanel</enum>
+         </property>
+         <property name="frameShadow">
+          <enum>QFrame::Raised</enum>
+         </property>
+         <layout class="QGridLayout" name="gridLayout_3">
+          <item row="1" column="0">
+           <widget class="QSpinBox" name="spinBoxCamera"/>
+          </item>
+          <item row="4" column="1">
+           <widget class="QPushButton" name="pushButtonAlignRight">
+            <property name="text">
+             <string>AlignRight</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="0">
+           <widget class="QPushButton" name="pushButtonVertical">
+            <property name="text">
+             <string>Vertical</string>
+            </property>
+           </widget>
+          </item>
+          <item row="4" column="0">
+           <widget class="QPushButton" name="pushButtonAlignLeft">
+            <property name="text">
+             <string>LeftAlign</string>
+            </property>
+           </widget>
+          </item>
+          <item row="2" column="1">
+           <widget class="QPushButton" name="pushButtonHorizontal">
+            <property name="text">
+             <string>Horizontal</string>
+            </property>
+           </widget>
+          </item>
+          <item row="0" column="0" colspan="2">
+           <widget class="QPushButton" name="AddDistance1Button">
+            <property name="text">
+             <string>Add Distance On View 1</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0" colspan="2">
+           <widget class="QPushButton" name="pushButtonHorizontalAndVertical">
+            <property name="text">
+             <string>Horizontal And Vertical</string>
+            </property>
+           </widget>
+          </item>
+         </layout>
+        </widget>
+       </item>
+       <item>
+        <spacer name="verticalSpacer">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+      </layout>
      </widget>
     </item>
    </layout>

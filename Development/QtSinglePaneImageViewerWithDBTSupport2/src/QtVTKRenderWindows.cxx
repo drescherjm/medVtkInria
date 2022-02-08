@@ -41,13 +41,18 @@
 
 #include <vtkCamera.h>
 #include <vtkNew.h>
+#include <vtkMatrix4x4.h>
+
+#include <vtkImageFlip.h>
 
 #include <vtkDebugLeaks.h>
 #include "QtVTKRenderWindows.h"
-
 #include "DicomReader.h"
+#include "FunctionProfiler.h"
 
 //#define TEST_SEED_WIDGET
+
+//#define FLIPZ_USING_FILTER
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -67,6 +72,8 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 	m_pReader = std::make_unique<DicomReader>(strFileName);
 
 	setupImage();
+
+	addViewConventionMatrix();
 };
 
 
@@ -74,6 +81,10 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 
 void QtVTKRenderWindows::setupImage()
 {
+	PROFILE_THIS_FUNCTION;
+
+	m_pReader->setFlipZ(true);
+
 	if (m_pReader && m_pReader->Read()) {
 
 		auto pImageData = m_pReader->GetOutput();
@@ -90,7 +101,7 @@ void QtVTKRenderWindows::setupImage()
 			std::cout << "AnatomicRegion: Not found or Unexpected" << std::endl;
 		}
 
-		std::cout << "ImageOrientationPatient: " << m_pReader->GetImageOrientationPatient() << std::endl;
+		std::cout << "ImageOrientationPatient: " << m_pReader->GetImageOrientationPatientString() << std::endl;
 
 		if (m_pReader->isMultiframeDicom()) {
 			std::cout << "We are loading a multi-frame dicom file" << std::endl;
@@ -102,7 +113,7 @@ void QtVTKRenderWindows::setupImage()
 		riw = vtkSmartPointer< VTKView >::New();
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-		riw->SetViewConvention(VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL);
+		riw->SetViewConvention(getProperViewConventionForImage());
 
 		vtkSmartPointer<vtkRenderer> pren = vtkSmartPointer<vtkRenderer>::New();
 
@@ -122,7 +133,16 @@ void QtVTKRenderWindows::setupImage()
 		riw->SetupInteractor(this->ui->view->GetRenderWindow()->GetInteractor());
 #endif
 
+#ifdef	FLIPZ_USING_FILTER
+		vtkNew<vtkImageFlip> flipZFilter;
+		//flipZFilter->SetFilteredAxis(2); // flip z axis
+		flipZFilter->SetInputConnection(m_pReader->GetOutputPort());
+		flipZFilter->Update();
+		
+		riw->SetInput(flipZFilter->GetOutputPort());
+#else
 		riw->SetInput(m_pReader->GetOutputPort());
+#endif //def FLIPZ_USING_FILTER
 
 		riw->SetSliceOrientation(vtkImageView2DExtended::SLICE_ORIENTATION_XY); // enum { SLICE_ORIENTATION_YZ = 0, SLICE_ORIENTATION_XZ = 1, SLICE_ORIENTATION_XY = 2 }
 
@@ -216,9 +236,67 @@ void QtVTKRenderWindows::setupImage()
 	}
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void QtVTKRenderWindows::addViewConventionMatrix()
+{
+	QGridLayout* layout = new QGridLayout;
+
+	auto pMainLayout = qobject_cast<QVBoxLayout*>(ui->frame->layout());
+
+	if (pMainLayout) {
+		pMainLayout->insertLayout(pMainLayout->indexOf(ui->verticalSpacer), layout);
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				auto pSpin = new QSpinBox;
+				pSpin->setObjectName(getViewConventionSpinName(i,j));
+				pSpin->setMinimum(-1);
+				pSpin->setMaximum(1);
+				layout->addWidget(pSpin, i, j);
+
+				connect(pSpin, SIGNAL(valueChanged(int)), this, SLOT(conventionSpinChanged()));
+			}
+		}
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+int QtVTKRenderWindows::getProperViewConventionForImage()
+{
+	int retVal = VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL;
+
+	bool bMultiframe = m_pReader->isMultiframeDicom();
+
+	if (bMultiframe) {
+		bool bLeftImage = m_pReader->isImageLateralityLeft();
+		if (bLeftImage) {
+			auto vecImageOrientationPatient = m_pReader->GetImageOrientationPatientVector();
+			if (!vecImageOrientationPatient.empty()) {
+
+			}
+
+			retVal = VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_CORONAL;
+		}
+		else {
+			retVal = VTKView::VIEW_CONVENTION_RADIOLOGICAL_BREAST;
+		}
+	}
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+QString QtVTKRenderWindows::getViewConventionSpinName(int i, int j)
+{
+	return QString("ConventionMatrix_%1%2").arg(i).arg(j);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 QtVTKRenderWindows::~QtVTKRenderWindows()
 {
-	std::cout << "Got Here!" << std::endl;
+	std::cout << __FUNCTION__ << std::endl;
 	
 
 	riw->Print(std::cout);
@@ -324,6 +402,19 @@ void QtVTKRenderWindows::AddDistanceMeasurementToView1()
  // this->AddDistanceMeasurementToView(1);
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void QtVTKRenderWindows::showEvent(QShowEvent* event)
+{
+	QMainWindow::showEvent(event);
+
+	riw->UpdateAlignment();
+	riw->Render();
+
+	emit initConventionSpinBoxes();
+
+	std::cout << "Render Time: " << riw->GetRenderer()->GetLastRenderTimeInSeconds() << std::endl;
+}
 
 void QtVTKRenderWindows::on_spinBoxCamera_valueChanged(int nValue)
 {
@@ -336,24 +427,32 @@ void QtVTKRenderWindows::on_spinBoxCamera_valueChanged(int nValue)
 
 	riw->SetViewConvention(nValue);
 	riw->Render();
+
+	emit initConventionSpinBoxes();
 }
 
 void QtVTKRenderWindows::on_pushButtonHorizontal_clicked(bool)
 {
 	riw->flipHorizontal();
 	riw->Render();
+
+	emit initConventionSpinBoxes();
 }
 
 void QtVTKRenderWindows::on_pushButtonHorizontalAndVertical_clicked(bool)
 {
 	riw->flipVerticalAndHorizontal();
 	riw->Render();
+
+	emit initConventionSpinBoxes();
 }
 
 void QtVTKRenderWindows::on_pushButtonVertical_clicked(bool)
 {
 	riw->flipVertical();
 	riw->Render();
+
+	emit initConventionSpinBoxes();
 }
 
 void QtVTKRenderWindows::on_pushButtonAlignLeft_clicked(bool)
@@ -368,6 +467,48 @@ void QtVTKRenderWindows::on_pushButtonAlignRight_clicked(bool)
 	riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
 	riw->UpdateAlignment();
 	riw->Render();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void QtVTKRenderWindows::conventionSpinChanged()
+{
+	if (m_bConventionInitialized) {
+
+		auto matrix = riw->GetConventionMatrix();
+
+		for (int i = 0; i < 4; ++i) {
+			for (int j = 0; j < 4; ++j) {
+				auto pWidget = ui->frame->findChild<QSpinBox*>(getViewConventionSpinName(i, j));
+				if (pWidget) {
+					matrix->SetElement(i, j, pWidget->value());
+				}
+			}
+		}
+		riw->UpdateOrientation();
+	}
+}
+
+void QtVTKRenderWindows::initConventionSpinBoxes()
+{
+
+	auto matrix = riw->GetConventionMatrix();
+
+	for (int i = 0; i < 4; ++i) {
+		for (int j = 0; j < 4; ++j) {
+			auto pWidget = ui->frame->findChild<QSpinBox*>(getViewConventionSpinName(i, j));
+			if (pWidget) {
+
+				double val = matrix->GetElement(i, j);
+				bool oldState = pWidget->blockSignals(true);
+				pWidget->setValue(val);
+				pWidget->blockSignals(oldState);
+
+			}
+		}
+	}
+
+	m_bConventionInitialized = true;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
