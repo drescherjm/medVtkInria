@@ -97,6 +97,7 @@ void QtVTKRenderWindows::setupImage()
 
 		auto pImageData = m_pReader->GetOutput();
 
+		std::cout << "Patient Matrix:" << std::endl;
 		m_pReader->GetPatientMatrix()->Print(std::cout);
 
 		auto strCode = m_pReader->GetViewCodeSequence();
@@ -128,12 +129,14 @@ void QtVTKRenderWindows::setupImage()
 		riw = vtkSmartPointer< VTKView >::New();
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-		auto matrix = getOrientationMatrixForImage(strLaterality, strMQCMCode);
+		auto pPatientMatrix = m_pReader->GetPatientMatrix();
+
+		auto matrix = getOrientationMatrixForImage(strLaterality, strMQCMCode,pPatientMatrix);
 		if (!matrix->IsIdentity()) {
 			riw->SetOrientationMatrix(matrix);
 		}
 
-		auto nConv = getProperViewConventionForImage(strLaterality,strMQCMCode,m_pReader->GetPatientMatrix());
+		auto nConv = getProperViewConventionForImage(strLaterality,strMQCMCode,pPatientMatrix);
 		riw->SetViewConvention(nConv);
 
 		ui->spinBoxCamera->blockSignals(true);
@@ -349,6 +352,11 @@ int GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix)
 
 int GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix)
 {
+	if (pPatientMatrix) {
+		if (pPatientMatrix->GetElement(1, 0) > 0) {
+			return 8;
+		}
+	}
 	return 2;
 }
 
@@ -418,14 +426,16 @@ QString QtVTKRenderWindows::getViewConventionSpinName(int i, int j)
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-vtkSmartPointer<vtkMatrix4x4> QtVTKRenderWindows::getOrientationMatrixForImage(std::string strLaterality, std::string strMQCMCode)
+vtkSmartPointer<vtkMatrix4x4> QtVTKRenderWindows::getOrientationMatrixForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix)
 {
 	vtkSmartPointer<vtkMatrix4x4> retVal = vtkIdentityMatrix4x4;
 
 	for (const auto& viewCode : { "LM", }) {
 		if (strMQCMCode == viewCode) {
-			retVal = vtkSmartPointer<vtkMatrix4x4>::New();
-			retVal->SetElement(2, 2, -1); // Flip the Z axis
+			if (pPatientMatrix && (pPatientMatrix->GetElement(1, 0) > 0)) {
+				retVal = vtkSmartPointer<vtkMatrix4x4>::New();
+				retVal->SetElement(2, 2, -1); // Flip the Z axis
+			}
 			break;
 		}
 	}

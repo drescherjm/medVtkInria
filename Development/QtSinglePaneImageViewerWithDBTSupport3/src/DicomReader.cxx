@@ -16,6 +16,8 @@
 #endif
 #include "FunctionProfiler.h"
 
+//#define DEBUG_DICOM_READER
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 class DicomReader::Private
@@ -119,8 +121,9 @@ void DicomReader::UpdateInformation()
 
 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
 
+#ifdef DEBUG_DICOM_READER
 	m_pPrivate->meta->Print(std::cout);
-
+#endif //def DEBUG_DICOM_READER
 	m_pPrivate->reader->Update();
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
 
@@ -128,7 +131,9 @@ void DicomReader::UpdateInformation()
 		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
 	}
 
+#ifdef DEBUG_DICOM_READER
 	pProps->Print(std::cout);
+#endif //def DEBUG_DICOM_READER
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -149,7 +154,10 @@ bool DicomReader::Read()
 		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
 	}
 
+#ifdef DEBUG_DICOM_READER
 	pProps->Print(std::cout);
+#endif //def DEBUG_IMAGE_VIEWER
+
 	return true;
 }
 

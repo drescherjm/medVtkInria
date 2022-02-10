@@ -84,7 +84,7 @@ void QtVTKRenderWindows::setupImage()
 {
 	PROFILE_THIS_FUNCTION;
 
-	m_pReader->setFlipZ(true);
+	//m_pReader->setFlipZ(true);
 
 	if (m_pReader && m_pReader->Read()) {
 
@@ -115,9 +115,10 @@ void QtVTKRenderWindows::setupImage()
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
 		auto matrix = riw->GetOrientationMatrix();
-		matrix->SetElement(2, 2, -1);
-		//matrix->SetElement(1, 1, -1);
-		//matrix->SetElement(0, 0, -1);
+// 		matrix->SetElement(3, 3, -1);
+// 		matrix->SetElement(2, 2, -1);
+// 		matrix->SetElement(1, 1, -1);
+// 		matrix->SetElement(0, 0, -1);
 		riw->SetOrientationMatrix(matrix);
 		matrix = riw->GetOrientationMatrix();
 		matrix->Print(std::cout);

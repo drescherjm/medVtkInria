@@ -67,7 +67,7 @@ private:
 	int	 getProperViewConventionForImage();
 	QString getViewConventionSpinName(int i, int j);
 
-	vtkSmartPointer<vtkMatrix4x4>	getOrientationMatrixForImage(std::string strLaterality, std::string strMQCMCode);
+	vtkSmartPointer<vtkMatrix4x4>	getOrientationMatrixForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 	int								getProperViewConventionForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 private:
 	bool m_bConventionInitialized = false;
