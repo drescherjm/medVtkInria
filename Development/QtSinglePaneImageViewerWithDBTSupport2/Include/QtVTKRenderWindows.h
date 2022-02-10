@@ -62,6 +62,7 @@ protected slots:
 
 private:
 	void setupImage();
+	void updateInformation();
 	void addViewConventionMatrix();
 	int	 getProperViewConventionForImage();
 	QString getViewConventionSpinName(int i, int j);

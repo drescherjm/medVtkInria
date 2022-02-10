@@ -10,7 +10,9 @@ find_package(VTK
     vtkImagingGeneral
     vtkInteractionImage
     vtkInteractionStyle
-    vtkInteractionWidgets)
+    vtkInteractionWidgets
+	vtkDICOM
+	)
 	
 	include(${VTK_USE_FILE})
 	
@@ -57,13 +59,18 @@ set(CMAKE_AUTOUIC_SEARCH_PATHS rc)
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
 
+if(NOT TARGET VTK::DICOM)
+   add_library(VTK::DICOM ALIAS vtkDICOM)
+   target_compile_definitions(${LOCAL_PROJECT_NAME} PRIVATE VTK_DICOM_MODULE)
+endif()
+
 # CMAKE_AUTOMOC in ON so the MocHdrs will be automatically wrapped.
 add_executable(${LOCAL_PROJECT_NAME} 
   ${Srcs} ${Hdrs} ${UIs})
 target_link_libraries(${LOCAL_PROJECT_NAME} 
   PRIVATE
     ${VTK_LIBRARIES}
-	vtkDICOM
+	VTK::DICOM
     Qt5::Widgets 
 	${TARGET_NAME})
 

@@ -1,5 +1,6 @@
 #include "DicomReader.h"
 #include <vtkSmartPointer.h>
+#include <vtkStringArray.h>
 #include <map>
 
 #include <boost/algorithm/string/predicate.hpp>
@@ -13,6 +14,7 @@
 #else
 #include <X:\x64.20\VC.142\Install\Libraries\VTK-7.1.1\include\vtk-7.1\vtkDICOMReader.h>
 #endif
+#include "FunctionProfiler.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -109,8 +111,32 @@ bool DicomReader::CanReadFile() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+void DicomReader::UpdateInformation()
+{
+	PROFILE_THIS_FUNCTION;
+
+	m_pPrivate->reader->UpdateInformation();
+
+	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
+
+	m_pPrivate->meta->Print(std::cout);
+
+	m_pPrivate->reader->Update();
+	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
+
+	if (isMultiframeDicom()) {
+		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
+	}
+
+	pProps->Print(std::cout);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 bool DicomReader::Read()
 {
+	PROFILE_THIS_FUNCTION;
+
 	if (m_pPrivate->m_bFlipZ) {
 		m_pPrivate->reader->SetMemoryRowOrderToFileNative();
 	}

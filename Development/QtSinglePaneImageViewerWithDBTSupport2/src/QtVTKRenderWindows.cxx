@@ -71,6 +71,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 
 	m_pReader = std::make_unique<DicomReader>(strFileName);
 
+	//updateInformation();
 	setupImage();
 
 	addViewConventionMatrix();
@@ -113,7 +114,20 @@ void QtVTKRenderWindows::setupImage()
 		riw = vtkSmartPointer< VTKView >::New();
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-		riw->SetViewConvention(getProperViewConventionForImage());
+		auto matrix = riw->GetOrientationMatrix();
+		matrix->SetElement(2, 2, -1);
+		//matrix->SetElement(1, 1, -1);
+		//matrix->SetElement(0, 0, -1);
+		riw->SetOrientationMatrix(matrix);
+		matrix = riw->GetOrientationMatrix();
+		matrix->Print(std::cout);
+
+		auto nConv = getProperViewConventionForImage();
+		riw->SetViewConvention(nConv);
+
+		ui->spinBoxCamera->blockSignals(true);
+		ui->spinBoxCamera->setValue(nConv);
+		ui->spinBoxCamera->blockSignals(false);
 
 		vtkSmartPointer<vtkRenderer> pren = vtkSmartPointer<vtkRenderer>::New();
 
@@ -135,9 +149,12 @@ void QtVTKRenderWindows::setupImage()
 
 #ifdef	FLIPZ_USING_FILTER
 		vtkNew<vtkImageFlip> flipZFilter;
-		//flipZFilter->SetFilteredAxis(2); // flip z axis
+		flipZFilter->SetFilteredAxis(2); // flip z axis
 		flipZFilter->SetInputConnection(m_pReader->GetOutputPort());
 		flipZFilter->Update();
+
+		double cosines[9]{};
+		flipZFilter->GetResliceAxesDirectionCosines(cosines);
 		
 		riw->SetInput(flipZFilter->GetOutputPort());
 #else
@@ -234,6 +251,13 @@ void QtVTKRenderWindows::setupImage()
 		connect(this->ui->resetButton, SIGNAL(pressed()), this, SLOT(ResetViews()));
 		connect(this->ui->AddDistance1Button, SIGNAL(pressed()), this, SLOT(AddDistanceMeasurementToView1()));
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void QtVTKRenderWindows::updateInformation()
+{
+	m_pReader->UpdateInformation();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
