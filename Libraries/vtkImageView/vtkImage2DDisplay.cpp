@@ -4,6 +4,8 @@
 #include <vtkImageAlgorithm.h>
 #include <vtkAlgorithmOutput.h>
 
+#define DEBUG_DUMP
+
 vtkStandardNewMacro(vtkImage2DDisplay);
 
 vtkImage2DDisplay::vtkImage2DDisplay()
@@ -30,9 +32,12 @@ vtkImage2DDisplay::~vtkImage2DDisplay()
 
    // this->WindowLevel->RemoveAllInputs();
     
+#ifndef  DEBUG_DUMP
     this->ImageActor->Print(std::cout);
     this->InputProducer->Print(std::cout);
 	this->WindowLevel->Print(std::cout);
+#endif //def DEBUG_DUMP
+
 }
 
 void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)

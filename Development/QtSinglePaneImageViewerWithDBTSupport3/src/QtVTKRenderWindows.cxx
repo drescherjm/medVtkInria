@@ -49,6 +49,7 @@
 #include "QtVTKRenderWindows.h"
 #include "DicomReader.h"
 #include "FunctionProfiler.h"
+#include "MammographyViewOrientatationHelper.h"
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -78,22 +79,36 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 		strFileName = argv[1];
 	}
 
-	m_pReader = std::make_unique<DicomReader>(strFileName);
+	m_pReader = std::make_shared<DicomReader>(strFileName);
 
-	//updateInformation();
+	updateInformation();
 	setupImage();
 
 	addViewConventionMatrix();
 };
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void QtVTKRenderWindows::setupImage()
 {
 	PROFILE_THIS_FUNCTION;
+	if (m_pReader) {
 
-	if (m_pReader && m_pReader->Read()) {
+		// Get the view convention
+		MammographyViewOrientatationHelper helper(m_pReader);
+		helper.Update();
+		
+		bool bNeedToFlip = !helper.hasIdentityAxesDirectionCosines();
+
+		const auto& axesDirectionCosines = helper.getAxesDirectionCosines();
+
+		if (bNeedToFlip) {
+			if (helper.isAxesDirectionCosinesFilpZ()) {
+				m_pReader->setFlipZ(true);
+			}
+		}
+
+		m_pReader->Read();
 
 		auto pImageData = m_pReader->GetOutput();
 
@@ -129,14 +144,7 @@ void QtVTKRenderWindows::setupImage()
 		riw = vtkSmartPointer< VTKView >::New();
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
-		auto pPatientMatrix = m_pReader->GetPatientMatrix();
-
-		auto matrix = getOrientationMatrixForImage(strLaterality, strMQCMCode,pPatientMatrix);
-		if (!matrix->IsIdentity()) {
-			riw->SetOrientationMatrix(matrix);
-		}
-
-		auto nConv = getProperViewConventionForImage(strLaterality,strMQCMCode,pPatientMatrix);
+		auto nConv = helper.getProperViewConventionForImage();
 		riw->SetViewConvention(nConv);
 
 		ui->spinBoxCamera->blockSignals(true);
@@ -277,7 +285,7 @@ void QtVTKRenderWindows::setupImage()
 
 void QtVTKRenderWindows::updateInformation()
 {
-	m_pReader->UpdateInformation();
+	m_pReader->ReadDicomMetaData();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

@@ -111,7 +111,7 @@ bool DicomReader::CanReadFile() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void DicomReader::UpdateInformation()
+void DicomReader::ReadDicomMetaData()
 {
 	PROFILE_THIS_FUNCTION;
 
@@ -121,7 +121,6 @@ void DicomReader::UpdateInformation()
 
 	m_pPrivate->meta->Print(std::cout);
 
-	m_pPrivate->reader->Update();
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
 
 	if (isMultiframeDicom()) {

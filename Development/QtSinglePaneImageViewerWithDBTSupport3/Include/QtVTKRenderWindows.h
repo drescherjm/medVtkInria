@@ -10,6 +10,8 @@
 #include "vtkImageView2DExtended.h"
 #include "smvtkImageView2D.h"
 
+#include <memory>
+
 class DicomReader;
 
 // Forward Qt class declarations
@@ -71,7 +73,7 @@ private:
 	int								getProperViewConventionForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 private:
 	bool m_bConventionInitialized = false;
-	std::unique_ptr<DicomReader>	m_pReader;
+	std::shared_ptr<DicomReader>	m_pReader;
   // Designer form
   Ui_QtVTKRenderWindow *ui;
 };

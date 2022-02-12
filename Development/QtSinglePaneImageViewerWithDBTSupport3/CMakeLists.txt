@@ -1,3 +1,8 @@
+
+option(${PROJECT_NAME}_BUILD_DEVELOPMENT_QtSinglePaneImageViewerWithDBTSupport_3   	"Build QtSinglePaneImageViewerWithDBTSupport_3"   ON )
+
+if (${PROJECT_NAME}_BUILD_DEVELOPMENT_QtSinglePaneImageViewerWithDBTSupport_3)
+
 myproject(QtSinglePaneImageViewerWithDBTSupport_3)
 
 find_package( Boost REQUIRED )
@@ -48,7 +53,9 @@ set(Srcs
   src/vtkResliceCursorCallback.cxx
   src/smvtkImageView2D.cxx
   src/smvtkImageView2DCommand.cxx
-  src/DicomReader.cxx)
+  src/DicomReader.cxx
+  src/MammographyViewOrientatationHelper.cxx
+)
 
 set(Hdrs
   Include/QtVTKRenderWindows.h
@@ -56,7 +63,9 @@ set(Hdrs
   Include/smvtkImageView2D.h
   Include/VTKQtWidget.h
   Include/smvtkImageView2DCommand.h
-  Include/DicomReader.h)
+  Include/DicomReader.h
+  Include/MammographyViewOrientatationHelper.h
+)
 
 set(UIs
   rc/QtVTKRenderWindow_vtk7.ui
@@ -93,3 +102,5 @@ add_custom_command(TARGET ${LOCAL_PROJECT_NAME} POST_BUILD
 
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE Include)
 set_target_properties(${LOCAL_PROJECT_NAME} PROPERTIES FOLDER Development)
+
+endif()

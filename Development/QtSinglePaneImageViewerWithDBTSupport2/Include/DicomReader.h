@@ -26,7 +26,7 @@ public:
 
 public:
 	bool CanReadFile() const;
-	void UpdateInformation();
+	void ReadDicomMetaData();
 	bool Read();
 	bool isMultiframeDicom() const;
 	void setFlipZ(bool bFlip);

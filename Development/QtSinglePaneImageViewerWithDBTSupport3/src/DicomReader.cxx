@@ -113,18 +113,17 @@ bool DicomReader::CanReadFile() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void DicomReader::UpdateInformation()
+void DicomReader::ReadDicomMetaData()
 {
 	PROFILE_THIS_FUNCTION;
 
 	m_pPrivate->reader->UpdateInformation();
-
 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
 
 #ifdef DEBUG_DICOM_READER
 	m_pPrivate->meta->Print(std::cout);
 #endif //def DEBUG_DICOM_READER
-	m_pPrivate->reader->Update();
+
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
 
 	if (isMultiframeDicom()) {
@@ -145,14 +144,15 @@ bool DicomReader::Read()
 	if (m_pPrivate->m_bFlipZ) {
 		m_pPrivate->reader->SetMemoryRowOrderToFileNative();
 	}
-	m_pPrivate->reader->Update();
-	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
-
-	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
-
-	if (isMultiframeDicom()) {
-		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
-	}
+	
+ 	m_pPrivate->reader->Update();
+// 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
+// 
+// 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
+// 
+// 	if (isMultiframeDicom()) {
+// 		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
+// 	}
 
 #ifdef DEBUG_DICOM_READER
 	pProps->Print(std::cout);

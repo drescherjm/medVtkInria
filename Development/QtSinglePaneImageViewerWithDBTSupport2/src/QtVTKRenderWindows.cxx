@@ -52,7 +52,7 @@
 
 //#define TEST_SEED_WIDGET
 
-//#define FLIPZ_USING_FILTER
+#define FLIPZ_USING_FILTER
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -71,12 +71,12 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 
 	m_pReader = std::make_unique<DicomReader>(strFileName);
 
-	//updateInformation();
+	updateInformation();
+
 	setupImage();
 
 	addViewConventionMatrix();
 };
-
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -115,10 +115,12 @@ void QtVTKRenderWindows::setupImage()
 		vtkSmartPointer<vtkRenderWindow> renderWindow = vtkSmartPointer<vtkGenericOpenGLRenderWindow>::New();
 
 		auto matrix = riw->GetOrientationMatrix();
+
 // 		matrix->SetElement(3, 3, -1);
 // 		matrix->SetElement(2, 2, -1);
 // 		matrix->SetElement(1, 1, -1);
 // 		matrix->SetElement(0, 0, -1);
+
 		riw->SetOrientationMatrix(matrix);
 		matrix = riw->GetOrientationMatrix();
 		matrix->Print(std::cout);
@@ -156,6 +158,11 @@ void QtVTKRenderWindows::setupImage()
 
 		double cosines[9]{};
 		flipZFilter->GetResliceAxesDirectionCosines(cosines);
+
+		auto resliceMatrix = flipZFilter->GetResliceAxes();
+
+		std::cout << "Reslice Matrix: " << std::endl;
+		resliceMatrix->Print(std::cout);
 		
 		riw->SetInput(flipZFilter->GetOutputPort());
 #else
@@ -258,7 +265,7 @@ void QtVTKRenderWindows::setupImage()
 
 void QtVTKRenderWindows::updateInformation()
 {
-	m_pReader->UpdateInformation();
+	m_pReader->ReadDicomMetaData();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
