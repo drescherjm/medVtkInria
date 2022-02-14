@@ -34,11 +34,14 @@ public:
 
 	boost::optional<std::pair<double, double>> getDefaultWindowLevel() const;
 
-	std::string			GetViewCodeSequence() const;
-	std::string			GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const;
-	std::string			GetImageLaterality() const;
-	std::string			GetAnatomicRegion() const;
-	std::string			GetImageOrientationPatientString() const;
+	std::string				GetViewCodeSequence() const;
+	std::string				GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const;
+	std::string				GetImageLaterality() const;
+	std::string				GetAnatomicRegion() const;
+	std::string				GetImageOrientationPatientString() const;
+	std::string				GetSOPClassUID() const;
+	boost::optional<int>	GetImagesInAcquisition() const;
+
 
 	std::vector<double> GetImageOrientationPatientVector() const;
 	bool				isAnatomicRegionBreast() const;

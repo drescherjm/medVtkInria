@@ -24,6 +24,7 @@ public:
 	bool							isAxesDirectionCosinesFilpZ() const;
 	const std::array<double, 9>&	getAxesDirectionCosines() const;
 	int								getProperViewConventionForImage() const;
+	bool							isFFDM() const;
 
 private:
 	class Private;

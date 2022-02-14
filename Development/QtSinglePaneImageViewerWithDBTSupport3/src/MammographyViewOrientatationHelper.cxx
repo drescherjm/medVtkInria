@@ -27,6 +27,7 @@ public:
 	static int GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix);
 	static int GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix);
 	void updateAxesDirectionCosines(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
+	bool isFFDM() const;
 public:
 	std::shared_ptr<DicomReader>	m_pReader;
 	bool							m_bInitialized{ false };
@@ -39,6 +40,24 @@ public:
 MammographyViewOrientatationHelper::Private::Private(std::shared_ptr<DicomReader> pReader) : m_pReader{ pReader }
 {
 
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool MammographyViewOrientatationHelper::Private::isFFDM() const
+{
+	bool retVal{ false };
+
+	auto dicomSOPClass = m_pReader->GetSOPClassUID();
+
+	static std::set<std::string> ffdmClasses{ "1.2.840.10008.5.1.4.1.1.1.2",
+		"1.2.840.10008.5.1.4.1.1.1.2.1" };
+
+	if (!dicomSOPClass.empty()) {
+		retVal = (ffdmClasses.find(dicomSOPClass) != ffdmClasses.end());
+	}
+
+	return retVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -111,8 +130,10 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 			static std::map<std::string, DetectionFunction> codeMap{
 				{"LMLO",GetCodeForDBT_LMLO_LCC},
 				{"LCC",GetCodeForDBT_LMLO_LCC},
+				{"LML",GetCodeForDBT_LMLO_LCC},
 				{"RMLO",GetCodeForDBT_RMLO_RCC},
 				{"RCC",GetCodeForDBT_RMLO_RCC},
+				{"RML",GetCodeForDBT_RMLO_RCC},
 				{"LLM",GetCodeForDBT_LLM},
 				{"RLM",GetCodeForDBT_RLM},
 				{"LXCCL",GetCodeForDBT_LXCCL},
@@ -124,8 +145,19 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 				retVal = it->second(pPatientMatrix);
 			}
 		}
-	}
+		else {
+			if (isFFDM()) {
+				retVal = VTKView::VIEW_CONVENTION_RADIOLOGICAL_BREAST;
+			}
+			else {
+				auto imagesInAcquisition = m_pReader->GetImagesInAcquisition();
+				if ((imagesInAcquisition) && (imagesInAcquisition.value() == 1)) {
+					retVal = VTKView::VIEW_CONVENTION_RADIOLOGICAL_BREAST;
+				}
+			}
+		}
 
+	}
 	return retVal;
 }
 

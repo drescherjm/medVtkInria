@@ -16,7 +16,7 @@
 #endif
 #include "FunctionProfiler.h"
 
-//#define DEBUG_DICOM_READER
+#define DEBUG_DICOM_READER
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -146,7 +146,11 @@ bool DicomReader::Read()
 	}
 	
  	m_pPrivate->reader->Update();
-// 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
+
+#ifdef DEBUG_DICOM_READER
+	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
+#endif //def DEBUG_DICOM_READER
+
 // 
 // 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
 // 
@@ -382,6 +386,37 @@ std::string DicomReader::GetImageOrientationPatientString() const
 			retVal = value.AsString();
 		}
 	}
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+std::string DicomReader::GetSOPClassUID() const
+{
+	std::string retVal;
+
+	auto value = m_pPrivate->meta->Get(DC::SOPClassUID);
+
+	if (value.IsValid()) {
+		retVal = value.AsString();
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+boost::optional<int> DicomReader::GetImagesInAcquisition() const
+{
+	boost::optional<int> retVal;
+
+	if (!isMultiframeDicom()) {
+		auto images = m_pPrivate->meta->Get(DC::ImagesInAcquisition);
+		if (images.IsValid()) {
+			retVal = images.AsInt();
+		}
+	}
+
 	return retVal;
 }
 
