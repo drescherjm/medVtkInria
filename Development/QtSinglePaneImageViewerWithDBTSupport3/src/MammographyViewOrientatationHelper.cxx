@@ -28,6 +28,7 @@ public:
 	static int GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix);
 	void updateAxesDirectionCosines(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 	bool isFFDM() const;
+	bool isDBT_BTO() const;
 public:
 	std::shared_ptr<DicomReader>	m_pReader;
 	bool							m_bInitialized{ false };
@@ -55,6 +56,21 @@ bool MammographyViewOrientatationHelper::Private::isFFDM() const
 
 	if (!dicomSOPClass.empty()) {
 		retVal = (ffdmClasses.find(dicomSOPClass) != ffdmClasses.end());
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool MammographyViewOrientatationHelper::Private::isDBT_BTO() const
+{
+	bool retVal{ false };
+
+	auto dicomSOPClass = m_pReader->GetSOPClassUID();
+
+	if (!dicomSOPClass.empty()) {
+		retVal = (dicomSOPClass == "1.2.840.10008.5.1.4.1.1.13.1.3");
 	}
 
 	return retVal;
@@ -161,6 +177,7 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 	return retVal;
 }
 
+/////////////////////////////////////////////////////////////////////////////////////////
 
 void MammographyViewOrientatationHelper::Private::updateAxesDirectionCosines(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix)
 {
@@ -253,6 +270,20 @@ bool MammographyViewOrientatationHelper::isAxesDirectionCosinesFilpZ() const
 int MammographyViewOrientatationHelper::getProperViewConventionForImage() const
 {
 	return m_pPrivate->m_nViewConvention;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool MammographyViewOrientatationHelper::isFFDM() const
+{
+	return m_pPrivate->isFFDM();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool MammographyViewOrientatationHelper::isDBT_BTO() const
+{
+	return m_pPrivate->isDBT_BTO();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
