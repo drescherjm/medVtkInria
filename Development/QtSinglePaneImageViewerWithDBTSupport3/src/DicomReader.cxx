@@ -145,7 +145,9 @@ bool DicomReader::Read()
 		m_pPrivate->reader->SetMemoryRowOrderToFileNative();
 	}
 	
- 	m_pPrivate->reader->Update();
+	Update();
+
+// 	m_pPrivate->reader->Update();
 
 #ifdef DEBUG_DICOM_READER
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
@@ -177,6 +179,13 @@ bool DicomReader::isMultiframeDicom() const
 void DicomReader::setFlipZ(bool bFlip)
 {
 	m_pPrivate->m_bFlipZ = bFlip;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void DicomReader::Update()
+{
+	m_pPrivate->reader->Update();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

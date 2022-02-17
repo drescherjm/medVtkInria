@@ -31,6 +31,7 @@ public:
 	bool Read();
 	bool isMultiframeDicom() const;
 	void setFlipZ(bool bFlip);
+	void Update();
 
 	boost::optional<std::pair<double, double>> getDefaultWindowLevel() const;
 

@@ -50,6 +50,9 @@
 #include "DicomReader.h"
 #include "FunctionProfiler.h"
 #include "MammographyViewOrientatationHelper.h"
+#include <vtkImageData.h>
+
+#include <QTimer>
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -278,6 +281,10 @@ void QtVTKRenderWindows::setupImage()
 
 		connect(this->ui->resetButton, SIGNAL(pressed()), this, SLOT(ResetViews()));
 		connect(this->ui->AddDistance1Button, SIGNAL(pressed()), this, SLOT(AddDistanceMeasurementToView1()));
+
+		QTimer::singleShot(100, [this]() {m_pReader->Update();
+		riw->UpdateDisplayExtent();
+		riw->Render(); });
 	}
 }
 
