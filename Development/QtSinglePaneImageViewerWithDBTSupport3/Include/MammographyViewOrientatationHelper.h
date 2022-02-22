@@ -17,6 +17,9 @@ class MammographyViewOrientatationHelper
 public:
 	MammographyViewOrientatationHelper(std::shared_ptr<DicomReader> pReader);
 	~MammographyViewOrientatationHelper();
+
+	using AxesDirectionCosines = std::array<double, 9>;
+
 public:
 	bool					Update();
 	bool					hasValidData() const;
@@ -27,6 +30,9 @@ public:
 	bool							isFFDM() const;
 	bool							isDBT_BTO() const;
 	//bool							isDBT() const;
+
+public:
+	static bool	isIdentityCosines(const AxesDirectionCosines& directionCosines);
 
 private:
 	class Private;
