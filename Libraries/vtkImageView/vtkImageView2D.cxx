@@ -89,6 +89,29 @@
 
 vtkStandardNewMacro(vtkImageView2D);
 
+#define CATCH_MSVC_ACCESS_VIOLATION_ON_REMOVE_RENDERER
+
+#ifdef CATCH_MSVC_ACCESS_VIOLATION_ON_REMOVE_RENDERER
+
+#include <windows.h> // for EXCEPTION_ACCESS_VIOLATION
+#include <excpt.h>
+
+int filter(unsigned int code, struct _EXCEPTION_POINTERS* ep)
+{
+    std::cerr << __FUNCTION__ << "Got an error." << std::endl;
+	if (code == EXCEPTION_ACCESS_VIOLATION)
+	{
+        std::cerr << "caught AV as expected." << std::endl;
+		return EXCEPTION_EXECUTE_HANDLER;
+	}
+	else
+	{
+        std::cerr << "caught unexpected error." << std::endl;
+		return EXCEPTION_CONTINUE_SEARCH;
+	};
+}
+#endif
+
 //----------------------------------------------------------------------------
 vtkImageView2D::vtkImageView2D()
 {
@@ -1800,6 +1823,21 @@ void vtkImageView2D::UnInstallPipeline()
   this->Superclass::UnInstallPipeline();
 }
 
+void vtkImageView2D::RemoveRenderer(vtkRenderer* pRenderer) noexcept
+{
+#ifdef CATCH_MSVC_ACCESS_VIOLATION_ON_REMOVE_RENDERER
+	//this->RenderWindow->SetInteractor(nullptr);
+	__try {
+		this->RenderWindow->RemoveRenderer(pRenderer);
+	}
+	__except (filter(GetExceptionCode(), GetExceptionInformation())) {
+		std::cerr << __FUNCTION__ << std::endl;
+	}
+#else
+    this->RenderWindow->RemoveRenderer(pRenderer);
+#endif //def CATCH_MSVC_ACCESS_VIOLATION_ON_REMOVE_RENDERER
+}
+
 //----------------------------------------------------------------------------
 /** Start/Stop the interactor relation with the view.
  it basically plug or unplug the interactor.
@@ -1864,11 +1902,11 @@ void vtkImageView2D::UnInstallInteractor()
   this->AngleWidget->SetInteractor ( nullptr );
   this->Axes2DWidget->SetImageView ( nullptr );
 
-  if (this->Interactor)
-  {
-    this->Interactor->SetRenderWindow (nullptr);
-    this->Interactor->SetInteractorStyle (nullptr);
-  }
+//   if (this->Interactor)
+//   {
+//     this->Interactor->SetRenderWindow (nullptr);
+//     this->Interactor->SetInteractorStyle (nullptr);
+//   }
 
   if (this->RenderWindow)
    {
@@ -1876,17 +1914,22 @@ void vtkImageView2D::UnInstallInteractor()
      {
       if (vtkRenderer *renderer = it->Renderer)
        {
-        this->RenderWindow->RemoveRenderer(renderer);
+          RemoveRenderer(renderer);
        }
      }
    }
-
 
   for (std::list<vtkDataSet2DWidget*>::iterator it = this->DataSetWidgets.begin();
       it!=this->DataSetWidgets.end(); ++it )
   {
     (*it)->SetImageView(0);
     (*it)->Off();
+  }
+
+  if (this->Interactor)
+  {
+	  this->Interactor->SetRenderWindow(nullptr);
+	  this->Interactor->SetInteractorStyle(nullptr);
   }
 
   this->IsInteractorInstalled = 0;

@@ -422,6 +422,8 @@ protected:
     virtual void InstallPipeline();
     virtual void UnInstallPipeline();
 
+    virtual void RemoveRenderer(vtkRenderer* pRenderer) noexcept;
+
     /**
    The ViewConvention instance explains where to place the camera around
    the patient. Default behavior is Radiological convention, meaning

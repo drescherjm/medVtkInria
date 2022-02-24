@@ -39,7 +39,6 @@ public:
 		IA_VCenter	=0x00,
 		IA_Top		=0x10,
 		IA_Bottom	=0x20,
-
 	};
 
 	Q_DECLARE_FLAGS(ImageAlignmentFlags, ImageAlignmentFlag);

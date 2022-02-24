@@ -49,7 +49,7 @@ public:
 	bool				isImageLateralityLeft(std::string strLaterality = std::string{}) const;
 	bool				isImageLateralityRight(std::string strLaterality = std::string{}) const;
 
-	vtkMatrix4x4*		GetPatientMatrix()const;
+	vtkMatrix4x4*		GetPatientMatrix() const;
 
 private:
 	class Private;
