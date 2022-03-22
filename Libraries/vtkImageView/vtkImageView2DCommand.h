@@ -56,6 +56,7 @@ class MEDVTKINRIA_EXPORT vtkImageView2DCommand : public vtkCommand
     CameraPanEvent,
     DefaultMoveEvent,
     RequestedCursorInformationEvent,
+    END_EVENT_MARKER,
   };
   //ETX
 
