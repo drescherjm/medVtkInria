@@ -451,6 +451,7 @@ the CornerAnnotation are modified.
 */
 void vtkImageView2D::UpdateOrientation()
 {
+    if (!this->GetMedVtkImageInfo() || !this->GetMedVtkImageInfo()->initialized) return;
   // Store zoom and pan :
   double zoom = this->GetZoom();
   double pan[2];
