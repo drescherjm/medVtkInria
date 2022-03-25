@@ -134,14 +134,14 @@ vtkImageView::vtkImageView()
     this->ScalarBar->PickableOff();
     this->ScalarBar->VisibilityOn();
 
+    for (int i = 0; i < 3; i++) {
+        this->CurrentPoint[i] = 0.0; 
+        this->CursorPosition[i] = 0.0;
+    }
 
-
-    for(int i=0; i<3; i++)
-        this->CurrentPoint[i] = 0.0; //VTK_DOUBLE_MIN;
-
-    this->PatientName = "";
-    this->StudyName   = "";
-    this->SeriesName  = "";
+//     this->PatientName = "";
+//     this->StudyName   = "";
+//     this->SeriesName  = "";
 
     this->ShowAnnotations = true;
     this->ShowScalarBar = true;

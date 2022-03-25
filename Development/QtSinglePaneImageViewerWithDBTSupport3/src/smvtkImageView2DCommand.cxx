@@ -293,6 +293,7 @@ void smvtkImageView2DCommand::Execute( vtkObject *caller,unsigned long event, vo
 			{
 				smvtkImageView2D* psmViewer = smvtkImageView2D::SafeDownCast(pViewer);
 				if (psmViewer != nullptr) {
+					psmViewer->UpdateDisplayExtent();
 					psmViewer->UpdateAlignment();
 				}
 			}

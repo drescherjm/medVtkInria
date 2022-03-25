@@ -9,6 +9,7 @@
 #include <QSharedPointer>
 #include <QSize>
 #include <QFlags>
+#include <array>
 
 class smvtkInteractorEvent;
 class vtkLookupTable;

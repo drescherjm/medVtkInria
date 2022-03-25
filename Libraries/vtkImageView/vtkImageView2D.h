@@ -25,6 +25,7 @@
 #include <map>
 #include <vector>
 #include <QObject>
+#include <array>
 
 class vtkImageActor;
 class vtkAxes2DWidget;
@@ -273,10 +274,10 @@ public:
     vtkGetMacro (ViewConvention, int);
     virtual void SetViewConvention (int convention);
 
-    virtual void GetWorldCoordinatesForSlice (int slice, double* position);
-    virtual int GetSliceForWorldCoordinates(double pos[3]) const;
-
-
+    virtual void    GetWorldCoordinatesForSlice (int slice, double* position);
+    virtual int     GetSliceForWorldCoordinates(double pos[3]) const;
+    virtual void    calculateImageScale(std::array<double, 2>& scale);
+    const std::array<double, 2>& getImageScale();
     virtual void SetPan(double* arg);
     virtual double* GetPan();
     virtual void GetPan(double pan[2]);
@@ -401,6 +402,14 @@ public:
 	virtual void setUserAnnotation(vtkImageViewCornerAnnotation::TextPosition nPos, std::string strAnnotation);
     virtual void UpdateOrientation();
 
+
+    virtual void SetZoom(double arg) override;
+
+
+    virtual void SetSize(int a, int b) override;
+
+    void    InvalidateCalculatedImageScale();
+
 protected:
     vtkImageView2D();
     ~vtkImageView2D();
@@ -410,7 +419,6 @@ protected:
     virtual void UpdateSlicePlane();
     virtual void UpdateCenter();
     
-
     virtual void SetSlicePlaneFromOrientation();
     virtual int GetViewOrientationFromSliceOrientation(int sliceorientation, double* cam_pos = 0, double* cam_focus = 0);
 
@@ -487,6 +495,8 @@ protected:
     double Pan[2];
     double ViewCenter[3];
     int CurrentLayer;
+    std::array<double, 2> ImageScale;
+    bool bImageScaleNeedsCalculated;
 
     vtkRulerWidget     *RulerWidget;
     vtkAxes2DWidget    *Axes2DWidget;

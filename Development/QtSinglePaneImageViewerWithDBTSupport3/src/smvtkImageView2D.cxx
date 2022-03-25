@@ -93,6 +93,41 @@ smvtkImageView2D::~smvtkImageView2D()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+// std::array<double, 2> smvtkImageView2D::getImageScale()
+// {
+// 	std::array<double, 2> retVal{ 1.0,1.0 };
+// 
+// 	vtkRenderer* pRenderer = GetRenderer();
+// 	vtkImageActor* pImageActor = GetImageActor();
+// 	if (pImageActor && pRenderer) {
+// 		double worldBounds[6];
+// 
+// 		pRenderer->ComputeVisiblePropBounds(worldBounds);
+// 		//pImageActor->GetDisplayBounds(worldBounds); // Gets the displayed image in world coordinates
+// 
+// 		int imageBounds[2][3];
+// 		double displayBounds[2][3];
+// 
+// 		for (int i = 0; i < 2; ++i) {
+// 			double pos[3]{ worldBounds[0 + i], worldBounds[2 + i], worldBounds[4 + i] };
+// 			GetImageCoordinatesFromWorldCoordinates(pos, imageBounds[i]);
+// 			pRenderer->SetWorldPoint(pos);
+// 			pRenderer->WorldToDisplay();
+// 			pRenderer->GetDisplayPoint(displayBounds[i]);
+// 		}
+// 		int imageSize[2]{ imageBounds[1][0] - imageBounds[0][0] + 1,imageBounds[1][1] - imageBounds[0][1] + 1 };
+// 		double displaySize[2]{ displayBounds[1][0] - displayBounds[0][0] + 1,displayBounds[1][1] - displayBounds[0][1] + 1 };
+// 		std::cout << "XDiff: " << imageSize[0] << " YDiff: " << imageSize[1] << std::endl;
+// 		std::cout << "XDiff: " << displaySize[0] << " YDiff: " << displaySize[1] << std::endl;
+// 
+// 		std::cout << "XRatio: " << displaySize[0] / imageSize[0] << " YRatio: " << displaySize[1] / imageSize[1] << std::endl;
+// 
+// 	}
+// 	return retVal;
+// }
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 bool smvtkImageView2D::GetSafeDisplayCoordinatesFromImageCoordinates( int indices[3], double* dispaypos )
 {
 	bool retVal;
@@ -476,6 +511,9 @@ void smvtkImageView2D::UpdateAlignment()
 			}
 
 		SetPan(pan);
+
+		auto ret = getImageScale();
+		std::cout << "XScale: " << ret[0] << " YScale: " << ret[1] << std::endl;
 	}
 #endif
 }

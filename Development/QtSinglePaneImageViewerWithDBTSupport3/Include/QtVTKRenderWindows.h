@@ -48,6 +48,9 @@ protected:
 
   virtual void showEvent(QShowEvent* event) override;
 
+
+  virtual void resizeEvent(QResizeEvent* event) override;
+
   // vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
 protected slots:
@@ -57,6 +60,7 @@ protected slots:
 	void on_pushButtonVertical_clicked(bool);
 	void on_pushButtonAlignLeft_clicked(bool);
 	void on_pushButtonAlignRight_clicked(bool);
+	void on_pushButtonComputeScale_clicked(bool);
 
 	void conventionSpinChanged();
 

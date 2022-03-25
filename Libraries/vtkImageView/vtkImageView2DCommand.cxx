@@ -222,6 +222,7 @@ vtkImageView2DCommand::Execute(vtkObject*    caller,
     // Zooming
     if (event == vtkImageView2DCommand::CameraZoomEvent)
     {
+        this->Viewer->InvalidateCalculatedImageScale();
         this->Viewer->Modified();
         return;
     }

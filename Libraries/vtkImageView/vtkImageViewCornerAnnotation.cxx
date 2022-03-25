@@ -65,7 +65,7 @@ void vtkImageViewCornerAnnotation::TextReplace(vtkImageActor *ia,
     double pos_x = 0.0, pos_y = 0.0, pos_z = 0.0;
     int coord[3] = { 0, 0, 0 };
     int coord_x = 0, coord_y = 0, coord_z = 0;
-    double value = 0.0, zoom = 100.0;
+    double value = 0.0, zoom = 100.0, scale = 100.0;
     std::string patient_name, study_name, series_name;
 
     vtkImageView2D *view2d = vtkImageView2D::SafeDownCast (this->ImageView);
@@ -76,6 +76,7 @@ void vtkImageViewCornerAnnotation::TextReplace(vtkImageActor *ia,
         this->ImageView->GetImageCoordinatesFromWorldCoordinates (pos, coord);
         value = this->ImageView->GetValueAtPosition(pos);
         zoom  = this->ImageView->GetZoom()*100.0;
+        scale = this->ImageView->GetCameraParallelScale();
         patient_name = this->ImageView->GetPatientName();
         study_name   = this->ImageView->GetStudyName();
         series_name  = this->ImageView->GetSeriesName();
@@ -551,6 +552,17 @@ void vtkImageViewCornerAnnotation::TextReplace(vtkImageActor *ia,
                 text2 = tmp;
                 rpos = strstr(text, "<zoom>");
             }
+
+			rpos = strstr(text, "<scale>");
+			while (rpos)
+			{
+				*rpos = '\0';
+				snprintf(text2, len, "%sscale: %4.4g%s", text, scale, rpos + 7);
+				tmp = text;
+				text = text2;
+				text2 = tmp;
+				rpos = strstr(text, "<scale>");
+			}
 
             rpos = strstr(text, "<patient>");
             while (rpos)

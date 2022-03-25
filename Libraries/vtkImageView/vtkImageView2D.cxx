@@ -124,7 +124,7 @@ vtkImageView2D::vtkImageView2D()
   this->SlicePlane          = vtkPolyData::New();
   this->Command             = vtkImageView2DCommand::New();
   this->OrientationAnnotation = vtkOrientationAnnotation::New();
-
+  this->bImageScaleNeedsCalculated = true;
   this->CurrentLayer = 0;
 
   this->LayerInfoVec.resize(1);
@@ -474,6 +474,29 @@ void vtkImageView2D::UpdateOrientation()
 }
 
 //----------------------------------------------------------------------------
+
+void vtkImageView2D::SetZoom(double arg)
+{
+    vtkImageView::SetZoom(arg);
+    InvalidateCalculatedImageScale();
+}
+
+//----------------------------------------------------------------------------
+
+void vtkImageView2D::SetSize(int a, int b)
+{
+    vtkImageView::SetSize(a, b);
+    InvalidateCalculatedImageScale();
+}
+
+//----------------------------------------------------------------------------
+
+void vtkImageView2D::InvalidateCalculatedImageScale()
+{
+	bImageScaleNeedsCalculated = true;
+}
+
+//----------------------------------------------------------------------------
 /** Update the display extent manually so that the proper slice for the
  given orientation is displayed. It will also try to set a
  reasonable camera clipping range.
@@ -487,6 +510,8 @@ void vtkImageView2D::UpdateOrientation()
  */
 void vtkImageView2D::UpdateDisplayExtent()
 {
+    bImageScaleNeedsCalculated = true;
+
   if (this->LayerInfoVec.empty())
     return;
 
@@ -535,6 +560,11 @@ void vtkImageView2D::UpdateDisplayExtent()
         break;
     }
 
+  }
+
+  vtkCamera* cam = this->GetRenderer()->GetActiveCamera();
+  if (cam) {
+      cam->Print(std::cout);
   }
 
   // Figure out the correct clipping range
@@ -1297,7 +1327,7 @@ void vtkImageView2D::SetAnnotationsFromOrientation()
     case AnnotationStyle1:
     default:
 
-      osSW << "<zoom>\n";
+      osSW << "<zoom> <scale>\n";
       osSW << "<slice_and_max>\n";
       osNW<< "Image size: " << "<size_x>x<size_y>\n";
       osNW<< "Voxel size: " << "<spacing_x>x<spacing_y>\n";
@@ -1439,6 +1469,55 @@ int vtkImageView2D::GetSliceForWorldCoordinates(double pos[3]) const
 }
 
 //----------------------------------------------------------------------------
+
+void vtkImageView2D::calculateImageScale(std::array<double,2> & scale)
+{
+	vtkRenderer* pRenderer = GetRenderer();
+	vtkImageActor* pImageActor = GetImageActor();
+	if (pImageActor && pRenderer) {
+		double worldBounds[6];
+
+		pRenderer->ComputeVisiblePropBounds(worldBounds);
+		//pImageActor->GetDisplayBounds(worldBounds); // Gets the displayed image in world coordinates
+
+		int imageBounds[2][3];
+		double displayBounds[2][3];
+
+		for (int i = 0; i < 2; ++i) {
+			double pos[3]{ worldBounds[0 + i], worldBounds[2 + i], worldBounds[4 + i] };
+			GetImageCoordinatesFromWorldCoordinates(pos, imageBounds[i]);
+			pRenderer->SetWorldPoint(pos);
+			pRenderer->WorldToDisplay();
+			pRenderer->GetDisplayPoint(displayBounds[i]);
+		}
+		int imageSize[2]{ imageBounds[1][0] - imageBounds[0][0] + 1,imageBounds[1][1] - imageBounds[0][1] + 1 };
+		double displaySize[2]{ displayBounds[1][0] - displayBounds[0][0] + 1,displayBounds[1][1] - displayBounds[0][1] + 1 };
+		//std::cout << "XDiff: " << imageSize[0] << " YDiff: " << imageSize[1] << std::endl;
+		//std::cout << "XDiff: " << displaySize[0] << " YDiff: " << displaySize[1] << std::endl;
+
+		//std::cout << "XRatio: " << displaySize[0] / imageSize[0] << " YRatio: " << displaySize[1] / imageSize[1] << std::endl;
+
+        for (int i = 0; i < 2; ++i) {
+            scale[i] = displaySize[i] / imageSize[i];
+        }
+        bImageScaleNeedsCalculated = false;
+	}
+
+}
+
+//----------------------------------------------------------------------------
+
+const std::array<double, 2>& vtkImageView2D::getImageScale()
+{
+    if (bImageScaleNeedsCalculated) {
+        calculateImageScale(ImageScale);
+        //bImageScaleNeedsCalculated = false;
+    }
+
+    return ImageScale;
+}
+
+//----------------------------------------------------------------------------
 /**
 Convert an indices coordinate point (image coordinates) into a world coordinate point
 */
@@ -1563,6 +1642,8 @@ void vtkImageView2D::ResetCamera()
   // this->SetZoom (1.0); // already called in Superclass method
   this->Pan[0] = this->Pan[1] = 0.0;
   this->SetPan (this->Pan); // not sure this is needed
+
+  InvalidateCalculatedImageScale();
 }
 
 //----------------------------------------------------------------------------

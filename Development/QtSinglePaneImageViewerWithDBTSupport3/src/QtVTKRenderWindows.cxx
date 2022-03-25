@@ -220,6 +220,8 @@ void QtVTKRenderWindows::setupImage()
 		}
 #endif //def DEBUG_CAMERA
 
+		//riw->SetSize(imageDims[0], imageDims[1]);
+
 		if (!align == static_cast<smvtkImageView2D::ImageAlignmentFlags>(smvtkImageView2D::IA_HCenter | smvtkImageView2D::IA_VCenter)) {
 			riw->UpdateAlignment();
 			riw->Render();
@@ -603,6 +605,13 @@ void QtVTKRenderWindows::showEvent(QShowEvent* event)
 	std::cout << "Render Time: " << riw->GetRenderer()->GetLastRenderTimeInSeconds() << std::endl;
 }
 
+void QtVTKRenderWindows::resizeEvent(QResizeEvent* event)
+{
+	QMainWindow::resizeEvent(event);
+
+	//riw->UpdateDisplayExtent();
+}
+
 /////////////////////////////////////////////////////////////////////////////////////////
 
 void QtVTKRenderWindows::on_spinBoxCamera_valueChanged(int nValue)
@@ -666,6 +675,13 @@ void QtVTKRenderWindows::on_pushButtonAlignRight_clicked(bool)
 	riw->setImageAlignment(VTKView::IA_Right | VTKView::IA_VCenter);
 	riw->UpdateAlignment();
 	riw->Render();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void QtVTKRenderWindows::on_pushButtonComputeScale_clicked(bool)
+{
+	riw->getImageScale();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
