@@ -1535,9 +1535,6 @@ Get/Set the pan factor of the view
 */
 void vtkImageView2D::SetPan (double* arg)
 {
-  this->Pan[0] = arg[0];
-  this->Pan[1] = arg[1];
-
   // If mapWorldToDisplayCoordinates is called when RenderWindow has never been rendered, nans are returned
   // Reason: mapWorldToDisplayCoordinates needs to now the window size, which detected when the vtk renderwindow
   // has been rendered at least once
@@ -1546,6 +1543,9 @@ void vtkImageView2D::SetPan (double* arg)
   {
     return;
   }
+
+  this->Pan[0] = arg[0];
+  this->Pan[1] = arg[1];
 
   double focaldepth, focalpoint[4], position[4], motion[4];
   double bounds[6];

@@ -390,6 +390,8 @@ public:
 
     virtual void Reset();
 
+    bool    isRenderValid(vtkRenderer* pRenderer); 
+
     /**
     * Show/Hide the annotations.
     */

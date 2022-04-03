@@ -110,6 +110,7 @@ std::string vtkImageViewCornerAnnotationEx::replaceStrings( vtkImageActor *ia,
 		windowi = (long int)window;
 		leveli = (long int)level;
 		cameraScale = pImageView->GetCameraParallelScale();
+		
 
 		std::cout << "Window: " << window << " Level: " << level << std::endl;
 		

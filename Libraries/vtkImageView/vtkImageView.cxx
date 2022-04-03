@@ -1421,6 +1421,19 @@ void vtkImageView::Reset()
 }
 
 //----------------------------------------------------------------------------
+
+bool vtkImageView::isRenderValid(vtkRenderer* pRenderer)
+{
+    // If the renderer does not have a window yet it silently fails coordinate transformations to display coordinates.
+    bool retVal = (pRenderer != nullptr);
+    if (retVal) {
+        int* pSize = pRenderer->GetSize();
+        retVal = ((pSize[0] > 0) && (pSize[1] > 0));
+    }
+    return retVal;
+}
+
+//----------------------------------------------------------------------------
 void vtkImageView::SetShowAnnotations (int val)
 {
     this->ShowAnnotations = val;

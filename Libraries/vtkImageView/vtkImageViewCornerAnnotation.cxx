@@ -76,7 +76,12 @@ void vtkImageViewCornerAnnotation::TextReplace(vtkImageActor *ia,
         this->ImageView->GetImageCoordinatesFromWorldCoordinates (pos, coord);
         value = this->ImageView->GetValueAtPosition(pos);
         zoom  = this->ImageView->GetZoom()*100.0;
-        scale = this->ImageView->GetCameraParallelScale();
+
+        if (view2d) {
+            //scale = this->ImageView->GetCameraParallelScale();
+            const auto& scaleAry = view2d->getImageScale();
+            scale = std::max(scaleAry[0], scaleAry[1]);
+        }
         patient_name = this->ImageView->GetPatientName();
         study_name   = this->ImageView->GetStudyName();
         series_name  = this->ImageView->GetSeriesName();
