@@ -1499,7 +1499,10 @@ void vtkImageView2D::calculateImageScale(std::array<double,2> & scale)
 		//std::cout << "XRatio: " << displaySize[0] / imageSize[0] << " YRatio: " << displaySize[1] / imageSize[1] << std::endl;
 
         for (int i = 0; i < 2; ++i) {
-            scale[i] = displaySize[i] / imageSize[i];
+            if (imageSize[i] != 0) {
+                scale[i] = std::abs(displaySize[i] / imageSize[i]);
+            }
+            else return;
         }
         bImageScaleNeedsCalculated = false;
 	}
