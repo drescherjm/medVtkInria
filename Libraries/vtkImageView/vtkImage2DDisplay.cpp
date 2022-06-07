@@ -4,7 +4,7 @@
 #include <vtkImageAlgorithm.h>
 #include <vtkAlgorithmOutput.h>
 
-#define DEBUG_DUMP
+//#define DEBUG_DUMP
 
 vtkStandardNewMacro(vtkImage2DDisplay);
 
@@ -32,11 +32,11 @@ vtkImage2DDisplay::~vtkImage2DDisplay()
 
    // this->WindowLevel->RemoveAllInputs();
     
-#ifndef  DEBUG_DUMP
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
     this->ImageActor->Print(std::cout);
     this->InputProducer->Print(std::cout);
 	this->WindowLevel->Print(std::cout);
-#endif //def DEBUG_DUMP
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
 }
 
@@ -49,9 +49,11 @@ void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
             vtkAlgorithmOutput *poVtkAlgoPortTmp = pi_poVtkAlgoPort;
             vtkImageAlgorithm *poVtkImgAlgoTmp = static_cast<vtkImageAlgorithm*>(pi_poVtkAlgoPort->GetProducer());
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 			if (poVtkImgAlgoTmp != nullptr) {
 				poVtkImgAlgoTmp->Print(std::cout);
 			}
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
             //vtkImageData *poVtkImgTmp = poVtkImgAlgoTmp->GetOutput();
 
@@ -77,8 +79,10 @@ void vtkImage2DDisplay::SetInput(vtkAlgorithmOutput *pi_poVtkAlgoPort)
 
             //poVtkImgTmp->Delete();
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 			this->ImageActor->Print(std::cout);
 			this->InputProducer->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
         }
         else

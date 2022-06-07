@@ -114,9 +114,11 @@ void QtVTKRenderWindows::setupImage()
 		m_pReader->Read();
 
 		auto pImageData = m_pReader->GetOutput();
-
+ 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 		std::cout << "Patient Matrix:" << std::endl;
 		m_pReader->GetPatientMatrix()->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
 		auto strCode = m_pReader->GetViewCodeSequence();
 		std::string strMQCMCode;
@@ -125,9 +127,14 @@ void QtVTKRenderWindows::setupImage()
 		
 		if (!strCode.empty()) {
 			strMQCMCode = m_pReader->GetMammographyACR_MQCM_CodeFromViewCodeSequence(strCode);
+
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 			std::cout << "ViewCodeSequence: " << strCode << " MQCM: " << strMQCMCode << std::endl;
+#endif// defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
+
 		}
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 		if (m_pReader->isAnatomicRegionBreast()) {
 			std::cout << "AnatomicRegion: Breast" << std::endl;
 		}
@@ -140,6 +147,7 @@ void QtVTKRenderWindows::setupImage()
 		if (m_pReader->isMultiframeDicom()) {
 			std::cout << "We are loading a multi-frame dicom file" << std::endl;
 		}
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
 		int imageDims[3];
 		pImageData->GetDimensions(imageDims);

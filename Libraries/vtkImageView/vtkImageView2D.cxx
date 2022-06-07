@@ -563,10 +563,12 @@ void vtkImageView2D::UpdateDisplayExtent()
 
   }
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
   vtkCamera* cam = this->GetRenderer()->GetActiveCamera();
   if (cam) {
       cam->Print(std::cout);
   }
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
   // Figure out the correct clipping range
   if (this->GetRenderer())
@@ -724,7 +726,9 @@ void vtkImageView2D::SetViewConvention(int convention)
 	this->ConventionMatrix->SetElement(1, 3, y_watcher);
 	this->ConventionMatrix->SetElement(2, 3, z_watcher);
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 	this->ConventionMatrix->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 
 	this->UpdateOrientation();
 }

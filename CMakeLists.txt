@@ -51,6 +51,33 @@ SET(LIBRARY_OUTPUT_PATH
 
 option(${PROJECT_NAME}_BUILD_TESTS   		"Build tests"   OFF )
 option(${PROJECT_NAME}_BUILD_DEVELOPMENT   	"Build development examples"   OFF )
+option(DEBUG_DUMP_EXTRA_INFO "Add additional debug output in debug mode." OFF)
+
+#########################################################################################
+
+macro( conditional_define VariableName DefineName)
+	if (${VariableName})
+	
+		message( STATUS "add_definitions(-D${DefineName})" )
+		add_definitions(-D${DefineName})
+		
+	endif(${VariableName})
+endmacro( conditional_define )
+
+#########################################################################################
+
+macro( conditional_not_define VariableName DefineName)
+	if (NOT ${VariableName})
+	
+		message( STATUS "add_definitions(-D${DefineName})" )
+		add_definitions(-D${DefineName})
+		
+	endif(NOT ${VariableName})
+endmacro( conditional_not_define )
+
+#########################################################################################
+
+conditional_define(DEBUG_DUMP_EXTRA_INFO DEBUG_DUMP_EXTRA_INFO)
 
 if(${PROJECT_NAME}_BUILD_TESTS)
     enable_testing()

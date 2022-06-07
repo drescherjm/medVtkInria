@@ -322,7 +322,11 @@ void smvtkImageView2D::flipVertical()
 			this->ConventionMatrix->SetElement(2,3,this->ConventionMatrix->GetElement(2,3) * -1.0);
 		break;
 	}
+	
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 	this->ConventionMatrix->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
+
 	this->UpdateOrientation();
 }
 
@@ -339,7 +343,11 @@ void smvtkImageView2D::flipHorizontal()
 		this->ConventionMatrix->SetElement(3, 0, -1.0);
 		break;
 	}
+
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 	this->ConventionMatrix->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
+
 	this->UpdateOrientation();
 }
 
@@ -355,7 +363,11 @@ void smvtkImageView2D::flipVerticalAndHorizontal()
 		this->ConventionMatrix->SetElement(3,0,-1.0);
 		break;
 	}
+
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 	this->ConventionMatrix->Print(std::cout);
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
+
 	this->UpdateOrientation();
 }
 
@@ -512,8 +524,11 @@ void smvtkImageView2D::UpdateAlignment()
 
 		SetPan(pan);
 
+#if defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
 		auto ret = getImageScale();
 		std::cout << "XScale: " << ret[0] << " YScale: " << ret[1] << std::endl;
+#endif //defined(_DEBUG) && defined(DEBUG_DUMP_EXTRA_INFO)
+
 	}
 #endif
 }
