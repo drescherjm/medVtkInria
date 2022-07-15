@@ -170,7 +170,8 @@ public:
         CameraChangedEvent,
         WindowLevelChangedEvent,
         ZoomChangedEvent,
-        PanChangedEvent
+        PanChangedEvent,
+        SliceChangedEvent,
     };
     //ETX
 

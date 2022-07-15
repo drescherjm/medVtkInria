@@ -384,6 +384,7 @@ void vtkImageView2D::SetSlice(int slice)
 
   // Verify slice is actually changing.
   int old_slice = this->GetSlice();
+  if (old_slice == slice) return;
 
   // Estimate the displacement
   double displacement[4] = {0,0,0,0};
@@ -410,6 +411,8 @@ void vtkImageView2D::SetSlice(int slice)
   }
 
   this->SetCurrentPoint (pos);
+
+  this->InvokeEvent(vtkImageView::SliceChangedEvent,this);
 }
 
 //----------------------------------------------------------------------------
