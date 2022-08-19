@@ -9,8 +9,10 @@
 
 using VTKView = smvtkImageView2D;
 
-static constexpr std::array<double, 9> IdentityCosines{ 1,0,0,0,1,0,0,0,1 };
-static constexpr std::array<double, 9> FlipZCosines{ 1,0,0,0,1,0,0,0,-1 };
+using DblArr9 = std::array<double, 9>;
+
+static constexpr DblArr9 IdentityCosines{ 1,0,0,0,1,0,0,0,1 };
+static constexpr DblArr9 FlipZCosines{ 1,0,0,0,1,0,0,0,-1 };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -20,12 +22,12 @@ public:
 	Private(std::shared_ptr<DicomReader> pReader);
 public:
 	int getProperViewConventionForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_RLM(vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix);
-	static int GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix);
+	static int GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
+	static int GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
+	static int GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
+	static int GetCodeForDBT_RLM(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
+	static int GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
+	static int GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines);
 	void updateAxesDirectionCosines(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 	bool isFFDM() const;
 	bool isDBT_BTO() const;
@@ -33,7 +35,7 @@ public:
 	std::shared_ptr<DicomReader>	m_pReader;
 	bool							m_bInitialized{ false };
 	int								m_nViewConvention{ VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL };
-	std::array<double, 9>			m_aryAxesCosines{ IdentityCosines };
+	DblArr9							m_aryAxesCosines{ IdentityCosines };
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -78,11 +80,23 @@ bool MammographyViewOrientatationHelper::Private::isDBT_BTO() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, DblArr9 & arrayCosines)
 {
 	if (pPatientMatrix) {
-		if (pPatientMatrix->GetElement(1, 0) < 0) {
-			return 3;
+		auto val = pPatientMatrix->GetElement(1, 0);
+		auto val1 = pPatientMatrix->GetElement(0, 1);
+		if (val < 0) {
+			if (val1 < 0) {
+				return 3;
+			}
+			else {
+				return 2;
+			}
+		}
+		else if (val1 > 0) {
+			// We need to flip the ZAxis
+			arrayCosines[8] = -1;
+			return 4;
 		}
 	}
 	return 4;
@@ -90,14 +104,23 @@ int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatri
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix, DblArr9 & arrayCosines)
 {
+	if (pPatientMatrix) {
+		// Detect if we need to flip the Z axis
+		auto val = pPatientMatrix->GetElement(1, 0);
+		auto val1 = pPatientMatrix->GetElement(0, 1);
+		if ((val1 < 0) && (val < 0)) {
+			arrayCosines[8] = -1;
+			return 4;
+		}
+	}
 	return 2;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines)
 {
 	if (pPatientMatrix) {
 		if (pPatientMatrix->GetElement(1, 0) > 0) {
@@ -109,21 +132,21 @@ int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LLM(vtkMatrix4x4*
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RLM(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RLM(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines)
 {
 	return 3;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines)
 {
 	return 4;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix)
+int MammographyViewOrientatationHelper::Private::GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix, DblArr9 & pArrayCosines)
 {
 	return 2;
 }
@@ -141,7 +164,7 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 		bool bMultiframe = m_pReader->isMultiframeDicom();
 		if (bMultiframe) {
 
-			using DetectionFunction = std::function<int(vtkMatrix4x4*)>;
+			using DetectionFunction = std::function<int(vtkMatrix4x4*, DblArr9 &)>;
 
 			static std::map<std::string, DetectionFunction> codeMap{
 				{"LMLO",GetCodeForDBT_LMLO_LCC},
@@ -158,7 +181,7 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 
 			auto it = codeMap.find(strCode);
 			if (it != codeMap.end()) {
-				retVal = it->second(pPatientMatrix);
+				retVal = it->second(pPatientMatrix,m_aryAxesCosines);
 			}
 		}
 		else {
@@ -174,6 +197,12 @@ int MammographyViewOrientatationHelper::Private::getProperViewConventionForImage
 		}
 
 	}
+
+	std::cout << "Detected View Convention: " << retVal << '\n';
+	if (m_aryAxesCosines == FlipZCosines) {
+		std::cout << "Flip Z Axis while using convention: " << retVal << '\n';
+	}
+
 	return retVal;
 }
 
@@ -190,6 +219,17 @@ void MammographyViewOrientatationHelper::Private::updateAxesDirectionCosines(std
 			break;
 		}
 	}
+// 	if (strLaterality == "R") {
+// 		for (const auto& viewCode : { "MLO", "CC" }) {
+// 			if (strMQCMCode == viewCode) {
+// 				if (pPatientMatrix && (pPatientMatrix->GetElement(1, 0) < 0) && (pPatientMatrix->GetElement(0, 1) < 0)) {
+// 					// Flip the ZAxis
+// 					m_aryAxesCosines[8] = -1;
+// 				}
+// 				break;
+// 			}
+// 		}
+// 	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

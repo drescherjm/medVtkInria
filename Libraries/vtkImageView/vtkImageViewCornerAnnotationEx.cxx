@@ -496,7 +496,7 @@ std::string vtkImageViewCornerAnnotationEx::replaceStrings( vtkImageActor *ia,
 	while (rpos)
 	{
 		*rpos = '\0';
-		sprintf(text2,"%s%g%s",text,pos_x,rpos+7);
+		sprintf(text2,"%s%.2f%s",text,pos_x,rpos+7);
 		tmp = text;
 		text = text2;
 		text2 = tmp;
@@ -507,7 +507,7 @@ std::string vtkImageViewCornerAnnotationEx::replaceStrings( vtkImageActor *ia,
 	while (rpos)
 	{
 		*rpos = '\0';
-		sprintf(text2,"%s%g%s",text,pos_y,rpos+7);
+		sprintf(text2,"%s%.2f%s",text,pos_y,rpos+7);
 		tmp = text;
 		text = text2;
 		text2 = tmp;
@@ -518,7 +518,7 @@ std::string vtkImageViewCornerAnnotationEx::replaceStrings( vtkImageActor *ia,
 	while (rpos)
 	{
 		*rpos = '\0';
-		sprintf(text2,"%s%g%s",text,pos_z,rpos+7);
+		sprintf(text2,"%s%.2f%s",text,pos_z,rpos+7);
 		tmp = text;
 		text = text2;
 		text2 = tmp;
