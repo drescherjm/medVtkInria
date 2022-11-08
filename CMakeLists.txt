@@ -26,7 +26,7 @@ cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0011 NEW)
 
 project(medVtkInriaEx)
-cmake_minimum_required(VERSION 3.12)
+cmake_minimum_required(VERSION 3.21)
 
 set (${PROJECT_NAME}_VERSION_MAJOR 3)
 set (${PROJECT_NAME}_VERSION_MINOR 0)
