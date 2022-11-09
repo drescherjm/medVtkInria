@@ -41,17 +41,12 @@ public slots:
   virtual void ResetViews();
   virtual void Render();
   virtual void AddDistanceMeasurementToView1();
-  //virtual void AddDistanceMeasurementToView( int );
 
 protected:
   vtkSmartPointer< VTKView > riw;
 
   virtual void showEvent(QShowEvent* event) override;
-
-
   virtual void resizeEvent(QResizeEvent* event) override;
-
-  // vtkSmartPointer< vtkResliceImageViewerMeasurements > ResliceMeasurements;
 
 protected slots:
 	void on_spinBoxCamera_valueChanged(int nValue);
@@ -62,22 +57,12 @@ protected slots:
 	void on_pushButtonAlignRight_clicked(bool);
 	void on_pushButtonComputeScale_clicked(bool);
 
-	void conventionSpinChanged();
-
-	void initConventionSpinBoxes();
-
 private:
 	void setupImage();
-	void updateInformation();
-	void addViewConventionMatrix();
-	int	 getProperViewConventionForImage();
-	QString getViewConventionSpinName(int i, int j);
 
-	vtkSmartPointer<vtkMatrix4x4>	getOrientationMatrixForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
-	int								getProperViewConventionForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 private:
 	bool m_bConventionInitialized = false;
-	std::shared_ptr<DicomReader>	m_pReader;
+	vtkSmartPointer<vtkImageData>	m_pImage;
   // Designer form
   Ui_QtVTKRenderWindow *ui;
 };
