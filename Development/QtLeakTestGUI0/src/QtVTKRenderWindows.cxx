@@ -55,8 +55,6 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-static const vtkSmartPointer<vtkMatrix4x4> vtkIdentityMatrix4x4{ vtkSmartPointer<vtkMatrix4x4>::New()};
-
 //#define TEST_SEED_WIDGET
 
 //#define FLIPZ_USING_FILTER

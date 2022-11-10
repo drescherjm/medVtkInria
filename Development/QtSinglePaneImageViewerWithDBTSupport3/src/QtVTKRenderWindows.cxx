@@ -56,7 +56,7 @@
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-static const vtkSmartPointer<vtkMatrix4x4> vtkIdentityMatrix4x4{ vtkSmartPointer<vtkMatrix4x4>::New()};
+static vtkSmartPointer<vtkMatrix4x4> vtkIdentityMatrix4x4{ vtkSmartPointer<vtkMatrix4x4>::New()};
 
 //#define TEST_SEED_WIDGET
 
@@ -473,6 +473,8 @@ vtkSmartPointer<vtkMatrix4x4> QtVTKRenderWindows::getOrientationMatrixForImage(s
 QtVTKRenderWindows::~QtVTKRenderWindows()
 {
 	std::cout << __FUNCTION__ << std::endl;
+
+	vtkIdentityMatrix4x4 = nullptr;
 	
 #ifdef DEBUG_IMAGE_VIEWER
 	riw->Print(std::cout);

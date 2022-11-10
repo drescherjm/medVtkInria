@@ -29,6 +29,8 @@ public:
 	bool m_bFlipZ{ false };
 	vtkSmartPointer< vtkDICOMReader > reader;
 	vtkSmartPointer<vtkDICOMMetaData> meta = vtkSmartPointer<vtkDICOMMetaData>::New();
+
+	//vtkDICOMMetaData* meta = nullptr;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -88,7 +90,13 @@ DicomReader::DicomReader(std::string strFileName) : m_pPrivate{std::make_unique<
 	m_pPrivate->reader->SetFileName(strFileName.c_str());
 }
 
-DicomReader::~DicomReader() = default;
+//DicomReader::~DicomReader() = default;
+
+DicomReader::~DicomReader()
+{
+	m_pPrivate = nullptr;
+	std::cout << __FUNCTION__;
+}
 
 /////////////////////////////////////////////////////////////////////////////////////////
 

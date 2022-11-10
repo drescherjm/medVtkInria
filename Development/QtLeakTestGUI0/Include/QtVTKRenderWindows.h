@@ -5,7 +5,6 @@
 //#include "vtkResliceImageViewer.h"
 #include "vtkImagePlaneWidget.h"
 #include "vtkDistanceWidget.h"
-//#include "vtkResliceImageViewerMeasurements.h"
 #include <QMainWindow>
 #include "vtkImageView2DExtended.h"
 #include "smvtkImageView2D.h"
