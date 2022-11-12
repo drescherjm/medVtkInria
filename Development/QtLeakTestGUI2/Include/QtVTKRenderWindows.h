@@ -58,8 +58,7 @@ protected slots:
 
 private:
 	void setupImage();
-
-
+	void setupSignalsAndSlots();
 
 private:
 	bool m_bConventionInitialized = false;
