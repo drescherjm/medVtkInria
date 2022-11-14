@@ -13,6 +13,12 @@
 #include <vtkDebugLeaks.h>
 #include "myVtkQtDebugLeaksView.h"
 
+/////////////////////////////////////////////////////////////////////////////////////////
+
+constexpr int LOOP_COUNT = 10;
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
 int main( int argc, char** argv )
 {
 #if VTK_MAJOR_VERSION >= 9 
@@ -31,7 +37,7 @@ int main( int argc, char** argv )
   
   {
 
-	  for (int i = 0; i < 10; ++i) {
+	  for (int i = 0; i < LOOP_COUNT; ++i) {
 		  QtVTKRenderWindows* pWidget = new QtVTKRenderWindows(argc, argv);
 		  pWidget->setAttribute(Qt::WA_DeleteOnClose);
 		  pWidget->show();

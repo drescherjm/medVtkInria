@@ -1,5 +1,5 @@
 
-option(${PROJECT_NAME}_BUILD_DEVELOPMENT_QtLeakTestGUI1 	"Build QtLeakTestGUI1"   OFF )
+option(${PROJECT_NAME}_BUILD_DEVELOPMENT_QtLeakTestGUI1 	"Build QtLeakTestGUI1"   ON )
 
 if (${PROJECT_NAME}_BUILD_DEVELOPMENT_QtLeakTestGUI1)
 
@@ -55,6 +55,8 @@ set(Srcs
   src/smvtkImageView2DCommand.cxx
   src/DicomReader.cxx
   src/MammographyViewOrientatationHelper.cxx
+  src/myVtkQtDebugLeaksView.cxx
+  src/myVtkQtDebugLeaksModel.cxx
 )
 
 set(Hdrs
@@ -65,6 +67,8 @@ set(Hdrs
   Include/smvtkImageView2DCommand.h
   Include/DicomReader.h
   Include/MammographyViewOrientatationHelper.h
+  Include/myVtkQtDebugLeaksView.h
+  Include/myVtkQtDebugLeaksModel.h
 )
 
 set(UIs
