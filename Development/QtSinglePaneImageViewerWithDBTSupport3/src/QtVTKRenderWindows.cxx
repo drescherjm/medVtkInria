@@ -49,7 +49,7 @@
 #include "QtVTKRenderWindows.h"
 #include "DicomReader.h"
 #include "FunctionProfiler.h"
-#include "MammographyViewOrientatationHelper.h"
+#include "smMammographyViewOrientatationHelper.h"
 #include <vtkImageData.h>
 
 #include <QTimer>
@@ -98,7 +98,7 @@ void QtVTKRenderWindows::setupImage()
 	if (m_pReader) {
 
 		// Get the view convention
-		MammographyViewOrientatationHelper helper(m_pReader);
+		smMammographyViewOrientatationHelper helper(m_pReader);
 		helper.Update();
 		
 		bool bNeedToFlip = !helper.hasIdentityAxesDirectionCosines();

@@ -1,4 +1,7 @@
-#include "DicomReader.h"
+#include "smCasePCH.h"
+
+#include "smDicomReader.h"
+
 #include <vtkSmartPointer.h>
 #include <vtkStringArray.h>
 #include <map>
@@ -14,13 +17,36 @@
 #else
 #include <X:\x64.20\VC.142\Install\Libraries\VTK-7.1.1\include\vtk-7.1\vtkDICOMReader.h>
 #endif
-#include "FunctionProfiler.h"
+
+#include "smFunctionProfiler.h"
 
 #define DEBUG_DICOM_READER
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-class DicomReader::Private
+// Return a trimmed copy
+static std::string trimWhitespace(const std::string& s) {
+	auto start = std::find_if_not(s.begin(), s.end(),
+		[](unsigned char ch) { return std::isspace(ch); });
+	auto end = std::find_if_not(s.rbegin(), s.rend(),
+		[](unsigned char ch) { return std::isspace(ch); }).base();
+	return (start < end ? std::string(start, end) : std::string());
+}
+
+// Trim in place (modifies the string directly)
+static void trimWhitespace_in_place(std::string& s) {
+	// Trim left
+	s.erase(s.begin(), std::find_if_not(s.begin(), s.end(),
+		[](unsigned char ch) { return std::isspace(ch); }));
+	// Trim right
+	s.erase(std::find_if_not(s.rbegin(), s.rend(),
+		[](unsigned char ch) { return std::isspace(ch); }).base(),
+		s.end());
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+class smDicomReader::Private
 {
 public:
 	bool updateWindowAndLevelForMultiframe(vtkMedicalImageProperties* pProps);
@@ -29,19 +55,17 @@ public:
 	bool m_bFlipZ{ false };
 	vtkSmartPointer< vtkDICOMReader > reader;
 	vtkSmartPointer<vtkDICOMMetaData> meta = vtkSmartPointer<vtkDICOMMetaData>::New();
-
-	//vtkDICOMMetaData* meta = nullptr;
 };
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::Private::updateWindowAndLevelForMultiframe(vtkMedicalImageProperties* pProps)
+bool smDicomReader::Private::updateWindowAndLevelForMultiframe(vtkMedicalImageProperties* pProps)
 {
 	bool retVal{ false };
 	int fileIndex = 0;
 	auto value = meta->Get(fileIndex, DC::SharedFunctionalGroupsSequence);
 	retVal = value.IsValid();
-	
+
 	if (retVal) {
 		auto seqShared = value.GetSequenceData();
 		auto valueWL = seqShared->Get(DC::FrameVOILUTSequence);
@@ -54,7 +78,7 @@ bool DicomReader::Private::updateWindowAndLevelForMultiframe(vtkMedicalImageProp
 			// This code handles the case where there are multiple WL presets
 			// The code is based on the code from the github source: 
 			// https://github.com/dgobbi/vtk-dicom/blob/master/Source/vtkDICOMReader.cxx#L2514
-			
+
 			retVal = (windowWidth.IsValid() && windowCenter.IsValid());
 			if (retVal) {
 				int n = static_cast<int>(windowCenter.GetNumberOfValues());
@@ -84,44 +108,63 @@ bool DicomReader::Private::updateWindowAndLevelForMultiframe(vtkMedicalImageProp
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-DicomReader::DicomReader(std::string strFileName) : m_pPrivate{std::make_unique<Private>()}
+smDicomReader::smDicomReader(const VecFileNames & vecFileNames) : m_pPrivate{ std::make_unique<Private>() }
+{
+	m_pPrivate->reader = vtkSmartPointer< vtkDICOMReader >::New();
+
+	if (vecFileNames.size() == 1) {
+		m_pPrivate->reader->SetFileName(vecFileNames[0].c_str());
+	}
+	else {
+		vtkSmartPointer<vtkStringArray> pFileNames = vtkSmartPointer<vtkStringArray>::New();
+		for (const auto& strFileName : vecFileNames) {
+			pFileNames->InsertNextValue(strFileName.c_str());
+		}
+		m_pPrivate->reader->SetFileNames(pFileNames);
+	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+smDicomReader::smDicomReader(const std::string& strFileName) : m_pPrivate{ std::make_unique<Private>() }
 {
 	m_pPrivate->reader = vtkSmartPointer< vtkDICOMReader >::New();
 	m_pPrivate->reader->SetFileName(strFileName.c_str());
 }
 
-//DicomReader::~DicomReader() = default;
-
-DicomReader::~DicomReader()
-{
-	m_pPrivate = nullptr;
-	std::cout << __FUNCTION__;
-}
+smDicomReader::~smDicomReader() = default;
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-vtkImageData* DicomReader::GetOutput()
+vtkImageData* smDicomReader::GetOutput()
 {
 	return m_pPrivate->reader->GetOutput();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-vtkAlgorithmOutput* DicomReader::GetOutputPort()
+vtkAlgorithmOutput* smDicomReader::GetOutputPort()
 {
 	return m_pPrivate->reader->GetOutputPort();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::CanReadFile() const
+vtkObject* smDicomReader::GetReader()
+{
+	return m_pPrivate->reader;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool smDicomReader::CanReadFile() const
 {
 	return m_pPrivate->reader->CanReadFile(m_pPrivate->reader->GetFileName());
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void DicomReader::ReadDicomMetaData()
+void smDicomReader::ReadDicomMetaData()
 {
 	PROFILE_THIS_FUNCTION;
 
@@ -129,7 +172,8 @@ void DicomReader::ReadDicomMetaData()
 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
 
 #ifdef DEBUG_DICOM_READER
-	m_pPrivate->meta->Print(std::cout);
+	std::ostringstream stream;
+	m_pPrivate->meta->Print(stream);
 #endif //def DEBUG_DICOM_READER
 
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
@@ -139,37 +183,38 @@ void DicomReader::ReadDicomMetaData()
 	}
 
 #ifdef DEBUG_DICOM_READER
-	pProps->Print(std::cout);
+	pProps->Print(stream);
+	QLOG_DEBUG() << QString::fromStdString(stream.str());
 #endif //def DEBUG_DICOM_READER
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::Read()
+bool smDicomReader::Read()
 {
 	PROFILE_THIS_FUNCTION;
 
 	if (m_pPrivate->m_bFlipZ) {
 		m_pPrivate->reader->SetMemoryRowOrderToFileNative();
 	}
-	
-	Update();
 
-// 	m_pPrivate->reader->Update();
+	m_pPrivate->reader->Update();
 
 #ifdef DEBUG_DICOM_READER
 	auto pProps = m_pPrivate->reader->GetMedicalImageProperties();
 #endif //def DEBUG_DICOM_READER
 
-// 
-// 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
-// 
-// 	if (isMultiframeDicom()) {
-// 		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
-// 	}
+	// 
+	// 	m_pPrivate->meta = m_pPrivate->reader->GetMetaData();
+	// 
+	// 	if (isMultiframeDicom()) {
+	// 		m_pPrivate->updateWindowAndLevelForMultiframe(pProps);
+	// 	}
 
 #ifdef DEBUG_DICOM_READER
-	pProps->Print(std::cout);
+	std::ostringstream stream;
+	pProps->Print(stream);
+	QLOG_DEBUG() << QString::fromStdString(stream.str());
 #endif //def DEBUG_IMAGE_VIEWER
 
 	return true;
@@ -177,28 +222,37 @@ bool DicomReader::Read()
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isMultiframeDicom() const
+bool smDicomReader::isMultiframeDicom() const
 {
 	return m_pPrivate->meta->Has(DC::SharedFunctionalGroupsSequence);
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void DicomReader::setFlipZ(bool bFlip)
+void smDicomReader::setFlipZ(bool bFlip)
 {
 	m_pPrivate->m_bFlipZ = bFlip;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-void DicomReader::Update()
+void smDicomReader::Print(std::ostream& os)
 {
-	m_pPrivate->reader->Update();
+	if (m_pPrivate->reader) {
+		m_pPrivate->reader->Print(os);
+	}
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-boost::optional<std::pair<double, double>> DicomReader::getDefaultWindowLevel() const
+vtkDICOMMetaData* smDicomReader::GetMetaData() const
+{
+	return m_pPrivate->meta.Get();
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+boost::optional<std::pair<double, double>> smDicomReader::getDefaultWindowLevel() const
 {
 	boost::optional<std::pair<double, double>> retVal;
 
@@ -230,7 +284,7 @@ boost::optional<std::pair<double, double>> DicomReader::getDefaultWindowLevel() 
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetViewCodeSequence() const
+std::string smDicomReader::GetViewCodeSequence() const
 {
 	/*
 	 *	A Sequence looks like the following
@@ -256,11 +310,11 @@ std::string DicomReader::GetViewCodeSequence() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const
+std::string smDicomReader::GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::string strViewCode) const
 {
 	// See: https://dicom.nema.org/dicom/2013/output/chtml/part16/sect_CID_4014.html
 
-	static std::map<std::string, std::string> mapCodes{ 
+	static std::map<std::string, std::string> mapCodes{
 		{"R-10224","ML"},
 		{"R-10226","MLO"},
 		{"R-10228","LM"},
@@ -275,7 +329,7 @@ std::string DicomReader::GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::st
 		{"Y-X1771","XCCM"},
 		{"R-102C2","TAN"},
 	};
-	
+
 	std::string retVal;
 
 	auto it = mapCodes.find(strViewCode);
@@ -292,7 +346,7 @@ std::string DicomReader::GetMammographyACR_MQCM_CodeFromViewCodeSequence(std::st
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetImageLaterality() const
+std::string smDicomReader::GetImageLaterality() const
 {
 	std::string retVal;
 	if (isMultiframeDicom()) {
@@ -348,7 +402,7 @@ std::string DicomReader::GetImageLaterality() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetAnatomicRegion() const
+std::string smDicomReader::GetAnatomicRegion() const
 {
 	std::string retVal;
 
@@ -393,7 +447,39 @@ std::string DicomReader::GetAnatomicRegion() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetImageOrientationPatientString() const
+std::string smDicomReader::GetBodyPartExamined() const
+{
+	std::string retVal;
+	auto value = m_pPrivate->meta->Get(
+		vtkDICOMTag(DC::BodyPartExamined)
+	);
+
+	if (value.IsValid()) {
+		retVal = value.AsString();
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+std::string smDicomReader::GetOrganExposed() const
+{
+	std::string retVal;
+	auto value = m_pPrivate->meta->Get(
+		vtkDICOMTag(DC::OrganExposed)
+	);
+
+	if (value.IsValid()) {
+		retVal = value.AsString();
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+std::string smDicomReader::GetImageOrientationPatientString() const
 {
 	/*
 	*
@@ -445,7 +531,23 @@ std::string DicomReader::GetImageOrientationPatientString() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::string DicomReader::GetSOPClassUID() const
+std::string smDicomReader::GetPatientOrientation() const
+{
+	std::string retVal;
+	auto value = m_pPrivate->meta->Get(
+		vtkDICOMTag(DC::PatientOrientation)
+	);
+
+	if (value.IsValid()) {
+		retVal = trimWhitespace(value.AsString());
+	}
+
+	return retVal;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+std::string smDicomReader::GetSOPClassUID() const
 {
 	std::string retVal;
 
@@ -460,7 +562,7 @@ std::string DicomReader::GetSOPClassUID() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-boost::optional<int> DicomReader::GetImagesInAcquisition() const
+boost::optional<int> smDicomReader::GetImagesInAcquisition() const
 {
 	boost::optional<int> retVal;
 
@@ -476,10 +578,10 @@ boost::optional<int> DicomReader::GetImagesInAcquisition() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-std::vector<double> DicomReader::GetImageOrientationPatientVector() const
+std::vector<double> smDicomReader::GetImageOrientationPatientVector() const
 {
 	/*
-	*   
+	*
 	(0020,9116) SQ "PlaneOrientationSequence" : (1 item)
 		---- SQ Item 0001 at offset 14630 ----
 		(0020,0037) DS "ImageOrientationPatient" : [0\-1\0\0.003\0\-1.000] (22 bytes)
@@ -489,7 +591,7 @@ std::vector<double> DicomReader::GetImageOrientationPatientVector() const
 
 	if (isMultiframeDicom()) {
 		auto value = m_pPrivate->meta->Get(
-			vtkDICOMTagPath(DC::SharedFunctionalGroupsSequence,0,
+			vtkDICOMTagPath(DC::SharedFunctionalGroupsSequence, 0,
 				DC::PlaneOrientationSequence, 0,
 				DC::ImageOrientationPatient)
 		);
@@ -504,7 +606,7 @@ std::vector<double> DicomReader::GetImageOrientationPatientVector() const
 	}
 	else {
 		auto value = m_pPrivate->meta->Get(DC::ImageOrientationPatient);
-	
+
 		if (value.IsValid()) {
 			auto size = value.GetNumberOfValues();
 			if (size > 0) {
@@ -519,15 +621,20 @@ std::vector<double> DicomReader::GetImageOrientationPatientVector() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isAnatomicRegionBreast() const
+bool smDicomReader::isAnatomicRegionBreast() const
 {
 	auto strAnatomicRegion = GetAnatomicRegion();
+
+	if (strAnatomicRegion.empty()) {
+		strAnatomicRegion = GetBodyPartExamined();
+	}
+
 	return (boost::iequals(strAnatomicRegion, "Breast"));
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isImageLateralityLeft(std::string strLaterality) const
+bool smDicomReader::isImageLateralityLeft(std::string strLaterality) const
 {
 	bool retVal{ false };
 
@@ -545,7 +652,7 @@ bool DicomReader::isImageLateralityLeft(std::string strLaterality) const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-bool DicomReader::isImageLateralityRight(std::string strLaterality) const
+bool smDicomReader::isImageLateralityRight(std::string strLaterality) const
 {
 	bool retVal{ false };
 
@@ -562,7 +669,7 @@ bool DicomReader::isImageLateralityRight(std::string strLaterality) const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
-vtkMatrix4x4* DicomReader::GetPatientMatrix() const
+vtkMatrix4x4* smDicomReader::GetPatientMatrix() const
 {
 	return m_pPrivate->reader->GetPatientMatrix();
 }

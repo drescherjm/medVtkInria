@@ -54,7 +54,7 @@ set(Srcs
   src/smvtkImageView2D.cxx
   src/smvtkImageView2DCommand.cxx
   src/DicomReader.cxx
-  src/MammographyViewOrientatationHelper.cxx
+  src/smMammographyViewOrientatationHelper.cxx
 )
 
 set(Hdrs
@@ -64,7 +64,7 @@ set(Hdrs
   Include/VTKQtWidget.h
   Include/smvtkImageView2DCommand.h
   Include/DicomReader.h
-  Include/MammographyViewOrientatationHelper.h
+  Include/smMammographyViewOrientatationHelper.h
 )
 
 set(UIs
