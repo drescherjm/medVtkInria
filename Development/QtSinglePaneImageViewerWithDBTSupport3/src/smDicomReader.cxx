@@ -1,4 +1,4 @@
-#include "smCasePCH.h"
+//#include "smCasePCH.h"
 
 #include "smDicomReader.h"
 
@@ -17,6 +17,9 @@
 #else
 #include <X:\x64.20\VC.142\Install\Libraries\VTK-7.1.1\include\vtk-7.1\vtkDICOMReader.h>
 #endif
+
+#include <QDebug>
+#include <sstream>
 
 #include "smFunctionProfiler.h"
 
@@ -184,7 +187,8 @@ void smDicomReader::ReadDicomMetaData()
 
 #ifdef DEBUG_DICOM_READER
 	pProps->Print(stream);
-	QLOG_DEBUG() << QString::fromStdString(stream.str());
+	//std::cout << qPrintable(QString::fromStdString(stream.str())) << std::endl;
+	qDebug(stream.str().c_str());
 #endif //def DEBUG_DICOM_READER
 }
 
@@ -214,7 +218,7 @@ bool smDicomReader::Read()
 #ifdef DEBUG_DICOM_READER
 	std::ostringstream stream;
 	pProps->Print(stream);
-	QLOG_DEBUG() << QString::fromStdString(stream.str());
+	qDebug(stream.str().c_str());
 #endif //def DEBUG_IMAGE_VIEWER
 
 	return true;
@@ -232,6 +236,13 @@ bool smDicomReader::isMultiframeDicom() const
 void smDicomReader::setFlipZ(bool bFlip)
 {
 	m_pPrivate->m_bFlipZ = bFlip;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+void smDicomReader::Update()
+{
+	m_pPrivate->reader->Update();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////

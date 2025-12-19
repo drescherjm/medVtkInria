@@ -1,10 +1,14 @@
-#include "smCasePCH.h"
+//#include "smCasePCH.h"
 #include "smMammographyViewOrientatationHelper.h"
 #include "smDicomReader.h"
 #include "smvtkImageView2D.h"
 
 #include <array>
 #include <vtkMatrix4x4.h>
+
+#include <unordered_set>
+#include <sstream>
+
 
 #define DEBUG_ORIENTATION
 
@@ -87,6 +91,8 @@ bool smMammographyViewOrientatationHelper::Private::isDBT_BTO() const
 
 int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation, DblArr9& arrayCosines)
 {
+	static std::unordered_set<std::string> orientationsThatFlip = { R"(P\R)", R"(P\FR)" };
+
 	if (pPatientMatrix) {
 		auto val = pPatientMatrix->GetElement(1, 0);
 		auto val1 = pPatientMatrix->GetElement(0, 1);
@@ -95,7 +101,13 @@ int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMat
 				return 3;
 			}
 			else {
-				return 2;
+				if (orientationsThatFlip.count(strPatientOrientation)) {
+					arrayCosines[8] = -1;
+					return 4;
+				}
+				else {
+					return 2;
+				}
 			}
 		}
 		else if (val1 > 0) {
@@ -105,7 +117,7 @@ int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMat
 		}
 	}
 
-	static std::unordered_set<std::string> orientationsThatFlip = { R"(P\R)", R"(P\FR)" };
+	
 
 	if (orientationsThatFlip.count(strPatientOrientation)) {
 		arrayCosines[8] = -1;
@@ -275,7 +287,7 @@ bool smMammographyViewOrientatationHelper::Update()
 				stream << "Laterality: " << strLaterality << std::endl;
 				stream << "PatientOrientation: " << strPatientOrientation << std::endl;
 
-				QLOG_DEBUG() << QString::fromStdString(stream.str());
+				//QLOG_DEBUG() << QString::fromStdString(stream.str());
 #endif 
 
 				m_pPrivate->m_nViewConvention = m_pPrivate->getProperViewConventionForImage(strLaterality, strPatientOrientation, strMQCMCode, pPatientMatrix);
@@ -283,7 +295,7 @@ bool smMammographyViewOrientatationHelper::Update()
 			}
 		}
 		else {
-			QLOG_WARN_ASSERT() << QString("In %1 the view code is empty").arg(__FUNCTION__);
+			//QLOG_WARN_ASSERT() << QString("In %1 the view code is empty").arg(__FUNCTION__);
 		}
 	}
 

@@ -40,6 +40,7 @@ public:
 	bool Read();
 	bool isMultiframeDicom() const;
 	void setFlipZ(bool bFlip);
+	void Update();
 	void Print(std::ostream& os);
 	
 	vtkDICOMMetaData* GetMetaData() const;

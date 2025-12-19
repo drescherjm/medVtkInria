@@ -1,5 +1,9 @@
-#ifndef QtVTKRenderWindows_H
-#define QtVTKRenderWindows_H
+#pragma once
+
+#ifndef QTVTKRENDERWINDOWS_H
+#define QTVTKRENDERWINDOWS_H
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 #include "vtkSmartPointer.h"
 //#include "vtkResliceImageViewer.h"
@@ -12,7 +16,7 @@
 
 #include <memory>
 
-class DicomReader;
+class smDicomReader;
 
 // Forward Qt class declarations
 class Ui_QtVTKRenderWindow;
@@ -77,9 +81,11 @@ private:
 	int								getProperViewConventionForImage(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 private:
 	bool m_bConventionInitialized = false;
-	std::shared_ptr<DicomReader>	m_pReader;
+	std::shared_ptr<smDicomReader>	m_pReader;
   // Designer form
   Ui_QtVTKRenderWindow *ui;
 };
 
-#endif // QtVTKRenderWindows_H
+/////////////////////////////////////////////////////////////////////////////////////////
+
+#endif // QTVTKRENDERWINDOWS_H

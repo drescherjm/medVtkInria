@@ -53,7 +53,7 @@ set(Srcs
   src/vtkResliceCursorCallback.cxx
   src/smvtkImageView2D.cxx
   src/smvtkImageView2DCommand.cxx
-  src/DicomReader.cxx
+  src/smDicomReader.cxx
   src/smMammographyViewOrientatationHelper.cxx
 )
 
@@ -63,7 +63,7 @@ set(Hdrs
   Include/smvtkImageView2D.h
   Include/VTKQtWidget.h
   Include/smvtkImageView2DCommand.h
-  Include/DicomReader.h
+  Include/smDicomReader.h
   Include/smMammographyViewOrientatationHelper.h
 )
 

@@ -47,7 +47,7 @@
 
 #include <vtkDebugLeaks.h>
 #include "QtVTKRenderWindows.h"
-#include "DicomReader.h"
+#include "smDicomReader.h"
 #include "FunctionProfiler.h"
 #include "smMammographyViewOrientatationHelper.h"
 #include <vtkImageData.h>
@@ -82,7 +82,7 @@ QtVTKRenderWindows::QtVTKRenderWindows(int argc, char* argv[])
 		strFileName = argv[1];
 	}
 
-	m_pReader = std::make_shared<DicomReader>(strFileName);
+	m_pReader = std::make_shared<smDicomReader>(strFileName);
 
 	updateInformation();
 	setupImage();
@@ -230,7 +230,7 @@ void QtVTKRenderWindows::setupImage()
 
 		//riw->SetSize(imageDims[0], imageDims[1]);
 
-		if (!align == static_cast<smvtkImageView2D::ImageAlignmentFlags>(smvtkImageView2D::IA_HCenter | smvtkImageView2D::IA_VCenter)) {
+		if (align != static_cast<smvtkImageView2D::ImageAlignmentFlags>(smvtkImageView2D::IA_HCenter | smvtkImageView2D::IA_VCenter)) {
 			riw->UpdateAlignment();
 			riw->Render();
 		}
