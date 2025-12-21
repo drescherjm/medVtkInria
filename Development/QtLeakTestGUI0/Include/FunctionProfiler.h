@@ -25,7 +25,7 @@ public:
 
 	~FunctionProfiler() {
 		qint32 msecs = m_startTime.msecsTo(QTime::currentTime());
-		qDebug("PROFILE: (%5d) %s", msecs, qPrintable(m_function));
+		qDebug("PROFILE: (%5d) %s \n", msecs, qPrintable(m_function));
 	}
 
 private:

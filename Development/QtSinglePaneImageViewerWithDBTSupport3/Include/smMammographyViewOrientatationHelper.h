@@ -19,6 +19,7 @@ public:
 	~smMammographyViewOrientatationHelper();
 
 	using AxesDirectionCosines = std::array<double, 9>;
+	using Vector1x3 = std::array<double, 3>;
 
 public:
 	bool							Update();

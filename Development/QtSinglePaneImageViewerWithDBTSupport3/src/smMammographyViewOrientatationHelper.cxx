@@ -5,7 +5,7 @@
 
 #include <array>
 #include <vtkMatrix4x4.h>
-
+#include <vtkMath.h>
 #include <unordered_set>
 #include <sstream>
 
@@ -32,11 +32,18 @@ public:
 	int getProperViewConventionForImage(std::string strLaterality, std::string strPatientOrientation,
 		std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 	static int GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
+	static int GetCodeForDBT_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation, DblArr9& arrayCosines);
 	static int GetCodeForDBT_RMLO_RCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
 	static int GetCodeForDBT_LLM(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
 	static int GetCodeForDBT_RLM(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
 	static int GetCodeForDBT_LXCCL(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
 	static int GetCodeForDBT_RXCCL(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation,DblArr9& pArrayCosines);
+
+	static Vector1x3	GetNormalVector(vtkMatrix4x4* pPatientMatrix);
+
+
+	static bool isNegativeValue(double bVal);
+
 	void updateAxesDirectionCosines(std::string strLaterality, std::string strMQCMCode, vtkMatrix4x4* pPatientMatrix);
 	bool isFFDM() const;
 	bool isDBT_BTO() const;
@@ -89,6 +96,7 @@ bool smMammographyViewOrientatationHelper::Private::isDBT_BTO() const
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
+#if 0
 int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation, DblArr9& arrayCosines)
 {
 	static std::unordered_set<std::string> orientationsThatFlip = { R"(P\R)", R"(P\FR)" };
@@ -117,13 +125,79 @@ int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMat
 		}
 	}
 
-	
-
 	if (orientationsThatFlip.count(strPatientOrientation)) {
 		arrayCosines[8] = -1;
 	}
 	return 4;
 }
+#endif
+
+
+int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LMLO_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation, DblArr9& arrayCosines)
+{
+
+	if (pPatientMatrix) {
+
+		auto normalVec = GetNormalVector(pPatientMatrix);
+
+		bool signs[3]{ std::signbit(normalVec[0]),std::signbit(normalVec[1]),std::signbit(normalVec[2]) };
+
+		if (!signs[1] && !signs[2]) {
+			return 2;
+		}
+		else {
+			if (!signs[0]) {
+				arrayCosines[8] = -1;
+				return 8;
+			}
+			return 6;
+		}
+
+	}
+	return 4;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_LCC(vtkMatrix4x4* pPatientMatrix, std::string strPatientOrientation, DblArr9& arrayCosines)
+{
+	if (pPatientMatrix) {
+
+		auto normalVec = GetNormalVector(pPatientMatrix);
+
+
+		auto val1 = pPatientMatrix->GetElement(1, 0);
+		auto val0 = pPatientMatrix->GetElement(0, 1);
+		auto val3 = pPatientMatrix->GetElement(2, 3);
+
+
+		if ((val0 > 0) && (val1 < 0)) {
+			return 2;
+		}
+		else if ((val0 < 0) && (val1 > 0)) {
+			if (val3 < 0) {
+				arrayCosines[8] = -1;
+				return 8;
+			}
+			else {
+				return 6;
+			}
+		}
+
+// 		bool signs[3]{ std::signbit(normalVec[0]),std::signbit(normalVec[1]),std::signbit(normalVec[2]) };
+// 
+// 		if (signs[2]) {
+// 			return 2;
+// 		}
+// 		else {
+// 			return 6;
+// 		}
+
+	}
+	return 4;
+}
+
 
 /////////////////////////////////////////////////////////////////////////////////////////
 
@@ -133,9 +207,16 @@ int smMammographyViewOrientatationHelper::Private::GetCodeForDBT_RMLO_RCC(vtkMat
 		// Detect if we need to flip the Z axis
 		auto val = pPatientMatrix->GetElement(1, 0);
 		auto val1 = pPatientMatrix->GetElement(0, 1);
-		if ((val1 < 0) && (val < 0)) {
+
+		if ( isNegativeValue(val1) ) {
 			arrayCosines[8] = -1;
+		}
+
+		if ((isNegativeValue(val)) && (isNegativeValue(val1))) {			
 			return 4;
+		}
+		else if (isNegativeValue(val1)) {
+			return 3;
 		}
 	}
 	return 2;
@@ -181,9 +262,9 @@ int smMammographyViewOrientatationHelper::Private::getProperViewConventionForIma
 {
 	int retVal = VTKView::VIEW_CONVENTION_LUNG_HFS_AXIAL_VIEW_AXIAL;
 
-	if (!strLaterality.empty() && !strMQCMCode.empty()) {
+	std::string strCode = strLaterality[0] + strMQCMCode;
 
-		std::string strCode = strLaterality[0] + strMQCMCode;
+	if (!strLaterality.empty() && !strMQCMCode.empty()) {
 
 		bool bMultiframe = m_pReader->isMultiframeDicom();
 		if (bMultiframe) {
@@ -192,7 +273,7 @@ int smMammographyViewOrientatationHelper::Private::getProperViewConventionForIma
 
 			static std::map<std::string, DetectionFunction> codeMap{
 				{"LMLO",GetCodeForDBT_LMLO_LCC},
-				{"LCC",GetCodeForDBT_LMLO_LCC},
+				{"LCC",GetCodeForDBT_LCC},
 				{"LML",GetCodeForDBT_LMLO_LCC},
 				{"RMLO",GetCodeForDBT_RMLO_RCC},
 				{"RCC",GetCodeForDBT_RMLO_RCC},
@@ -222,7 +303,7 @@ int smMammographyViewOrientatationHelper::Private::getProperViewConventionForIma
 
 	}
 
-	std::cout << "Detected View Convention: " << retVal << '\n';
+	std::cout << "Detected View Convention: " << retVal << '\n' << "View: " << strCode << '\n' << "Patient Orientation: " << strPatientOrientation << '\n';
 	if (m_aryAxesCosines == FlipZCosines) {
 		std::cout << "Flip Z Axis while using convention: " << retVal << '\n';
 	}
@@ -243,6 +324,44 @@ void smMammographyViewOrientatationHelper::Private::updateAxesDirectionCosines(s
 			break;
 		}
 	}
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+bool smMammographyViewOrientatationHelper::Private::isNegativeValue(double bVal)
+{
+	return std::signbit(bVal);
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////
+
+smMammographyViewOrientatationHelper::Vector1x3 smMammographyViewOrientatationHelper::Private::GetNormalVector(vtkMatrix4x4* pPatientMatrix)
+{
+	Vector1x3 retVal{};
+
+	if (pPatientMatrix) {
+		Vector1x3 rowVec{ pPatientMatrix->GetElement(0, 0),pPatientMatrix->GetElement(0, 1), pPatientMatrix->GetElement(0, 2) };
+		Vector1x3 colVec{ pPatientMatrix->GetElement(1, 0),pPatientMatrix->GetElement(1, 1), pPatientMatrix->GetElement(1, 2) };
+
+		vtkMath::Cross(rowVec.data(), colVec.data(), retVal.data());
+
+		std::cout << "Row Vector (R): ["
+			<< rowVec[0] << ", "
+			<< rowVec[1] << ", "
+			<< rowVec[2] << "]" << std::endl;
+
+		std::cout << "Col Vector (C): ["
+			<< colVec[0] << ", "
+			<< colVec[1] << ", "
+			<< colVec[2] << "]" << std::endl;
+
+		std::cout << "Normal Vector (N): ["
+			<< retVal[0] << ", "
+			<< retVal[1] << ", "
+			<< retVal[2] << "]" << std::endl;
+	}
+
+	return retVal;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////
@@ -283,11 +402,11 @@ bool smMammographyViewOrientatationHelper::Update()
 				auto pPatientMatrix = m_pPrivate->m_pReader->GetPatientMatrix();
 				pPatientMatrix->Print(stream);
 
-				stream << "View Code: " << strMQCMCode << std::endl;
+				stream << "\nView Code: " << strMQCMCode << std::endl;
 				stream << "Laterality: " << strLaterality << std::endl;
 				stream << "PatientOrientation: " << strPatientOrientation << std::endl;
 
-				//QLOG_DEBUG() << QString::fromStdString(stream.str());
+				std::cout << stream.str() << std::endl;
 #endif 
 
 				m_pPrivate->m_nViewConvention = m_pPrivate->getProperViewConventionForImage(strLaterality, strPatientOrientation, strMQCMCode, pPatientMatrix);

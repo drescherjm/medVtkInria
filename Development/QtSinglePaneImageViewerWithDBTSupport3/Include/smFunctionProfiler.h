@@ -26,7 +26,7 @@ public:
 
 		//QLOG_INFO() << QString("PROFILE: %1 msecs - %2").arg(msecs).arg(m_function);
 
-		std::cout << qPrintable(QString("PROFILE: %1 msecs - %2").arg(msecs).arg(m_function));
+		std::cout << qPrintable(QString("PROFILE: %1 msecs - %2").arg(msecs).arg(m_function)) << std::endl;
 	}
 
 private:
