@@ -133,6 +133,7 @@ smDicomReader::smDicomReader(const std::string& strFileName) : m_pPrivate{ std::
 {
 	m_pPrivate->reader = vtkSmartPointer< vtkDICOMReader >::New();
 	m_pPrivate->reader->SetFileName(strFileName.c_str());
+	//m_pPrivate->reader->SetMemoryRowOrderToFileNative();
 }
 
 smDicomReader::~smDicomReader() = default;
