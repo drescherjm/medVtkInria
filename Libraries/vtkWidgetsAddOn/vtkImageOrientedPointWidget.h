@@ -16,6 +16,7 @@
 #include <medVtkInriaExport.h>
 
 #include <vtk3DWidget.h>
+#include <vtkLegacy.h> // For VTK_LEGACY
 
 class vtkAbstractPropPicker;
 class vtkActor;
