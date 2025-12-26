@@ -3,11 +3,14 @@
   "version-string": "4.0",
   "dependencies": [	
   "gdcm", 
+  "cmake-modules",
   "cmake-git-versioner",
 	{
 		"name": "vtk",
 		"features": [
-			  "vtk-dicom"
+			  "vtk-dicom",
+			  "qt",
+			  "opengl"
 		]
 	}
   ],
@@ -40,7 +43,8 @@
 		  },
 		  "qtbase",
 		  "qttools",
-		  "qtscxml"
+		  "qtscxml",
+		  "qt5compat"
 		]
 	  }
 	},

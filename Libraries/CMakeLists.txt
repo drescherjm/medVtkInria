@@ -119,8 +119,8 @@ if (VTK_VERSION VERSION_LESS "8.90.0")
 
 target_link_libraries(${TARGET_NAME}
   ${OPENGL_LIBRARIES}
-  Qt5::Core
-  Qt5::Widgets
+  ${QT}::Core
+  ${QT}::Widgets
   #medCoreLegacy
   vtkCommonCore
   vtkCommonSystem
@@ -150,8 +150,8 @@ target_link_libraries(${TARGET_NAME}
 else() 
   target_link_libraries(${TARGET_NAME}
 	${OPENGL_LIBRARIES}
-	Qt5::Core
-	Qt5::Widgets
+	${QT}::Core
+	${QT}::Widgets
 	${VTK_LIBRARIES}
   )
 

@@ -27,8 +27,8 @@ cmake_policy(SET CMP0020 NEW)
 cmake_policy(SET CMP0074 NEW)
 cmake_policy(SET CMP0011 NEW)
 
-project(medVtkInriaEx)
 cmake_minimum_required(VERSION 3.21)
+project(medVtkInriaEx)
 
 set (${PROJECT_NAME}_VERSION_MAJOR 3)
 set (${PROJECT_NAME}_VERSION_MINOR 0)
@@ -36,7 +36,39 @@ set (${PROJECT_NAME}_VERSION_PATCH 0)
 
 set (${PROJECT_NAME}_VERSION_PATCH_CLEAN ${${PROJECT_NAME}_VERSION_PATCH})
 
+if (DEFINED VCPKG_TARGET_TRIPLET)
+	find_package(cmake-modules REQUIRED)
+	LIST(APPEND CMAKE_MODULE_PATH ${cmake-modules_MODULE_DIR})
+	LIST(APPEND CMAKE_MODULE_PATH ${cmake-modules_SCRIPTS_DIR})
+	
+	find_package(cmake-git-versioner REQUIRED)
+	LIST(APPEND CMAKE_MODULE_PATH ${cmake-git-versioner_DIR})
+	
+else(DEFINED VCPKG_TARGET_TRIPLET)
+	LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake/External/Modules)
+	LIST(APPEND CMAKE_MODULE_PATH ${PROJECT_SOURCE_DIR}/CMake/External/Scripts)
+endif(DEFINED VCPKG_TARGET_TRIPLET)
+
+if (EXISTS ${PROJECT_SOURCE_DIR}/.git) 
+	set (DU_USE_GIT 1)
+	include(GitVersioner)
+	set (GIT_VERSIONER_AUTO_DETECT_CI false)	
+    git_versioner_get_version(GIT_VERSION_RESULT)
+	set (${PROJECT_NAME}_VERSION_PATCH ${${PROJECT_NAME}_VERSION_PATCH}.${GIT_VERSION_RESULT}-git)
+else()
+	set (DU_USE_SVN 1)
+	include(${PROJECT_SOURCE_DIR}/CMake/External/Scripts/SubversionVersionInfo.cmake)
+endif()
+
+include(GNUInstallDirs)
+include(GetCompilerVersion)
+set (${PROJECT_NAME}_VERSION_STRING "${${PROJECT_NAME}_VERSION_MAJOR}.${${PROJECT_NAME}_VERSION_MINOR}.${${PROJECT_NAME}_VERSION_PATCH}")
 set(TARGET_NAME ${PROJECT_NAME})
+
+include(SupportQt56)
+include(HelperMacros)
+include(SupportQt)
+include(CMake/SetupQt.cmake)
 
 #Use solution folders.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
@@ -135,19 +167,19 @@ message (STATUS "VTK_VERSION: ${VTK_VERSION}")
 
 find_package(OpenGL REQUIRED)
 
-find_package(Qt5 REQUIRED COMPONENTS
-  Concurrent
-  Core
-  Gui
-  Network
-  OpenGL
-  Quick
-  Sql
-  Svg
-  Test
-  Widgets
-  Xml
-  )
+# find_package(Qt5 REQUIRED COMPONENTS
+  # Concurrent
+  # Core
+  # Gui
+  # Network
+  # OpenGL
+  # Quick
+  # Sql
+  # Svg
+  # Test
+  # Widgets
+  # Xml
+  # )
   
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
@@ -213,7 +245,7 @@ endif()
 
 #set (QT_LIBRARIES Qt5::Core Qt5::Network Qt5::Sql Qt5::Widgets Qt5::Gui Qt5::WinMain Qt5::Xml Qt5::PrintSupport)
 #set (QT_MODULES Qt5::Core Qt5::Network Qt5::Sql Qt5::Widgets Qt5::Gui Qt5::WinMain Qt5::Xml Qt5::PrintSupport)
-set (QT_PLATFORM_MODULES Qt5::QWindowsIntegrationPlugin)
+#set (QT_PLATFORM_MODULES Qt5::QWindowsIntegrationPlugin)
 
 include(GetQtRuntime)
 
