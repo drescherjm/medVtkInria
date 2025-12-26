@@ -1,0 +1,6 @@
+{
+  "name": "cmake-modules",
+  "version": "1.0.0",
+  "description": "Reusable CMake modules for cross-platform builds",
+  "homepage": "https://github.com/drescherjm/cmake-modules"
+}

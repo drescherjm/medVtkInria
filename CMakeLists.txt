@@ -20,6 +20,8 @@ if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
       CACHE STRING "")
 endif()
 
+include(CMake/SupportSwitchingQtVersionAsAFeature.cmake)
+
 cmake_policy(SET CMP0003 NEW)
 cmake_policy(SET CMP0020 NEW)
 cmake_policy(SET CMP0074 NEW)

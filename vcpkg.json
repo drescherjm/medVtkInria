@@ -1,0 +1,50 @@
+{
+  "name": "med-vtk-inria",
+  "version-string": "4.0",
+  "dependencies": [	
+  "gdcm", 
+  "cmake-git-versioner",
+	{
+		"name": "vtk",
+		"features": [
+			  "vtk-dicom"
+		]
+	}
+  ],
+  "features": {
+	  "qt5": {
+		"description": "Use Qt5",
+		"dependencies": [
+		  {
+			"name": "linuxdeployqt",
+			"features": [
+			  "qt5"
+			],
+			"platform": "linux",
+			"default-features": false
+		  },
+		  "qt5-base",
+		  "qt5-tools"
+		]
+	  },
+	  "qt6": {
+		"description": "Use Qt6",
+		"dependencies": [
+		  {
+			"name": "linuxdeployqt",
+			"features": [
+			  "qt6"
+			],
+			"platform": "linux",
+			"default-features": false
+		  },
+		  "qtbase",
+		  "qttools",
+		  "qtscxml"
+		]
+	  }
+	},
+  "default-features": [
+
+  ]
+}

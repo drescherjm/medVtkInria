@@ -1,0 +1,367 @@
+{
+   "version": 6,
+   "include": ["CMakePresets-Common.json"],
+   "configurePresets": [
+		{	
+			"name": "windows-config",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "vs2019-x64",
+			"hidden": true,
+			"inherits": "windows-config",
+			"generator": "Visual Studio 16 2019",
+			"architecture": { "value": "x64" },
+			"binaryDir": "${sourceDir}/build"
+		},
+		{
+			"name": "vs2022-x64",
+			"hidden": true,
+			"inherits": "windows-config",
+			"generator": "Visual Studio 17 2022",
+			"architecture": { "value": "x64" },
+			"binaryDir": "${sourceDir}/build"
+		},
+		{
+			"name": "vs2026-x64",
+			"hidden": true,
+			"inherits": "windows-config",
+			"generator": "Visual Studio 18 2026",
+			"architecture": { "value": "x64" },
+			"binaryDir": "${sourceDir}/build"
+		},
+		{
+			"name": "qt5-vcpkg-vs2019-config",
+			"inherits": ["base-vcpkg-qt5","vs2019-x64"],
+			"description": "Qt5 build using Visual Studio 2019 and vcpkg"
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-config",
+			"inherits": ["base-vcpkg-qt6","vs2019-x64"],
+			"description": "Qt6 build using Visual Studio 2019 and vcpkg"
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-config",
+			"inherits": ["base-vcpkg-qt5","vs2022-x64"],
+			"description": "Qt5 build using Visual Studio 2022 and vcpkg"
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-config",
+			"inherits": ["base-vcpkg-qt6","vs2022-x64"],
+			"description": "Qt6 build using Visual Studio 2022 and vcpkg"
+		},
+		{
+			"name": "qt5-vcpkg-vs2026-config",
+			"inherits": ["base-vcpkg-qt5","vs2026-x64"],
+			"description": "Qt5 build using Visual Studio 2026 and vcpkg"
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-config",
+			"inherits": ["base-vcpkg-qt6","vs2026-x64"],
+			"description": "Qt6 build using Visual Studio 2026 and vcpkg"
+		}
+   ],
+   "buildPresets":[
+		{
+			"name": "qt5-vcpkg-vs2019-build",
+			"configurePreset":  "qt5-vcpkg-vs2019-config"
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-build",
+			"configurePreset":  "qt6-vcpkg-vs2019-config"
+		},
+		{
+			"name": "qt5-vcpkg-vs2019-build-debug",
+			"configurePreset":  "qt5-vcpkg-vs2019-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-build-debug",
+			"configurePreset":  "qt6-vcpkg-vs2019-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt5-vcpkg-vs2019-build-release",
+			"configurePreset":  "qt5-vcpkg-vs2019-config",
+			"configuration": "Release"
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-build-release",
+			"configurePreset":  "qt6-vcpkg-vs2019-config",
+			"configuration": "Release"
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-build",
+			"configurePreset":  "qt5-vcpkg-vs2022-config"
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-build",
+			"configurePreset":  "qt6-vcpkg-vs2022-config"
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-build-debug",
+			"configurePreset":  "qt5-vcpkg-vs2022-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-build-debug",
+			"configurePreset":  "qt6-vcpkg-vs2022-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-build-release",
+			"configurePreset":  "qt5-vcpkg-vs2022-config",
+			"configuration": "Release"
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-build-release",
+			"configurePreset":  "qt6-vcpkg-vs2022-config",
+			"configuration": "Release"
+		},
+		{
+			"name": "qt5-vcpkg-vs2026-build",
+			"configurePreset":  "qt5-vcpkg-vs2026-config"
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-build",
+			"configurePreset":  "qt6-vcpkg-vs2026-config"
+		},
+		{
+			"name": "qt5-vcpkg-vs2026-build-debug",
+			"configurePreset":  "qt5-vcpkg-vs2026-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-build-debug",
+			"configurePreset":  "qt6-vcpkg-vs2026-config",
+			"configuration": "Debug"
+		},
+		{
+			"name": "qt5-vcpkg-vs2026-build-release",
+			"configurePreset":  "qt5-vcpkg-vs2026-config",
+			"configuration": "Release"
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-build-release",
+			"configurePreset":  "qt6-vcpkg-vs2026-config",
+			"configuration": "Release"
+		}
+   ],
+   "testPresets": [
+   		{
+			"name": "qt5-vcpkg-vs2019-test-debug",
+			"configurePreset": "qt5-vcpkg-vs2019-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2019",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt5-vcpkg-vs2019-test-release",
+			"configurePreset": "qt5-vcpkg-vs2019-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2019",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-test-debug",
+			"configurePreset": "qt6-vcpkg-vs2019-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2019",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2019-test-release",
+			"configurePreset": "qt6-vcpkg-vs2019-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2019",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-test-debug",
+			"configurePreset": "qt5-vcpkg-vs2022-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2022",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt5-vcpkg-vs2022-test-release",
+			"configurePreset": "qt5-vcpkg-vs2022-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2022",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-test-debug",
+			"configurePreset": "qt6-vcpkg-vs2022-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2022",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2022-test-release",
+			"configurePreset": "qt6-vcpkg-vs2022-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2022",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		},		
+		{
+			"name": "qt5-vcpkg-vs2026-test-debug",
+			"configurePreset": "qt5-vcpkg-vs2026-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2026",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt5-vcpkg-vs2026-test-release",
+			"configurePreset": "qt5-vcpkg-vs2026-config",
+			"description": "Run unit tests for qt5-vcpkg-vs2026",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-test-debug",
+			"configurePreset": "qt6-vcpkg-vs2026-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2026",
+			"configuration": "Debug",
+			"output": { "outputOnFailure": true }
+		},
+		{
+			"name": "qt6-vcpkg-vs2026-test-release",
+			"configurePreset": "qt6-vcpkg-vs2026-config",
+			"description": "Run unit tests for qt6-vcpkg-vs2026",
+			"configuration": "Release",
+			"output": { "outputOnFailure": true }
+		}
+	],
+	"packagePresets": [
+		{
+		  "name": "qt6-vcpkg-vs2026-package-release",
+		  "configurePreset": "qt6-vcpkg-vs2026-config",
+		  "generators": ["NSIS"],
+		  "configurations": ["Release"],
+		  "variables": {
+			"CPACK_NSIS_ENABLE_UNINSTALL_BEFORE_INSTALL": "ON"
+		  }
+		}
+	],
+	"workflowPresets": [
+		{
+		   "name": "qt5-vcpkg-vs2019-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2019-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2019-build-debug" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2019-test-debug" }
+			]
+		},
+		{
+		   "name": "qt5-vcpkg-vs2019-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2019-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2019-build-release" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2019-test-release" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2019-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2019-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2019-build-debug" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2019-test-debug" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2019-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2019-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2019-build-release" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2019-test-release" }
+			]
+		},
+		{
+		   "name": "qt5-vcpkg-vs2022-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2022-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2022-build-debug" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2022-test-debug" }
+			]
+		},
+		{
+		   "name": "qt5-vcpkg-vs2022-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2022-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2022-build-release" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2022-test-release" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2022-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2022-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2022-build-debug" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2022-test-debug" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2022-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2022-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2022-build-release" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2022-test-release" }
+			]
+		},
+		{
+		   "name": "qt5-vcpkg-vs2026-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2026-build-debug" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2026-test-debug" }
+			]
+		},
+		{
+		   "name": "qt5-vcpkg-vs2026-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt5-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt5-vcpkg-vs2026-build-release" },
+				{ "type": "test", "name": "qt5-vcpkg-vs2026-test-release" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2026-debug",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2026-build-debug" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2026-test-debug" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2026-release",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2026-build-release" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2026-test-release" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2026-release-package",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2026-build-release" },
+				{ "type": "test", "name": "qt6-vcpkg-vs2026-test-release" },
+				{ "type": "package", "name": "qt6-vcpkg-vs2026-package-release" }
+			]
+		},
+		{
+		   "name": "qt6-vcpkg-vs2026-release-package-notesting",
+		   "steps": [
+				{ "type": "configure", "name": "qt6-vcpkg-vs2026-config" },
+				{ "type": "build", "name": "qt6-vcpkg-vs2026-build-release" },
+				{ "type": "package", "name": "qt6-vcpkg-vs2026-package-release" }
+			]
+		}
+	]
+}

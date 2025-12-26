@@ -1,0 +1,6 @@
+{
+  "name": "cmake-git-versioner",
+  "version": "1.0.0",
+  "description": "Git Versioner for CMake",
+  "homepage": "https://github.com/symboxtra/cmake-GitVersioner"
+}

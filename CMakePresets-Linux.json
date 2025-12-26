@@ -1,0 +1,145 @@
+{
+   "version": 6,
+   "include": ["CMakePresets-Common.json"],
+   "configurePresets": [
+   		{
+			"name": "linux-config",
+			"hidden": true,
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Linux"
+			}
+		},
+		{
+			"name": "ninja-config",
+			"hidden": true,
+			"inherits": "linux-config",
+			"generator": "Ninja",
+			"binaryDir": "${sourceDir}/build"
+		},
+        {
+            "name": "ninja-config-debug",
+            "hidden": true,
+            "inherits": "ninja-config",
+            "binaryDir": "${sourceDir}/build/debug",
+            "cacheVariables": {
+                "CMAKE_BUILD_TYPE": "Debug"
+            }
+        },
+        {
+            "name": "qt5-vcpkg-ninja-config",
+            "inherits": ["base-vcpkg-qt5","ninja-config"],
+            "description": "Qt5 build using Ninja and vcpkg",
+            "binaryDir": "${sourceDir}/build/qt5-ninja"
+        },
+        {
+            "name": "qt6-vcpkg-ninja-config",
+            "inherits": ["base-vcpkg-qt6","ninja-config"],
+            "description": "Qt6 build using Ninja and vcpkg",
+            "binaryDir": "${sourceDir}/build/qt6-ninja"
+        },
+        {
+            "name": "qt5-vcpkg-ninja-config-debug",
+            "inherits": ["base-vcpkg-qt5","ninja-config-debug"],
+            "description": "Qt5 build using Ninja and vcpkg",
+            "binaryDir": "${sourceDir}/build/qt5-ninja/debug"
+        },
+        {
+            "name": "qt6-vcpkg-ninja-config-debug",
+            "inherits": ["base-vcpkg-qt6","ninja-config-debug"],
+            "description": "Qt6 build using Ninja and vcpkg",
+            "binaryDir": "${sourceDir}/build/qt6-ninja/debug"
+        }
+    ],
+    "buildPresets": [
+        {
+            "name": "qt5-vcpkg-ninja-build",
+			"configurePreset":  "qt5-vcpkg-ninja-config"
+        },
+        {
+            "name": "qt5-vcpkg-ninja-build-debug",
+			"configurePreset":  "qt5-vcpkg-ninja-config-debug"
+        },
+        {
+            "name": "qt5-vcpkg-ninja-build-release",
+			"configurePreset":  "qt5-vcpkg-ninja-config"
+        },
+        {
+            "name": "qt6-vcpkg-ninja-build",
+			"configurePreset":  "qt6-vcpkg-ninja-config"
+        },
+        {
+            "name": "qt6-vcpkg-ninja-build-debug",
+			"configurePreset":  "qt6-vcpkg-ninja-config-debug"
+        },
+        {
+            "name": "qt6-vcpkg-ninja-build-release",
+			"configurePreset":  "qt6-vcpkg-ninja-config"
+        }
+    ],
+    "testPresets": [
+        {
+            "name": "qt5-vcpkg-ninja-test-debug",
+            "configurePreset": "qt5-vcpkg-ninja-config-debug",
+            "description": "Run unit tests for qt5-vcpkg-ninja",
+            "configuration": "Debug",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "qt5-vcpkg-ninja-test-release",
+            "configurePreset": "qt5-vcpkg-ninja-config",
+            "description": "Run unit tests for qt5-vcpkg-ninja",
+            "configuration": "Release",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "qt6-vcpkg-ninja-test-debug",
+            "configurePreset": "qt6-vcpkg-ninja-config-debug",
+            "description": "Run unit tests for qt6-vcpkg-ninja",
+            "configuration": "Debug",
+            "output": { "outputOnFailure": true }
+        },
+        {
+            "name": "qt6-vcpkg-ninja-test-release",
+            "configurePreset": "qt6-vcpkg-ninja-config",
+            "description": "Run unit tests for qt6-vcpkg-ninja",
+            "configuration": "Release",
+            "output": { "outputOnFailure": true }
+        }
+    ],
+    "workflowPresets": [
+        {
+            "name": "qt5-vcpkg-ninja-debug",
+            "steps": [
+                { "type": "configure", "name": "qt5-vcpkg-ninja-config-debug" },
+                { "type": "build", "name": "qt5-vcpkg-ninja-build-debug" },
+                { "type": "test", "name": "qt5-vcpkg-ninja-test-debug" }
+            ]
+        },
+        {
+            "name": "qt5-vcpkg-ninja-release",
+            "steps": [
+                { "type": "configure", "name": "qt5-vcpkg-ninja-config" },
+                { "type": "build", "name": "qt5-vcpkg-ninja-build-release" },
+                { "type": "test", "name": "qt5-vcpkg-ninja-test-release" }
+            ]
+        },
+        {
+            "name": "qt6-vcpkg-ninja-debug",
+            "steps": [
+                { "type": "configure", "name": "qt6-vcpkg-ninja-config-debug" },
+                { "type": "build", "name": "qt6-vcpkg-ninja-build-debug" },
+                { "type": "test", "name": "qt6-vcpkg-ninja-test-debug" }
+            ]
+        },
+        {
+            "name": "qt6-vcpkg-ninja-release",
+            "steps": [
+                { "type": "configure", "name": "qt6-vcpkg-ninja-config" },
+                { "type": "build", "name": "qt6-vcpkg-ninja-build-release" },
+                { "type": "test", "name": "qt6-vcpkg-ninja-test-release" }
+            ]
+        }
+    ]
+}

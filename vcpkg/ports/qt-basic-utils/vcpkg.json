@@ -1,0 +1,59 @@
+{
+  "name": "qt-basic-utils",
+  "version": "3.0.0-git",
+  "description": "Basic utilities for Qt.",
+  "homepage": "https://github.com/drescherjm/QtBasicUtils",
+  "dependencies": [
+    "vcpkg-cmake",
+    "vcpkg-cmake-config",
+    "boost-core",
+	  "boost-multi-index",
+	  "boost-bimap",
+	  "cmake-modules"
+  ],
+  "features": {
+    "qt5": {
+      "description": "Use Qt5",
+      "dependencies": [
+        {
+          "name": "linuxdeployqt",
+          "features": [
+            "qt5"
+          ],
+          "platform": "linux"
+        },
+        "qt5-base",
+        "qt5-tools",
+        {
+          "name": "qxt",
+          "features": [
+            "qt5"
+          ]
+        }
+      ]
+    },
+    "qt6": {
+      "description": "Use Qt6",
+      "dependencies": [
+        {
+          "name": "linuxdeployqt",
+          "features": [
+            "qt6"
+          ],
+          "platform": "linux"
+        },
+        "qtbase",
+        "qttools",
+		"qtscxml",
+        {
+          "name": "qxt",
+          "features": [
+            "qt6"
+          ]
+        }
+      ]
+    }
+  },
+  "default-features": [
+  ]
+}

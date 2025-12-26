@@ -1,0 +1,278 @@
+{
+   "version": 6,
+   "configurePresets": [
+    {
+      "name": "qt5-vcpkg-ninja",
+      "inherits": "base-vcpkg",
+      "generator": "Ninja",
+      "description": "Qt5 build using Ninja and vcpkg",
+      "binaryDir": "${sourceDir}/build/qt5-ninja",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt5",
+        "SELECT_QT_VERSION": "Qt5"
+      }
+    },
+    {
+      "name": "qt5-vcpkg-ninja-asan",
+      "inherits": "qt5-vcpkg-ninja",
+      "description": "Qt5 build with Address + Undefined sanitizers",
+      "binaryDir": "${sourceDir}/build/qt5-ninja-asan",
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "qt5-vcpkg-ninja-clangtidy",
+      "inherits": "qt5-vcpkg-ninja",
+      "description": "Qt5 build with clang-tidy analysis enabled",
+      "binaryDir": "${sourceDir}/build/qt5-ninja-clangtidy",
+      "cacheVariables": {
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-checks=*"
+      }
+    },
+    {
+      "name": "qt5-vcpkg-ninja-cppcheck",
+      "inherits": "qt5-vcpkg-ninja",
+      "description": "Qt5 build with cppcheck analysis enabled",
+      "binaryDir": "${sourceDir}/build/qt5-ninja-cppcheck",
+      "cacheVariables": {
+        "CMAKE_CXX_CPPCHECK": "cppcheck;--enable=all;--inconclusive;--force"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-ninja",
+      "inherits": "base-vcpkg",
+      "generator": "Ninja",
+      "description": "Qt6 build using Ninja and vcpkg",
+      "binaryDir": "${sourceDir}/build/qt6-ninja",
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt6",
+        "SELECT_QT_VERSION": "Qt6"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-ninja-asan",
+      "inherits": "qt6-vcpkg-ninja",
+      "description": "Qt6 build with Address + Undefined sanitizers",
+      "binaryDir": "${sourceDir}/build/qt6-ninja-asan",
+      "cacheVariables": {
+        "CMAKE_C_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_CXX_FLAGS": "-fsanitize=address,undefined -fno-omit-frame-pointer",
+        "CMAKE_LINKER_FLAGS": "-fsanitize=address,undefined"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-ninja-clangtidy",
+      "inherits": "qt6-vcpkg-ninja",
+      "description": "Qt6 build with clang-tidy analysis enabled",
+      "binaryDir": "${sourceDir}/build/qt6-ninja-clangtidy",
+      "cacheVariables": {
+        "CMAKE_CXX_CLANG_TIDY": "clang-tidy;-checks=*"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-ninja-cppcheck",
+      "inherits": "qt6-vcpkg-ninja",
+      "description": "Qt6 build with cppcheck analysis enabled",
+      "binaryDir": "${sourceDir}/build/qt6-ninja-cppcheck",
+      "cacheVariables": {
+        "CMAKE_CXX_CPPCHECK": "cppcheck;--enable=all;--inconclusive;--force"
+      }
+    },
+    {
+      "name": "qt5-vcpkg-vs2019",
+      "inherits": "base-vcpkg",
+      "generator": "Visual Studio 16 2019",
+      "description": "Qt5 build using Visual Studio 2019 and vcpkg",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": { "value": "x64" },
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt5",
+        "SELECT_QT_VERSION": "Qt5"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-vs2019",
+      "inherits": "base-vcpkg",
+      "generator": "Visual Studio 16 2019",
+      "description": "Qt6 build using Visual Studio 2019 and vcpkg",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": { "value": "x64" },
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt6",
+        "SELECT_QT_VERSION": "Qt6"
+      }
+    },
+    {
+      "name": "qt5-vcpkg-vs2022",
+      "inherits": "base-vcpkg",
+      "generator": "Visual Studio 17 2022",
+      "description": "Qt5 build using Visual Studio 2022 and vcpkg",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": { "value": "x64" },
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt5",
+        "SELECT_QT_VERSION": "Qt5"
+      }
+    },
+    {
+      "name": "qt6-vcpkg-vs2022",
+      "inherits": "base-vcpkg",
+      "generator": "Visual Studio 17 2022",
+      "description": "Qt6 build using Visual Studio 2022 and vcpkg",
+      "binaryDir": "${sourceDir}/build",
+      "architecture": { "value": "x64" },
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt6",
+        "SELECT_QT_VERSION": "Qt6"
+      }
+    }
+  ],
+
+  "buildPresets":[
+  {
+    "name": "qt5-vcpkg-ninja",
+    "configurePreset": "qt5-vcpkg-ninja"
+  },
+  {
+    "name": "qt6-vcpkg-ninja",
+    "configurePreset": "qt6-vcpkg-ninja"
+  },
+  {
+	"name": "qt5-vcpkg-vs2022",
+	"configurePreset":  "qt5-vcpkg-vs2022"
+  },
+  {
+	"name": "qt6-vcpkg-vs2022",
+	"configurePreset":  "qt6-vcpkg-vs2022"
+  },
+  {
+	"name": "qt6-vcpkg-vs2022-debug",
+	"configurePreset":  "qt6-vcpkg-vs2022",
+	"configuration": "Debug"
+  },
+  {
+	"name": "qt6-vcpkg-vs2022-release",
+	"configurePreset":  "qt6-vcpkg-vs2022",
+	"configuration": "Release"
+  }
+  ],
+  "testPresets": [
+    {
+      "name": "valgrind-memcheck-qt5",
+      "configurePreset": "qt5-vcpkg-ninja",
+      "description": "Run Qt5 tests under Valgrind memcheck",
+      "execution": { "jobs": 1 },
+      "output": { "outputOnFailure": true },
+      "environment": {
+        "CTEST_MEMORYCHECK_COMMAND": "bash",
+        "CTEST_MEMORYCHECK_COMMAND_OPTIONS": "-c 'ulimit -n 65536 && exec valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 --xml=yes --xml-file=valgrind-qt5-%p.xml'"
+      }
+    },
+    {
+      "name": "valgrind-memcheck-qt6",
+      "configurePreset": "qt6-vcpkg-ninja",
+      "description": "Run Qt6 tests under Valgrind memcheck",
+      "execution": { "jobs": 1 },
+      "output": { "outputOnFailure": true },
+      "environment": {
+        "CTEST_MEMORYCHECK_COMMAND": "bash",
+        "CTEST_MEMORYCHECK_COMMAND_OPTIONS": "-c 'ulimit -n 65536 && exec valgrind --tool=memcheck --leak-check=full --track-origins=yes --error-exitcode=1 --xml=yes --xml-file=valgrind-qt6-%p.xml'"
+      }
+    },
+    {
+      "name": "asan-test-qt5",
+      "configurePreset": "qt5-vcpkg-ninja-asan",
+      "description": "Run Qt5 tests with Address/UBSan",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "asan-test-qt6",
+      "configurePreset": "qt6-vcpkg-ninja-asan",
+      "description": "Run Qt6 tests with Address/UBSan",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clangtidy-test-qt5",
+      "configurePreset": "qt5-vcpkg-ninja-clangtidy",
+      "description": "Qt5 build with clang-tidy checks",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "clangtidy-test-qt6",
+      "configurePreset": "qt6-vcpkg-ninja-clangtidy",
+      "description": "Qt6 build with clang-tidy checks",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "cppcheck-test-qt5",
+      "configurePreset": "qt5-vcpkg-ninja-cppcheck",
+      "description": "Qt5 build with cppcheck checks",
+      "output": { "outputOnFailure": true }
+    },
+    {
+      "name": "cppcheck-test-qt6",
+      "configurePreset": "qt6-vcpkg-ninja-cppcheck",
+      "description": "Qt6 build with cppcheck checks",
+      "output": { "outputOnFailure": true }
+    },
+	{
+	  "name": "qt6-vcpkg-vs2022-debug",
+	  "configurePreset": "qt6-vcpkg-vs2022",
+	  "description": "Run unit tests for qt6-vcpkg-vs2022",
+	  "configuration": "Debug",
+	  "output": { "outputOnFailure": true }
+	},
+	{
+	  "name": "qt6-vcpkg-vs2022-release",
+	  "configurePreset": "qt6-vcpkg-vs2022",
+	  "description": "Run unit tests for qt6-vcpkg-vs2022",
+	  "configuration": "Release",
+	  "output": { "outputOnFailure": true }
+	}
+  ],
+
+  "workflowPresets": [
+    {
+      "name": "analyze-with-valgrind-qt5",
+      "steps": [
+        { "type": "configure", "name": "qt5-vcpkg-ninja" },
+        { "type": "build", "name": "qt5-vcpkg-ninja" },
+        { "type": "test", "name": "valgrind-memcheck-qt5" }
+      ]
+    },
+    {
+      "name": "analyze-with-valgrind-qt6",
+      "steps": [
+        { "type": "configure", "name": "qt6-vcpkg-ninja" },
+        { "type": "build", "name": "qt6-vcpkg-ninja" },
+        { "type": "test", "name": "valgrind-memcheck-qt6" }
+      ]
+    },
+	{
+	   "name": "qt5-vcpkg-vs2022",
+	   "steps": [
+		    { "type": "configure", "name": "qt5-vcpkg-vs2022" },
+			{ "type": "build", "name": "qt5-vcpkg-vs2022" }	
+		]
+	},
+	{
+	   "name": "qt6-vcpkg-vs2022-debug",
+	   "steps": [
+		    { "type": "configure", "name": "qt6-vcpkg-vs2022" },
+			{ "type": "build", "name": "qt6-vcpkg-vs2022-debug" },
+			{ "type": "test", "name": "qt6-vcpkg-vs2022-debug" }
+		]
+	},
+	{
+	   "name": "qt6-vcpkg-vs2022-release",
+	   "steps": [
+		    { "type": "configure", "name": "qt6-vcpkg-vs2022" },
+			{ "type": "build", "name": "qt6-vcpkg-vs2022-release" },
+			{ "type": "test", "name": "qt6-vcpkg-vs2022-release" }
+		]
+	}
+  ]
+}

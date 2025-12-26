@@ -1,0 +1,28 @@
+--- a/libcommon/ParseArgv.c	2025-11-16 21:14:17.554135801 -0500
++++ b/libcommon/ParseArgv.c	2025-11-16 21:22:02.103961916 -0500
+@@ -315,8 +315,11 @@
+          }
+          break;
+       case ARGV_FUNC: {
+-         int (*handlerProc)() =  (int (*)())(uintptr_t)infoPtr->src;
+-		
++//       int (*handlerProc)() =  (int (*)())(uintptr_t)infoPtr->src;
++         /* handler takes (char *dst, char *key, char *arg) */
++         int (*handlerProc)(char *, char *, char *) =
++            (int (*)(char *, char *, char *))(uintptr_t)infoPtr->src;
++
+          if ((*handlerProc)(infoPtr->dst, infoPtr->key,
+                             argv[srcIndex])) {
+             srcIndex += 1;
+@@ -325,7 +328,10 @@
+          break;
+       }
+       case ARGV_GENFUNC: {
+-         int (*handlerProc)() = (int (*)())(uintptr_t)infoPtr->src;
++//      int (*handlerProc)() = (int (*)())(uintptr_t)infoPtr->src;
++        /* handler takes (char *dst, char *key, int argc, char **argv) */
++         int (*handlerProc)(char *, char *, int, char **) =
++            (int (*)(char *, char *, int, char **))(uintptr_t)infoPtr->src;
+ 
+          argc = (*handlerProc)(infoPtr->dst, infoPtr->key,
+                                argc, argv+srcIndex);

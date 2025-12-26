@@ -1,0 +1,21 @@
+{
+   "version": 6,
+   "configurePresets": [
+    {
+      "name": "qt6-vcpkg-ninja",
+      "inherits": "base-vcpkg",
+      "generator": "Ninja",
+      "description": "Qt6 build using Ninja and vcpkg",
+      "binaryDir": "${sourceDir}/build/qt6-ninja",
+      "condition": {
+        "type": "equals",
+        "lhs": "${hostSystemName}",
+        "rhs": "Linux"
+      },
+      "cacheVariables": {
+        "VCPKG_MANIFEST_FEATURES": "qt6",
+        "SELECT_QT_VERSION": "Qt6"
+      }
+    }
+  ]
+}
