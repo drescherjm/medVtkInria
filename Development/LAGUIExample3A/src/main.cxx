@@ -19,7 +19,11 @@
 #include <vtkImageActor.h>
 #include <vtkImageAlgorithm.h>
 #include <vtkSimpleImageToImageFilter.h>
+
+#if VTK_MAJOR_VERSION < 9
 #include <vtkSimpleImageFilterExample.h>
+#endif
+
 #include <vtkImageChangeInformation.h>
 #include <vtkImageConstantPad.h>
 

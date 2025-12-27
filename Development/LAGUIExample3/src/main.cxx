@@ -19,7 +19,11 @@
 #include <vtkImageActor.h>
 #include <vtkImageAlgorithm.h>
 #include <vtkSimpleImageToImageFilter.h>
+
+#if VTK_MAJOR_VERSION < 9
 #include <vtkSimpleImageFilterExample.h>
+#endif
+
 #include "vtkImageAlgorithmFilter.h"
 #include <vtkPNGWriter.h>
 
@@ -184,9 +188,16 @@ lavtkViewImage2D* InitializeView(vtkAlgorithmOutput* pImage, unsigned int orient
 
 vtkAlgorithmOutput* getImageAsAlgorithm(vtkImageData* pImage)
 {
+
+#if VTK_MAJOR_VERSION < 9
 	vtkImageAlgorithm* pSM = vtkSimpleImageFilterExample::New();
 	pSM->SetInformation(pImage->GetInformation());
 	pSM->SetInputData(pImage);
+#else // VTK_MAJOR_VERSION >= 9
+	auto pSM = vtkImageAlgorithmFilter::New();
+	pSM->SetInformation(pImage->GetInformation());
+	pSM->SetInputData(pImage);
+#endif // VTK_MAJOR_VERSION < 9
 
 // 	int extent[6];
 // 

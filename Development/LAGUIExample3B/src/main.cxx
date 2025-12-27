@@ -19,7 +19,7 @@
 #include <vtkImageActor.h>
 #include <vtkImageAlgorithm.h>
 #include <vtkSimpleImageToImageFilter.h>
-#include <vtkSimpleImageFilterExample.h>
+
 #include <vtkImageChangeInformation.h>
 #include <vtkImageConstantPad.h>
 #include <vtkAlgorithmOutput.h>
@@ -342,8 +342,10 @@ int main(int argc, char *argv[])
 
 	vtkSmartPointer<vtkOutputWindow> myOutputWindow = vtkSmartPointer<vtkOutputWindow>::New();
 
-#if VTK_MAJOR_VERSION >= 9
+#if VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION < 2
 	myOutputWindow->SetUseStdErrorForAllMessages(true);
+#elif VTK_MAJOR_VERSION >= 9 && VTK_MINOR_VERSION >= 2
+	myOutputWindow->SetDisplayMode(vtkOutputWindow::ALWAYS_STDERR);
 #endif
 
 	vtkOutputWindow::SetInstance(myOutputWindow);

@@ -5,6 +5,7 @@
   "gdcm", 
   "cmake-modules",
   "cmake-git-versioner",
+  "boost-core",
 	{
 		"name": "vtk",
 		"features": [
