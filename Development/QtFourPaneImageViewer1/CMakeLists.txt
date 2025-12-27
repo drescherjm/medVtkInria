@@ -32,11 +32,13 @@ if (NOT VTK_FOUND)
   return ()
 endif ()
 
-find_package(Qt5 COMPONENTS Widgets)
-if (NOT TARGET Qt5::Widgets)
-  message("Skipping example: ${Qt5_NOT_FOUND_MESSAGE}")
-  return ()
-endif ()
+if (NOT TARGET ${QT}::Widgets) 
+	find_package(Qt5 COMPONENTS Widgets)
+	if (NOT TARGET Qt5::Widgets)
+	  message("Skipping example: ${Qt5_NOT_FOUND_MESSAGE}")
+	  return ()
+	endif ()
+endif()
 
 # Set your files and resources here
 set(Srcs
