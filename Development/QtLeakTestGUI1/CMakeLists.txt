@@ -97,12 +97,12 @@ target_link_libraries(${LOCAL_PROJECT_NAME}
   PRIVATE
     ${VTK_LIBRARIES}
 	VTK::DICOM
-    Qt5::Widgets 
+    ${QT}::Widgets 
 	${TARGET_NAME})
 	
 add_custom_command(TARGET ${LOCAL_PROJECT_NAME} POST_BUILD
   COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_RUNTIME_DLLS:${LOCAL_PROJECT_NAME}> $<TARGET_FILE_DIR:${LOCAL_PROJECT_NAME}>
-  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:Qt5::QWindowsIntegrationPlugin> $<TARGET_FILE_DIR:${LOCAL_PROJECT_NAME}>/platforms
+  COMMAND ${CMAKE_COMMAND} -E copy_if_different $<TARGET_FILE:${QT}::QWindowsIntegrationPlugin> $<TARGET_FILE_DIR:${LOCAL_PROJECT_NAME}>/platforms
   COMMAND_EXPAND_LISTS
   )
 

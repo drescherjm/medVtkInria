@@ -77,7 +77,7 @@ endif()
 	  PRIVATE
 		${VTK_LIBRARIES}
 		VTK::DICOM
-		Qt5::Widgets 
+		${QT}::Widgets 
 		${TARGET_NAME})
 
 	target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE Include)

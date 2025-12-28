@@ -83,8 +83,8 @@ SET(LIBRARY_OUTPUT_PATH
  CACHE PATH "Single output directory for building all libraries."
 )
 
-option(${PROJECT_NAME}_BUILD_TESTS   		"Build tests"   OFF )
-option(${PROJECT_NAME}_BUILD_DEVELOPMENT   	"Build development examples"   OFF )
+option(${PROJECT_NAME}_BUILD_TESTS   		"Build tests"   ON )
+option(${PROJECT_NAME}_BUILD_DEVELOPMENT   	"Build development examples"   ON )
 option(DEBUG_DUMP_EXTRA_INFO "Add additional debug output in debug mode." OFF)
 
 #########################################################################################
@@ -180,6 +180,10 @@ find_package(OpenGL REQUIRED)
   # Widgets
   # Xml
   # )
+    
+if (DEFINED VCPKG_TARGET_TRIPLET)
+	find_package(DICOM REQUIRED)
+endif()
   
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)

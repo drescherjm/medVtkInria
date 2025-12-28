@@ -2,18 +2,19 @@
   "name": "med-vtk-inria",
   "version-string": "4.0",
   "dependencies": [	
-  "gdcm", 
-  "cmake-modules",
-  "cmake-git-versioner",
-  "boost-core",
+	"gdcm", 
+	"cmake-modules",
+	"cmake-git-versioner",
+	"boost-optional",
+	"boost-algorithm",
 	{
 		"name": "vtk",
 		"features": [
-			  "vtk-dicom",
 			  "qt",
 			  "opengl"
 		]
-	}
+	},
+	"vtk-dicom"
   ],
   "features": {
 	  "qt5": {

@@ -54,7 +54,7 @@ add_executable(${LOCAL_PROJECT_NAME}
 target_link_libraries(${LOCAL_PROJECT_NAME} 
   PRIVATE
     ${VTK_LIBRARIES}
-    Qt5::Widgets 
+    ${QT}::Widgets 
 	${TARGET_NAME})
 
 target_include_directories(${LOCAL_PROJECT_NAME} PRIVATE Include)
